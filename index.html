@@ -4283,16 +4283,31 @@
         cancelButtonColor: '#64748b',
         focusConfirm: false,
         didOpen: () => {
+          // 1. Evaluasi Tanggal Lahir -> Usia & Bekerja di Luar Negeri (< 10 thn)
           window.saatTbTglLahirBerubah = () => {
             const valTgl = document.getElementById('tb_tanggal_lahir').value;
             const inpUsia = document.getElementById('tb_display_usia');
+            const selLN = document.getElementById('tb_bekerja_luar_negeri');
             if (valTgl && inpUsia) {
-              inpUsia.value = hitungUsiaTahun(valTgl);
+              const usia = hitungUsiaTahun(valTgl);
+              inpUsia.value = usia;
+
+              if (selLN) {
+                if (usia < 10) {
+                  selLN.value = "4";
+                  selLN.disabled = true;
+                  selLN.classList.add('bg-slate-100', 'cursor-not-allowed');
+                } else {
+                  selLN.disabled = false;
+                  selLN.classList.remove('bg-slate-100', 'cursor-not-allowed');
+                }
+              }
             } else if (inpUsia) {
               inpUsia.value = '';
             }
           };
 
+          // 2. Evaluasi Status Perkawinan -> Usia Kawin Pertama
           window.saatTbPerkawinanBerubah = () => {
             const val = document.getElementById('tb_status_perkawinan').value;
             const wrap = document.getElementById('wrapper_tb_usia_kawin');
@@ -4305,6 +4320,7 @@
             }
           };
 
+          // 3. Evaluasi Hubungan Keluarga -> Kunci Kode Ibu Kandung jika KK / Istri (TETAP DIPERTAHANKAN)
           window.saatTbHubunganBerubah = () => {
             const hub = document.getElementById('tb_hubungan').value;
             const selIbu = document.getElementById('tb_kode_ibu');
@@ -4317,6 +4333,29 @@
               selIbu.classList.remove('bg-slate-100', 'cursor-not-allowed');
             }
           };
+
+          // 4. Evaluasi Kesulitan Fungsional -> Blank & Kunci jika "5. Tidak"
+          window.saatTbDisabilitasBerubah = () => {
+            const valDis = document.getElementById('tb_gangguan_fungsional').value;
+            const selUrus = document.getElementById('tb_kemampuan_mengurus_diri');
+            if (selUrus) {
+              if (valDis === '5') {
+                selUrus.value = '';
+                selUrus.disabled = true;
+                selUrus.classList.add('bg-slate-100', 'cursor-not-allowed');
+              } else {
+                selUrus.disabled = false;
+                selUrus.classList.remove('bg-slate-100', 'cursor-not-allowed');
+              }
+            }
+          };
+
+          // Pasang pemicu onchange & jalankan inisialisasi awal saat modal terbuka
+          document.getElementById('tb_gangguan_fungsional')?.setAttribute('onchange', 'saatTbDisabilitasBerubah()');
+          saatTbTglLahirBerubah();
+          saatTbPerkawinanBerubah();
+          saatTbHubunganBerubah();
+          saatTbDisabilitasBerubah();
         },
         preConfirm: () => {
           const nama = document.getElementById('tb_nama_lengkap')?.value.trim().toUpperCase();
@@ -5246,28 +5285,44 @@
         cancelButtonColor: '#64748b',
         focusConfirm: false,
         didOpen: () => {
+          // 1. Tanggal Lahir -> Hitung Usia & Kunci Bekerja di Luar Negeri (< 10 thn)
           window.saatEdTglLahirBerubah = () => {
             const valTgl = document.getElementById('ed_tanggal_lahir').value;
             const inpUsia = document.getElementById('ed_display_usia');
+            const selLN = document.getElementById('ed_bekerja_luar_negeri');
             if (valTgl && inpUsia) {
-              inpUsia.value = hitungUsiaTahun(valTgl);
+              const usia = hitungUsiaTahun(valTgl);
+              inpUsia.value = usia;
+              
+              if (selLN) {
+                if (usia < 10) {
+                  selLN.value = "4";
+                  selLN.disabled = true;
+                  selLN.classList.add('bg-slate-100', 'cursor-not-allowed');
+                } else {
+                  selLN.disabled = false;
+                  selLN.classList.remove('bg-slate-100', 'cursor-not-allowed');
+                }
+              }
             } else if (inpUsia) {
               inpUsia.value = '';
             }
           };
 
+          // 2. Status Perkawinan -> Usia Kawin Pertama
           window.saatEditPerkawinanBerubah = () => {
             const val = document.getElementById('ed_status_perkawinan').value;
             const wrap = document.getElementById('wrapper_ed_usia_kawin');
             const inp = document.getElementById('ed_usia_kawin_pertama');
-            if (val === '1') {
+            if (!val || val === '1') {
               wrap.classList.add('opacity-40', 'pointer-events-none');
-              inp.value = '';
+              if (inp) inp.value = '';
             } else {
               wrap.classList.remove('opacity-40', 'pointer-events-none');
             }
           };
 
+          // 3. Hubungan Dengan KK -> Kunci Kode Ibu Kandung jika KK atau Istri (TETAP DIPERTAHANKAN)
           window.saatEditHubunganBerubah = () => {
             const hub = document.getElementById('ed_hubungan').value;
             const selIbu = document.getElementById('ed_kode_ibu');
@@ -5281,7 +5336,30 @@
             }
           };
 
-          window.saatEditHubunganBerubah();
+          // 4. Kesulitan Fungsional -> Blank & Kunci jika "5. Tidak"
+          window.saatEditDisabilitasBerubah = () => {
+            const valDis = document.getElementById('ed_gangguan_fungsional').value;
+            const selUrus = document.getElementById('ed_kemampuan_mengurus_diri');
+            if (selUrus) {
+              if (valDis === '5') {
+                selUrus.value = '';
+                selUrus.disabled = true;
+                selUrus.classList.add('bg-slate-100', 'cursor-not-allowed');
+              } else {
+                selUrus.disabled = false;
+                selUrus.classList.remove('bg-slate-100', 'cursor-not-allowed');
+              }
+            }
+          };
+
+          // Pasang pemicu onchange pada elemen select kesulitan fungsional
+          document.getElementById('ed_gangguan_fungsional')?.setAttribute('onchange', 'saatEditDisabilitasBerubah()');
+
+          // Jalankan inisialisasi awal saat modal edit pertama kali dibuka
+          saatEdTglLahirBerubah();
+          saatEditPerkawinanBerubah();
+          saatEditHubunganBerubah();
+          saatEditDisabilitasBerubah();
         },
         preConfirm: () => {
           const nama = document.getElementById('ed_nama_lengkap').value.trim().toUpperCase();
@@ -5289,6 +5367,8 @@
           const tgl = document.getElementById('ed_tanggal_lahir').value;
           const statusKawin = document.getElementById('ed_status_perkawinan').value;
           const usiaKawin = document.getElementById('ed_usia_kawin_pertama').value;
+          const dis = document.getElementById('ed_gangguan_fungsional').value || '5';
+          const usia = tgl ? hitungUsiaTahun(tgl) : 0;
 
           if (!nama || !nik || !tgl) {
             Swal.showValidationMessage('Nama Lengkap, NIK, dan Tanggal Lahir wajib diisi!');
@@ -5317,10 +5397,10 @@
             jenis_pekerjaan: document.getElementById('ed_jenis_pekerjaan').value,
             pendidikan: document.getElementById('ed_pendidikan').value,
             kesertaan_jkn: document.getElementById('ed_kepesertaan_jkn')?.value || '1',
-            bekerja_luar_negeri: document.getElementById('ed_bekerja_luar_negeri').value,
+            bekerja_luar_negeri: usia < 10 ? '4' : document.getElementById('ed_bekerja_luar_negeri').value,
             mutasi_anggota: document.getElementById('ed_mutasi_anggota').value || '0',
-            gangguan_fungsional: document.getElementById('ed_gangguan_fungsional').value || '5',
-            kemampuan_mengurus_diri: document.getElementById('ed_kemampuan_mengurus_diri').value || '4'
+            gangguan_fungsional: dis,
+            kemampuan_mengurus_diri: dis === '5' ? null : (document.getElementById('ed_kemampuan_mengurus_diri').value || null)
           };
         }
       }).then(async (result) => {
@@ -8646,8 +8726,8 @@
         <!-- (4) TANGGAL LAHIR & USIA -->
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-700 font-medium mb-1">Tanggal Lahir *</label>
-            <input type="date" name="tanggal_lahir" required onchange="hitungUsiaAnggota(this, ${no})"
+            <label class="block text-slate-700 font-medium mb-1">Tanggal Lahir *</label>            
+            <input type="date" name="tanggal_lahir" required onchange="hitungUsiaAnggota(this, ${no}); evaluasiAturanOtomatisAnggota(${no});"
                    class="w-full px-2.5 py-2.5 bg-white border border-slate-300 rounded-lg outline-none font-medium text-slate-800 text-xs sm:text-sm focus:border-blue-500" />
           </div>
           <div>
@@ -8775,8 +8855,8 @@
             </select>
           </div>
           <div>
-            <label class="block text-slate-700 font-medium mb-1">Kesulitan Fungsional *</label>
-            <select name="gangguan_fungsional" required class="w-full px-2.5 py-2.5 bg-white border border-slate-300 rounded-lg outline-none text-xs sm:text-sm text-slate-800 focus:border-blue-500">
+            <label class="block text-slate-700 font-medium mb-1">Kesulitan Fungsional *</label>            
+            <select name="gangguan_fungsional" required onchange="evaluasiAturanOtomatisAnggota(${no});" class="w-full px-2.5 py-2.5 bg-white border border-slate-300 rounded-lg outline-none text-xs sm:text-sm text-slate-800 focus:border-blue-500">
               <option value="" selected>-- PILIH --</option>
               <option value="1">1. Fisik</option>
               <option value="2">2. Sensorik</option>
@@ -8842,6 +8922,7 @@
       const selectPerkawinan = hal.querySelector('[name="status_perkawinan"]');
       evaluasiUsiaKawin(selectPerkawinan, no);
       perbaruiSemuaOpsiIbuKandung();
+      evaluasiAturanOtomatisAnggota(no);
 
       if (no === 2) {
         sinkronisasiPasanganKK(1);
@@ -8863,6 +8944,52 @@
         wrapper.classList.remove('opacity-40', 'pointer-events-none');
         if (inputUsia) {
           inputUsia.required = true;
+        }
+      }
+    }
+
+    function evaluasiAturanOtomatisAnggota(noUrut) {
+      const hal = document.getElementById(`hal_anggota_${noUrut}`);
+      if (!hal) return;
+
+      const inpTgl = hal.querySelector('[name="tanggal_lahir"]');
+      const selDisabilitas = hal.querySelector('[name="gangguan_fungsional"]');
+      const selLuarNegeri = hal.querySelector('[name="bekerja_luar_negeri"]');
+      const selUrusDiri = hal.querySelector('[name="kemampuan_mengurus_diri"]');
+
+      // 1. Cek Usia
+      let usia = 99;
+      if (inpTgl && inpTgl.value) {
+        usia = hitungUsiaTahun(inpTgl.value);
+      }
+
+      // ATURAN 1: Usia < 10 tahun -> Bekerja di Luar Negeri = "4. Tidak" & Terkunci
+      if (selLuarNegeri) {
+        if (usia < 10) {
+          selLuarNegeri.value = "4";
+          selLuarNegeri.disabled = true;
+          selLuarNegeri.classList.add('bg-slate-100', 'cursor-not-allowed');
+          selLuarNegeri.classList.remove('bg-white');
+        } else {
+          selLuarNegeri.disabled = false;
+          selLuarNegeri.classList.remove('bg-slate-100', 'cursor-not-allowed');
+          selLuarNegeri.classList.add('bg-white');
+        }
+      }
+
+      // ATURAN 2: Kesulitan Fungsional = "5. Tidak" -> Mengurus Diri Sendiri = Blank & Terkunci
+      if (selDisabilitas && selUrusDiri) {
+        const valDis = String(selDisabilitas.value || '');
+        if (valDis === "5") {
+          selUrusDiri.value = "";
+          selUrusDiri.disabled = true;
+          selUrusDiri.classList.add('bg-slate-100', 'cursor-not-allowed');
+          selUrusDiri.classList.remove('bg-white');
+        } else if (valDis !== "") {
+          // Jika kode 1, 2, 3, 4 (mengalami kesulitan fungsional), buka kuncinya
+          selUrusDiri.disabled = false;
+          selUrusDiri.classList.remove('bg-slate-100', 'cursor-not-allowed');
+          selUrusDiri.classList.add('bg-white');
         }
       }
     }
@@ -9066,8 +9193,12 @@
       if (!didik) daftarBelumSesuai.push('Kolom 13: Pendidikan belum dipilih');
       if (!jkn) daftarBelumSesuai.push('Kolom 14: Kepesertaan JKN belum dipilih');
       if (!disabilitas) daftarBelumSesuai.push('Kolom 15: Kesulitan Fungsional belum dipilih');
-      if (!urusDiri) daftarBelumSesuai.push('Kolom 16: Mengurus Diri Sendiri belum dipilih');
-      if (!luarNegeri) daftarBelumSesuai.push('Kolom 17: Bekerja di Luar Negeri belum dipilih');
+      if (disabilitas !== '5' && !urusDiri) {
+        daftarBelumSesuai.push('Kolom 16: Mengurus Diri Sendiri wajib dipilih untuk penyandang disabilitas');
+      }
+      if (usia >= 10 && !luarNegeri) {
+        daftarBelumSesuai.push('Kolom 17: Bekerja di Luar Negeri belum dipilih');
+      }
       if (mutasi === '') daftarBelumSesuai.push('Kolom 18: Mutasi Anggota belum dipilih');
 
       if (daftarBelumSesuai.length > 0) {
