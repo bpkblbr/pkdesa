@@ -13140,7 +13140,7 @@
         const namaKK = (k.nama_kk || 'TANPA NAMA').toUpperCase();
 
         html += `
-          <div class="bg-amber-50/70 border border-amber-200/90 rounded-2xl p-3 flex items-center justify-between shadow-sm hover:bg-amber-100/60 transition">
+          <div class="bg-slate-50/80 border border-slate-300 rounded-2xl p-3 flex items-center justify-between shadow-sm hover:bg-slate-100 transition">
             <div class="flex items-center gap-2.5 overflow-hidden pr-2">
               <span class="text-slate-400 font-bold text-xs shrink-0">&gt;</span>
               <span class="font-black text-slate-500 text-xs shrink-0">${idx + 1}</span>
@@ -13150,7 +13150,7 @@
               </div>
             </div>
 
-            <!-- Tombol Aksi Kanan: Edit (Hijau) & Hapus (Merah) -->
+            <!-- Tombol Aksi Kanan: Edit & Hapus -->
             <div class="flex items-center gap-1.5 shrink-0">
               <button type="button" onclick="editFormulirKeluargaLengkap('${kodeKel}')" title="Edit Data Lengkap"
                       class="w-8 h-8 rounded-xl bg-emerald-100 hover:bg-emerald-600 text-emerald-800 hover:text-white flex items-center justify-center text-sm font-bold shadow-sm transition active:scale-95">
