@@ -1761,15 +1761,12 @@
           </button>
           <button type="button" id="btnTesting" onclick="isiDataUjiCobaOtomatis()" class="hidden text-xs bg-amber-500 ...">
             ⚡ ISI OTOMATIS (TESTING)
-          </button>
-          <span id="badgeLangkah" class="bg-white/20 text-white text-xs px-3.5 py-1.5 rounded-full font-black uppercase tracking-wider">
-            LANGKAH 1
-          </span>
+          </button>          
+          <span id="badgeLangkah" class="hidden"></span>
         </div>
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
-          <div>
-            <h1 class="text-lg sm:text-2xl font-black uppercase tracking-wide">FORMULIR PENDATAAN KELUARGA</h1>
-            <p class="text-emerald-100 text-xs mt-0.5">Sistem Input Terpadu Registrasi & Potensi Keluarga</p>
+          <div>            
+            <h1 class="text-lg sm:text-2xl font-black uppercase tracking-wide">FORM PENDATAAN</h1>            
           </div>
           <span id="labelTotalTahap" class="text-xs text-emerald-200 font-bold uppercase">
             I. IDENTITAS WILAYAH
@@ -4486,9 +4483,7 @@
 
         // Tampilkan Form
         tampilkanLayar('tampilan_formulir');
-        pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH (MODE EDIT)');
-        const badgeLangkah = document.getElementById('badgeLangkah');
-        if (badgeLangkah) badgeLangkah.innerText = "LANGKAH 1";
+        pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH (MODE EDIT)');        
 
         // 2. Isi Data Wilayah
         const kdProv = String(kel.kode_prov || '52').padStart(2, '0');
@@ -8538,9 +8533,7 @@
 
       if (status === '1' || status === '6') {        
         if (modeEditKeluargaLuar) {
-          pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
-          const badge = document.getElementById('badgeLangkah');
-          if (badge) badge.innerText = "LANGKAH 3 (KB)";
+          pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');          
           indexStepKB = 0;
           riwayatStepKB = [];
           tampilkanStepKB();
@@ -9141,16 +9134,16 @@
     }
 
     function bukaHalamanAnggota(noUrut) {
-      pindahHalamanForm(`hal_anggota_${noUrut}`, `ANGGOTA KELUARGA #${noUrut}`);
+      pindahHalamanForm(`hal_anggota_${noUrut}`, 'II. DATA KELUARGA');
       const badge = document.getElementById('badgeLangkah');
-      if (badge) badge.innerText = `ANGGOTA #${noUrut}`;
+      if (badge) badge.innerText = '';
     }
 
     function mundurDariAnggota(noUrut) {
       if (noUrut === 1) {
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
         const badge = document.getElementById('badgeLangkah');
-        if (badge) badge.innerText = "LANGKAH 1";
+        if (badge) badge.innerText = '';
       } else {
         bukaHalamanAnggota(noUrut - 1);
       }
@@ -9243,7 +9236,7 @@
         } else {
           pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
           const badge = document.getElementById('badgeLangkah');
-          if (badge) badge.innerText = "LANGKAH 3 (KB)";
+          if (badge) badge.innerText = '';
           indexStepKB = 0;
           riwayatStepKB = [];
           tampilkanStepKB();
@@ -11204,8 +11197,12 @@
             hal.id = `hal_anggota_${indexBaru}`;
             hal.setAttribute('data-urutan', indexBaru);
             hal.querySelector('[name="nomor_anggota_keluarga"]').value = indexBaru;
-            hal.querySelector('h2').innerHTML = `II. DATA ANGGOTA KELUARGA (NO. URUT ${indexBaru} DARI <span class="total-anggota-display">${totalHalamanAnggota}</span>)`;
-            hal.querySelector('p').innerText = `LEMBAR ISIAN ANGGOTA KE-${indexBaru}`;
+            hal.querySelector('h2').innerHTML = `Form Keluarga`;
+            const elSub = hal.querySelector('p');
+            if (elSub) elSub.remove();
+            
+            const noAnggotaSpan = hal.querySelector('.text-slate-900');
+            if (noAnggotaSpan) noAnggotaSpan.innerText = indexBaru;
             hal.querySelector('button[onclick*="hapusHalamanAnggota"]').setAttribute('onclick', `hapusHalamanAnggota(${indexBaru})`);
             hal.querySelector('button[onclick*="mundurDariAnggota"]').setAttribute('onclick', `mundurDariAnggota(${indexBaru})`);
             hal.querySelector('button[onclick*="majuDariAnggota"]').setAttribute('onclick', `majuDariAnggota(${indexBaru})`);
