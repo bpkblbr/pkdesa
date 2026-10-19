@@ -8644,13 +8644,21 @@
         }
 
         const sisaHalaman = document.querySelectorAll('.item-anggota-page');
-        if (sisaHalaman.length === 0) {
+        const jumlahSaatIni = sisaHalaman.length;
+
+        if (jumlahSaatIni === 0) {          
           const container = document.getElementById('area_anggota_keluarga');
           container.innerHTML = '';
           totalHalamanAnggota = 0;
           for (let i = 1; i <= jmlAnggota; i++) {
             tambahHalamanAnggotaBaru();
           }
+        } else if (jmlAnggota > jumlahSaatIni) {          
+          const selisih = jmlAnggota - jumlahSaatIni;
+          for (let i = 0; i < selisih; i++) {
+            tambahHalamanAnggotaBaru();
+          }
+          perbaruiSemuaOpsiIbuKandung();
         }
 
         bukaHalamanAnggota(1);
