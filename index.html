@@ -1774,13 +1774,15 @@
           </button>          
           <span id="badgeLangkah" class="hidden"></span>
         </div>
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2">
-          <div>            
-            <h1 class="text-lg sm:text-2xl font-black uppercase tracking-wide">FORM PENDATAAN</h1>            
+        <div class="text-center space-y-1 pt-1">
+          <h1 class="text-lg sm:text-2xl font-black uppercase tracking-wide text-center">
+            FORM PENDATAAN
+          </h1>
+          <div class="flex justify-center items-center">
+            <span id="labelTotalTahap" class="inline-block text-xs text-emerald-200 font-bold uppercase tracking-wider bg-black/10 px-3 py-0.5 rounded-full">
+              I. IDENTITAS WILAYAH
+            </span>
           </div>
-          <span id="labelTotalTahap" class="text-xs text-emerald-200 font-bold uppercase">
-            I. IDENTITAS WILAYAH
-          </span>
         </div>
       </header>
 
@@ -1933,7 +1935,7 @@
         <div id="hal_kb" class="halaman-form space-y-5">
           <div class="flex justify-between items-center border-b pb-2">
             <div>
-              <h2 class="text-sm sm:text-base font-bold text-slate-800">III. Formulir KB</h2>
+              <h2 class="text-sm sm:text-base font-bold text-slate-800">Form KB</h2>
               <p class="text-[11px] text-slate-500">Ditanyakan kepada wanita PUS usia 10–49 tahun</p>
             </div>
             <span id="label_langkah_kb" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
@@ -1964,7 +1966,7 @@
         <div id="hal_pembangunan" class="halaman-form space-y-5">
           <div class="flex justify-between items-center border-b pb-2">
             <div>
-              <h2 class="text-sm sm:text-base font-bold text-slate-800">IV. Pembangunan Keluarga</h2>
+              <h2 class="text-sm sm:text-base font-bold text-slate-800">Pembangunan Keluarga</h2>
               <p class="text-[11px] text-slate-500">Kondisi ketahanan keluarga, perumahan, sanitasi, dan lingkungan</p>
             </div>
             <span id="label_langkah_pk" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
@@ -9223,7 +9225,7 @@
     }
 
     function bukaHalamanAnggota(noUrut) {
-      pindahHalamanForm(`hal_anggota_${noUrut}`, 'II. DATA KELUARGA');
+      pindahHalamanForm(`hal_anggota_${noUrut}`, 'II. DATA INDIVIDU ANGGOTA KELUARGA');
       const badge = document.getElementById('badgeLangkah');
       if (badge) badge.innerText = '';
     }
