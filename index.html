@@ -8767,12 +8767,11 @@
       hal.innerHTML = `
         <!-- Header & Info -->
         <div class="border-b pb-2 flex justify-between items-center">
-          <h2 class="text-base font-bold text-slate-800">Form Keluarga</h2>
-          ${no > 1 ? `
+          <h2 class="text-base font-bold text-slate-800">Form Keluarga</h2>          
           <button type="button" onclick="hapusHalamanAnggota(${no})"
-                  class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
+                  class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
             <span>Hapus Individu</span> 🗑️
-          </button>` : ''}
+          </button>
         </div>
 
         <div class="flex justify-between items-center text-xs font-semibold text-slate-700 pt-1">
@@ -11262,14 +11261,22 @@
     }
 
     function hapusHalamanAnggota(noUrut) {
-      if (totalHalamanAnggota <= 1) {
-        Swal.fire('Perhatian', 'Minimal harus ada 1 anggota keluarga!', 'warning');
+      const sisaHalamanAwal = document.querySelectorAll('.item-anggota-page');
+      if (sisaHalamanAwal.length <= 1) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Tidak Dapat Dihapus',
+          text: 'Minimal harus ada 1 anggota keluarga dalam formulir!',
+          confirmButtonColor: '#0284c7'
+        });
         return;
       }
 
+      const namaTarget = document.getElementById(`hal_anggota_${noUrut}`)?.querySelector('[name="nama_lengkap"]')?.value.trim() || `Anggota #${noUrut}`;
+
       Swal.fire({
         title: 'Konfirmasi Hapus',
-        text: `Yakin ingin menghapus data anggota ke-${noUrut}?`,
+        html: `Apakah Anda yakin ingin menghapus <b>${namaTarget.toUpperCase()}</b>?${noUrut === 1 ? '<br><span class="text-xs text-amber-600 font-semibold">*Anggota berikutnya akan otomatis dipromosikan menjadi Kepala Keluarga.</span>' : ''}`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#e11d48',
@@ -11280,30 +11287,47 @@
         if (result.isConfirmed) {
           const el = document.getElementById(`hal_anggota_${noUrut}`);
           if (el) el.remove();
-
+          
           const sisaHalaman = document.querySelectorAll('.item-anggota-page');
           totalHalamanAnggota = sisaHalaman.length;
-
+          
           sisaHalaman.forEach((hal, idx) => {
             const indexBaru = idx + 1;
             hal.id = `hal_anggota_${indexBaru}`;
             hal.setAttribute('data-urutan', indexBaru);
             hal.querySelector('[name="nomor_anggota_keluarga"]').value = indexBaru;
+            
             hal.querySelector('h2').innerHTML = `Form Keluarga`;
             const elSub = hal.querySelector('p');
             if (elSub) elSub.remove();
             
             const noAnggotaSpan = hal.querySelector('.text-slate-900');
             if (noAnggotaSpan) noAnggotaSpan.innerText = indexBaru;
-            hal.querySelector('button[onclick*="hapusHalamanAnggota"]').setAttribute('onclick', `hapusHalamanAnggota(${indexBaru})`);
-            hal.querySelector('button[onclick*="mundurDariAnggota"]').setAttribute('onclick', `mundurDariAnggota(${indexBaru})`);
-            hal.querySelector('button[onclick*="majuDariAnggota"]').setAttribute('onclick', `majuDariAnggota(${indexBaru})`);
+            
+            const selHub = hal.querySelector('[name="hubungan_dengan_kk"]');
+            if (indexBaru === 1 && selHub) {
+              selHub.value = '1';
+              selHub.disabled = true;
+            }
+            
+            hal.querySelector('button[onclick*="hapusHalamanAnggota"]')?.setAttribute('onclick', `hapusHalamanAnggota(${indexBaru})`);
+            hal.querySelector('button[onclick*="mundurDariAnggota"]')?.setAttribute('onclick', `mundurDariAnggota(${indexBaru})`);
+            hal.querySelector('button[onclick*="majuDariAnggota"]')?.setAttribute('onclick', `majuDariAnggota(${indexBaru})`);
           });
 
           perbaruiLabelTotalAnggota();
           perbaruiSemuaOpsiIbuKandung();
+          
           const targetBuka = noUrut > totalHalamanAnggota ? totalHalamanAnggota : noUrut;
           bukaHalamanAnggota(targetBuka);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil Dihapus',
+            text: 'Data individu telah dihapus dan nomor anggota telah diperbarui.',
+            timer: 1300,
+            showConfirmButton: false
+          });
         }
       });
     }    
