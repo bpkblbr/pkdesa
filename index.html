@@ -4225,7 +4225,7 @@
               </div>
               <div>
                 <label class="block font-bold text-slate-700 uppercase mb-1">Kesulitan Fungsional *</label>
-                <select id="tb_gangguan_fungsional" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
+                <select id="tb_gangguan_fungsional" onchange="saatTbDisabilitasBerubah()" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
                   <option value="">-- PILIH --</option>
                   <option value="1">1. Fisik</option>
                   <option value="2">2. Sensorik</option>
@@ -4283,15 +4283,13 @@
         cancelButtonColor: '#64748b',
         focusConfirm: false,
         didOpen: () => {
-          // 1. Evaluasi Tanggal Lahir -> Usia & Bekerja di Luar Negeri (< 10 thn)
           window.saatTbTglLahirBerubah = () => {
-            const valTgl = document.getElementById('tb_tanggal_lahir').value;
+            const valTgl = document.getElementById('tb_tanggal_lahir')?.value;
             const inpUsia = document.getElementById('tb_display_usia');
             const selLN = document.getElementById('tb_bekerja_luar_negeri');
             if (valTgl && inpUsia) {
               const usia = hitungUsiaTahun(valTgl);
               inpUsia.value = usia;
-
               if (selLN) {
                 if (usia < 10) {
                   selLN.value = "4";
@@ -4302,44 +4300,14 @@
                   selLN.classList.remove('bg-slate-100', 'cursor-not-allowed');
                 }
               }
-            } else if (inpUsia) {
-              inpUsia.value = '';
             }
           };
 
-          // 2. Evaluasi Status Perkawinan -> Usia Kawin Pertama
-          window.saatTbPerkawinanBerubah = () => {
-            const val = document.getElementById('tb_status_perkawinan').value;
-            const wrap = document.getElementById('wrapper_tb_usia_kawin');
-            const inp = document.getElementById('tb_usia_kawin_pertama');
-            if (!val || val === '1') {
-              wrap.classList.add('opacity-40', 'pointer-events-none');
-              if (inp) inp.value = '';
-            } else {
-              wrap.classList.remove('opacity-40', 'pointer-events-none');
-            }
-          };
-
-          // 3. Evaluasi Hubungan Keluarga -> Kunci Kode Ibu Kandung jika KK / Istri (TETAP DIPERTAHANKAN)
-          window.saatTbHubunganBerubah = () => {
-            const hub = document.getElementById('tb_hubungan').value;
-            const selIbu = document.getElementById('tb_kode_ibu');
-            if (hub === '1' || hub === '2') {
-              selIbu.value = '00';
-              selIbu.disabled = true;
-              selIbu.classList.add('bg-slate-100', 'cursor-not-allowed');
-            } else {
-              selIbu.disabled = false;
-              selIbu.classList.remove('bg-slate-100', 'cursor-not-allowed');
-            }
-          };
-
-          // 4. Evaluasi Kesulitan Fungsional -> Blank & Kunci jika "5. Tidak"
           window.saatTbDisabilitasBerubah = () => {
-            const valDis = document.getElementById('tb_gangguan_fungsional').value;
+            const valDis = document.getElementById('tb_gangguan_fungsional')?.value;
             const selUrus = document.getElementById('tb_kemampuan_mengurus_diri');
             if (selUrus) {
-              if (valDis === '5') {
+              if (String(valDis) === '5') {
                 selUrus.value = '';
                 selUrus.disabled = true;
                 selUrus.classList.add('bg-slate-100', 'cursor-not-allowed');
@@ -4350,12 +4318,39 @@
             }
           };
 
-          // Pasang pemicu onchange & jalankan inisialisasi awal saat modal terbuka
-          document.getElementById('tb_gangguan_fungsional')?.setAttribute('onchange', 'saatTbDisabilitasBerubah()');
-          saatTbTglLahirBerubah();
-          saatTbPerkawinanBerubah();
-          saatTbHubunganBerubah();
-          saatTbDisabilitasBerubah();
+          window.saatTbPerkawinanBerubah = () => {
+            const val = document.getElementById('tb_status_perkawinan')?.value;
+            const wrap = document.getElementById('wrapper_tb_usia_kawin');
+            const inp = document.getElementById('tb_usia_kawin_pertama');
+            if (!val || val === '1') {
+              wrap?.classList.add('opacity-40', 'pointer-events-none');
+              if (inp) inp.value = '';
+            } else {
+              wrap?.classList.remove('opacity-40', 'pointer-events-none');
+            }
+          };
+
+          window.saatTbHubunganBerubah = () => {
+            const hub = document.getElementById('tb_hubungan')?.value;
+            const selIbu = document.getElementById('tb_kode_ibu');
+            if (hub === '1' || hub === '2') {
+              if (selIbu) {
+                selIbu.value = '00';
+                selIbu.disabled = true;
+                selIbu.classList.add('bg-slate-100', 'cursor-not-allowed');
+              }
+            } else if (selIbu) {
+              selIbu.disabled = false;
+              selIbu.classList.remove('bg-slate-100', 'cursor-not-allowed');
+            }
+          };
+
+          setTimeout(() => {
+            window.saatTbTglLahirBerubah();
+            window.saatTbDisabilitasBerubah();
+            window.saatTbPerkawinanBerubah();
+            window.saatTbHubunganBerubah();
+          }, 60);
         },
         preConfirm: () => {
           const nama = document.getElementById('tb_nama_lengkap')?.value.trim().toUpperCase();
@@ -4545,13 +4540,17 @@
 
         const containerAnggota = document.getElementById('area_anggota_keluarga');
         containerAnggota.innerHTML = '';
-        totalHalamanAnggota = 0;
+        totalHalamanAnggota = 0; // Reset ke 0
+
+        // Reset antrean anomali agar tidak mencegat saat navigasi edit biasa
+        daftarUrutanAnomali = [];
+        indexAnomaliAktif = 0;
 
         const jmlAng = Math.max(rawAnggota.length, 1);
         document.getElementById('jumlah_anggota_input').value = jmlAng;
 
         for (let i = 1; i <= jmlAng; i++) {
-          tambahHalamanAnggotaBaru();
+          tambahHalamanAnggotaBaru(); // Di dalam fungsi ini totalHalamanAnggota bertambah otomatis
           const dAng = rawAnggota[i - 1];
           if (dAng) {
             const hAng = document.getElementById(`hal_anggota_${i}`);
@@ -4579,9 +4578,16 @@
               hAng.querySelector('[name="kemampuan_mengurus_diri"]').value = String(dAng.kemampuan_mengurus_diri || '4');
               hAng.querySelector('[name="bekerja_luar_negeri"]').value = String(dAng.bekerja_luar_negeri || '4');
               hAng.querySelector('[name="mutasi_anggota"]').value = String(dAng.mutasi_anggota || '0');
+
+              // Jalankan aturan otomatis untuk mengunci kolom sesuai data yang dimuat
+              evaluasiAturanOtomatisAnggota(i);
             }
           }
         }
+
+        // Pastikan totalHalamanAnggota terdaftar persis dengan jumlah elemen yang terbuat
+        totalHalamanAnggota = document.querySelectorAll('.item-anggota-page').length;
+        perbaruiLabelTotalAnggota();
 
         perbaruiSemuaOpsiIbuKandung();
         rawAnggota.forEach((ang, idx) => {
@@ -5229,7 +5235,7 @@
               </div>
               <div>
                 <label class="block font-bold text-slate-700 uppercase mb-1">Kesulitan Fungsional</label>
-                <select id="ed_gangguan_fungsional" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
+                <select id="ed_gangguan_fungsional" onchange="saatEditDisabilitasBerubah()" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
                   <option value="5" ${String(targetAnggota.gangguan_fungsional) === '5' ? 'selected' : ''}>5. Tidak</option>
                   <option value="1" ${String(targetAnggota.gangguan_fungsional) === '1' ? 'selected' : ''}>1. Fisik</option>
                   <option value="2" ${String(targetAnggota.gangguan_fungsional) === '2' ? 'selected' : ''}>2. Sensorik</option>
@@ -5285,15 +5291,14 @@
         cancelButtonColor: '#64748b',
         focusConfirm: false,
         didOpen: () => {
-          // 1. Tanggal Lahir -> Hitung Usia & Kunci Bekerja di Luar Negeri (< 10 thn)
           window.saatEdTglLahirBerubah = () => {
-            const valTgl = document.getElementById('ed_tanggal_lahir').value;
+            const valTgl = document.getElementById('ed_tanggal_lahir')?.value;
             const inpUsia = document.getElementById('ed_display_usia');
             const selLN = document.getElementById('ed_bekerja_luar_negeri');
             if (valTgl && inpUsia) {
               const usia = hitungUsiaTahun(valTgl);
               inpUsia.value = usia;
-              
+
               if (selLN) {
                 if (usia < 10) {
                   selLN.value = "4";
@@ -5304,44 +5309,14 @@
                   selLN.classList.remove('bg-slate-100', 'cursor-not-allowed');
                 }
               }
-            } else if (inpUsia) {
-              inpUsia.value = '';
             }
           };
 
-          // 2. Status Perkawinan -> Usia Kawin Pertama
-          window.saatEditPerkawinanBerubah = () => {
-            const val = document.getElementById('ed_status_perkawinan').value;
-            const wrap = document.getElementById('wrapper_ed_usia_kawin');
-            const inp = document.getElementById('ed_usia_kawin_pertama');
-            if (!val || val === '1') {
-              wrap.classList.add('opacity-40', 'pointer-events-none');
-              if (inp) inp.value = '';
-            } else {
-              wrap.classList.remove('opacity-40', 'pointer-events-none');
-            }
-          };
-
-          // 3. Hubungan Dengan KK -> Kunci Kode Ibu Kandung jika KK atau Istri (TETAP DIPERTAHANKAN)
-          window.saatEditHubunganBerubah = () => {
-            const hub = document.getElementById('ed_hubungan').value;
-            const selIbu = document.getElementById('ed_kode_ibu');
-            if (hub === '1' || hub === '2') {
-              selIbu.value = '00';
-              selIbu.disabled = true;
-              selIbu.classList.add('bg-slate-100', 'cursor-not-allowed');
-            } else {
-              selIbu.disabled = false;
-              selIbu.classList.remove('bg-slate-100', 'cursor-not-allowed');
-            }
-          };
-
-          // 4. Kesulitan Fungsional -> Blank & Kunci jika "5. Tidak"
           window.saatEditDisabilitasBerubah = () => {
-            const valDis = document.getElementById('ed_gangguan_fungsional').value;
+            const valDis = document.getElementById('ed_gangguan_fungsional')?.value;
             const selUrus = document.getElementById('ed_kemampuan_mengurus_diri');
             if (selUrus) {
-              if (valDis === '5') {
+              if (String(valDis) === '5') {
                 selUrus.value = '';
                 selUrus.disabled = true;
                 selUrus.classList.add('bg-slate-100', 'cursor-not-allowed');
@@ -5352,14 +5327,39 @@
             }
           };
 
-          // Pasang pemicu onchange pada elemen select kesulitan fungsional
-          document.getElementById('ed_gangguan_fungsional')?.setAttribute('onchange', 'saatEditDisabilitasBerubah()');
+          window.saatEditPerkawinanBerubah = () => {
+            const val = document.getElementById('ed_status_perkawinan')?.value;
+            const wrap = document.getElementById('wrapper_ed_usia_kawin');
+            const inp = document.getElementById('ed_usia_kawin_pertama');
+            if (!val || val === '1') {
+              wrap?.classList.add('opacity-40', 'pointer-events-none');
+              if (inp) inp.value = '';
+            } else {
+              wrap?.classList.remove('opacity-40', 'pointer-events-none');
+            }
+          };
 
-          // Jalankan inisialisasi awal saat modal edit pertama kali dibuka
-          saatEdTglLahirBerubah();
-          saatEditPerkawinanBerubah();
-          saatEditHubunganBerubah();
-          saatEditDisabilitasBerubah();
+          window.saatEditHubunganBerubah = () => {
+            const hub = document.getElementById('ed_hubungan')?.value;
+            const selIbu = document.getElementById('ed_kode_ibu');
+            if (hub === '1' || hub === '2') {
+              if (selIbu) {
+                selIbu.value = '00';
+                selIbu.disabled = true;
+                selIbu.classList.add('bg-slate-100', 'cursor-not-allowed');
+              }
+            } else if (selIbu) {
+              selIbu.disabled = false;
+              selIbu.classList.remove('bg-slate-100', 'cursor-not-allowed');
+            }
+          };
+
+          setTimeout(() => {
+            window.saatEdTglLahirBerubah();
+            window.saatEditDisabilitasBerubah();
+            window.saatEditPerkawinanBerubah();
+            window.saatEditHubunganBerubah();
+          }, 60);
         },
         preConfirm: () => {
           const nama = document.getElementById('ed_nama_lengkap').value.trim().toUpperCase();
@@ -9167,8 +9167,8 @@
       const statusKawin = pageEl.querySelector('[name="status_perkawinan"]')?.value || '';
       const usiaKawin = pageEl.querySelector('[name="usia_kawin_pertama"]')?.value || '';
       const akta = pageEl.querySelector('[name="memiliki_akta_lahir"]')?.value || '';
-      const hub = pageEl.querySelector('[name="hubungan_dengan_kk"]')?.value || '';
-      const kodeIbu = pageEl.querySelector('[name="kode_ibu_kandung"]')?.value || '';
+      const hub = (noUrut === 1) ? '1' : (pageEl.querySelector('[name="hubungan_dengan_kk"]')?.value || '');
+      const kodeIbu = pageEl.querySelector('[name="kode_ibu_kandung"]')?.value || '00';
       const agama = pageEl.querySelector('[name="agama"]')?.value || '';
       const kerja = pageEl.querySelector('[name="jenis_pekerjaan"]')?.value || '';
       const didik = pageEl.querySelector('[name="pendidikan"]')?.value || '';
@@ -9176,116 +9176,79 @@
       const disabilitas = pageEl.querySelector('[name="gangguan_fungsional"]')?.value || '';
       const urusDiri = pageEl.querySelector('[name="kemampuan_mengurus_diri"]')?.value || '';
       const luarNegeri = pageEl.querySelector('[name="bekerja_luar_negeri"]')?.value || '';
-      const mutasi = pageEl.querySelector('[name="mutasi_anggota"]')?.value || '';
+      const mutasi = pageEl.querySelector('[name="mutasi_anggota"]')?.value || '0';
+
+      const usia = tgl ? hitungUsiaTahun(tgl) : 0;
 
       const daftarBelumSesuai = [];
-      if (!nama) daftarBelumSesuai.push('Kolom 2: Nama Lengkap belum diisi');
-      if (!nik || nik.length !== 16) daftarBelumSesuai.push('Kolom 2: NIK harus 16 digit');
-      if (!jk) daftarBelumSesuai.push('Kolom 3: Jenis Kelamin belum dipilih');
-      if (!tgl) daftarBelumSesuai.push('Kolom 4: Tanggal Lahir belum diisi');
-      if (!statusKawin) daftarBelumSesuai.push('Kolom 5: Status Perkawinan belum dipilih');
-      if (['2', '3', '4', '5', '6'].includes(statusKawin) && !usiaKawin) daftarBelumSesuai.push('Kolom 6: Usia Kawin Pertama belum diisi');
-      if (!akta) daftarBelumSesuai.push('Kolom 7: Memiliki Akta Lahir belum dipilih');
-      if (!hub) daftarBelumSesuai.push('Kolom 8: Hubungan Dengan KK belum dipilih');
-      if (!kodeIbu) daftarBelumSesuai.push('Kolom 9: Kode Ibu Kandung belum dipilih');
-      if (!agama) daftarBelumSesuai.push('Kolom 10: Agama belum dipilih');
-      if (!kerja) daftarBelumSesuai.push('Kolom 11: Jenis Pekerjaan belum dipilih');
-      if (!didik) daftarBelumSesuai.push('Kolom 13: Pendidikan belum dipilih');
-      if (!jkn) daftarBelumSesuai.push('Kolom 14: Kepesertaan JKN belum dipilih');
-      if (!disabilitas) daftarBelumSesuai.push('Kolom 15: Kesulitan Fungsional belum dipilih');
-      if (disabilitas !== '5' && !urusDiri) {
-        daftarBelumSesuai.push('Kolom 16: Mengurus Diri Sendiri wajib dipilih untuk penyandang disabilitas');
+      if (!nama) daftarBelumSesuai.push('Nama Lengkap belum diisi');
+      if (!nik || nik.length !== 16) daftarBelumSesuai.push('NIK harus 16 digit');
+      if (!jk) daftarBelumSesuai.push('Jenis Kelamin belum dipilih');
+      if (!tgl) daftarBelumSesuai.push('Tanggal Lahir belum diisi');
+      if (!statusKawin) daftarBelumSesuai.push('Status Perkawinan belum dipilih');
+      if (['2', '3', '4', '5', '6'].includes(statusKawin) && !usiaKawin) daftarBelumSesuai.push('Usia Kawin Pertama belum diisi');
+      if (!akta) daftarBelumSesuai.push('Memiliki Akta Lahir belum dipilih');
+      if (!hub) daftarBelumSesuai.push('Hubungan Dengan KK belum dipilih');
+      if (!agama) daftarBelumSesuai.push('Agama belum dipilih');
+      if (!kerja) daftarBelumSesuai.push('Jenis Pekerjaan belum dipilih');
+      if (!didik) daftarBelumSesuai.push('Pendidikan belum dipilih');
+      if (!jkn) daftarBelumSesuai.push('Kepesertaan JKN belum dipilih');
+      if (!disabilitas) daftarBelumSesuai.push('Kesulitan Fungsional belum dipilih');
+
+      // Validasi khusus: Kolom 16 hanya wajib jika kesulitan fungsional BUKAN kode 5 (Tidak)
+      if (disabilitas && disabilitas !== '5' && !urusDiri) {
+        daftarBelumSesuai.push('Kemampuan Mengurus Diri Sendiri wajib dipilih');
       }
+
+      // Kolom 17 hanya wajib jika usia >= 10 tahun
       if (usia >= 10 && !luarNegeri) {
-        daftarBelumSesuai.push('Kolom 17: Bekerja di Luar Negeri belum dipilih');
+        daftarBelumSesuai.push('Bekerja di Luar Negeri belum dipilih');
       }
-      if (mutasi === '') daftarBelumSesuai.push('Kolom 18: Mutasi Anggota belum dipilih');
 
       if (daftarBelumSesuai.length > 0) {
         Swal.fire({
           icon: 'warning',
-          title: 'Isian Belum Lengkap',
+          title: `Anggota #${noUrut} Belum Lengkap`,
           html: `<ul class="list-disc pl-5 text-xs text-left">${daftarBelumSesuai.map(d => `<li>${d}</li>`).join('')}</ul>`,
           confirmButtonColor: '#0284c7'
         });
         return;
       }
-      
-      if (daftarUrutanAnomali.length > 0) {
-        // Ambil data terbaru anggota saat ini untuk mengecek apakah masih anomali
-        const dataAnggotaSekarang = {
-          nama_lengkap: nama,
-          nik: nik,
-          jenis_kelamin: jk,
-          tanggal_lahir: tgl,
-          status_perkawinan: statusKawin,
-          hubungan_dengan_kk: hub,
-          jenis_pekerjaan: kerja,
-          pendidikan: didik
-        };
 
-        const anomaliSisa = deteksiAnomaliAnggota(dataAnggotaSekarang);
-        if (anomaliSisa.length === 0) {
-          // Jika individu ini sudah tidak anomali, hapus dari antrean
-          daftarUrutanAnomali = daftarUrutanAnomali.filter(num => num !== noUrut);
-        } else {
-          // Jika masih anomali, geser index ke anggota berikutnya di antrean
-          indexAnomaliAktif++;
-        }
-        
-        if (daftarUrutanAnomali.length === 0) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Semua Anomali Berhasil Diperbaiki!',
-            text: 'Data individu telah valid. Dialihkan kembali ke form pratinjau.',
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            bukaHalamanReview();
-          });
-          return;
-        }
+      perbaruiSemuaOpsiIbuKandung();
 
-        // Jika masih ada anomali lain yang tersisa, arahkan ke individu berikutnya
-        if (indexAnomaliAktif >= daftarUrutanAnomali.length) {
-          indexAnomaliAktif = 0; // Ulangi ke anomali yang belum selesai
-        }
+      // Cek jumlah total halaman yang ada di DOM saat ini
+      const totalHalamanSaatIni = document.querySelectorAll('.item-anggota-page').length;
 
-        const noUrutTarget = daftarUrutanAnomali[indexAnomaliAktif];
-        bukaHalamanAnggota(noUrutTarget);
-
-        Swal.fire({
-          icon: 'info',
-          title: `Pemeriksaan Anomali (${indexAnomaliAktif + 1} dari ${daftarUrutanAnomali.length})`,
-          text: `Mengarahkan ke Anggota #${noUrutTarget}.`,
-          timer: 1500,
-          showConfirmButton: false
-        });
+      // JIKA MASIH ADA ANGGOTA BERIKUTNYA: Langsung buka
+      if (noUrut < totalHalamanSaatIni) {
+        bukaHalamanAnggota(noUrut + 1);
+        evaluasiAturanOtomatisAnggota(noUrut + 1);
         return;
       }
-      
-      if (noUrut === totalHalamanAnggota) {
-        Swal.fire({
-          title: '<div class="text-base sm:text-lg font-black text-slate-800 uppercase">Tambah Data Individu</div>',
-          html: '<p class="text-xs sm:text-sm text-slate-600 font-medium">Apakah anda akan melakukan tambah data individu?</p>',
-          showCancelButton: true,
-          confirmButtonText: '👤+ Ya, Tambah Individu',
-          cancelButtonText: 'Tidak, Lanjut ke Blok KB →',
-          confirmButtonColor: '#48bb78',
-          cancelButtonColor: '#0284c7'
-        }).then((res) => {
-          if (res.isConfirmed) {
-            tambahHalamanAnggotaBaru();
-            bukaHalamanAnggota(totalHalamanAnggota);
-          } else {
-            pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
-            const badge = document.getElementById('badgeLangkah');
-            if (badge) badge.innerText = "LANGKAH 3";
-          }
-        });
-      } else {
-        bukaHalamanAnggota(noUrut + 1);
-      }
+
+      // JIKA DI ANGGOTA TERAKHIR: Tanyakan tambah anggota baru atau lanjut ke KB
+      Swal.fire({
+        title: '<div class="text-base sm:text-lg font-black text-slate-800 uppercase">Tambah Data Individu?</div>',
+        html: '<p class="text-xs sm:text-sm text-slate-600 font-medium">Apakah Anda ingin menambah anggota keluarga lagi?</p>',
+        showCancelButton: true,
+        confirmButtonText: '👤+ Ya, Tambah Anggota',
+        cancelButtonText: 'Tidak, Lanjut ke Blok KB →',
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#0284c7'
+      }).then((res) => {
+        if (res.isConfirmed) {
+          tambahHalamanAnggotaBaru();
+          bukaHalamanAnggota(document.querySelectorAll('.item-anggota-page').length);
+        } else {
+          pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
+          const badge = document.getElementById('badgeLangkah');
+          if (badge) badge.innerText = "LANGKAH 3 (KB)";
+          indexStepKB = 0;
+          riwayatStepKB = [];
+          tampilkanStepKB();
+        }
+      });
     }
 
     // ========================================================
