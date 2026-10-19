@@ -161,169 +161,279 @@
 
   <!-- ========================================================
        2. HALAMAN DASHBOARD UTAMA
-       ======================================================== -->
-  <div id="tampilan_dashboard" class="halaman-tampilan max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-    <header class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:px-6 sm:py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-xl flex-shrink-0">
-          👋
-        </div>
-        <div>
-          <p class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">Selamat Datang,</p>
-          <div class="flex items-center gap-2">
-            <h2 id="userNameDisplay" class="text-sm sm:text-base font-black text-slate-800 uppercase">SUPER ADMINISTRATOR</h2>
-            <span id="roleBadge" class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">SUPER ADMIN</span>
-            <!-- TAMBAHKAN BADGE INI: -->
-            <span id="badgeStatusKoneksi" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800">
-              🟢 Online
-            </span>
-            <button type="button" onclick="picuSinkronisasiManual()" 
-                    class="px-2 py-0.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-full text-[10px] font-bold uppercase transition flex items-center gap-1 shadow-sm active:scale-95">
-              🔄 Sinkronkan
-            </button>
+       ======================================================== -->  
+  <div id="tampilan_dashboard" class="halaman-tampilan min-h-screen bg-[#F6F7FB] text-slate-700">
+    
+    <!-- 1. TOP NAVBAR DENGAN GRADASI KHAS ADMINTY -->
+    <header class="bg-gradient-to-r from-[#404E67] via-[#455A64] to-[#2C3E50] text-white shadow-md sticky top-0 z-40">
+      <div class="flex items-center justify-between px-4 sm:px-6 h-16">
+        
+        <!-- Brand & Toggle Sidebar -->
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2.5">
+            <img src="https://raw.githubusercontent.com/bpkblbr/pdptpk/refs/heads/main/Logo3.png" alt="Logo" class="h-9 w-auto object-contain drop-shadow" />
+            <span class="font-black text-sm tracking-widest uppercase text-white truncate">ADMINTY DESA</span>
           </div>
-        </div>
-      </div>
-      <button onclick="prosesLogout()" class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-sm transition uppercase">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        <span>Logout</span>
-      </button>
-    </header>
-
-    <div class="text-center py-2 sm:py-4 space-y-1">
-      <h1 class="text-xl sm:text-2xl lg:text-3xl font-black text-slate-800 uppercase tracking-wide">APLIKASI PENDATAAN KELUARGA</h1>
-      <p class="text-xs sm:text-sm text-slate-500 font-medium max-w-2xl mx-auto">Kelola pendataan keluarga terpadu, rekapitulasi capaian KB, dan pemantauan sasaran lapangan</p>
-    </div>
-
-    <div class="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
-      <button id="btnPillKelolaWilayah" onclick="bukaKelolaWilayah()" class="px-3.5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-full text-xs font-bold shadow-sm transition uppercase flex items-center gap-1.5">
-        📍 KELOLA WILAYAH
-      </button>
-      <button onclick="navigasiKe('kelola_login')" class="px-3.5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full text-xs font-bold shadow-sm transition uppercase flex items-center gap-1.5">
-        🔑 KELOLA USER
-      </button>
-      <button type="button" onclick="bukaModalKelolaExcelKeluarga()" 
-              class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-full text-xs font-bold shadow-sm transition uppercase flex items-center gap-1.5">
-        📊 KELOLA DATA KELUARGA
-      </button>
-      <button type="button" onclick="auditNikIstriGandaKeluarga()" 
-              class="px-4 py-2 bg-rose-700 hover:bg-rose-800 text-white rounded-full text-xs font-bold shadow-sm transition uppercase flex items-center gap-1.5">
-        🔍 AUDIT NIK ISTRI GANDA
-      </button>
-    </div>
-
-    <!-- Modal Kelola Excel Keluarga (Download Terisi & Upload) -->
-    <div id="modalKelolaExcelKeluarga" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 space-y-5">
-        <div class="flex justify-between items-center border-b pb-3">
-          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide">Kelola Berkas Excel Data Keluarga</h3>
-          <button onclick="tutupModalKelolaExcelKeluarga()" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
-        </div>
-
-        <!-- Panel 1: Download Template Kosong & Data Terisi -->
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 text-xs">
-          <div class="flex justify-between items-center">
-            <span class="font-bold text-slate-700 uppercase">1. Unduh Format Excel</span>
-            <button type="button" onclick="downloadTemplateExcelKeluarga()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold uppercase text-[11px] transition">
-              📥 Template Kosong
-            </button>
-          </div>
-          
-          <div class="border-t border-slate-200 pt-3 space-y-2">
-            <p class="font-bold text-emerald-800 uppercase">Unduh Data Terisi Sesuai Wilayah:</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <select id="dl_kel_kecamatan" onchange="saatDlKecamatanBerubah()" class="p-2 border rounded-lg bg-white outline-none">
-                <option value="">-- SEMUA KECAMATAN --</option>
-              </select>
-              <select id="dl_kel_desa" class="p-2 border rounded-lg bg-white outline-none">
-                <option value="">-- SEMUA DESA --</option>
-              </select>
-            </div>
-            <button type="button" onclick="downloadExcelKeluargaTerisi()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold uppercase transition">
-              📥 Unduh Data Terisi (.xlsx)
-            </button>
-          </div>
-        </div>
-
-        <!-- Panel 2: Form Upload Excel -->
-        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 text-xs">
-          <span class="font-bold text-slate-700 uppercase block">2. Unggah Data Excel ke Database</span>
-          <input type="file" id="inputBerkasExcelKeluarga" accept=".xlsx, .xls" class="w-full p-2 border rounded-lg bg-white" />
-          <button type="button" id="btnUploadExcelKeluarga" onclick="eksekusiUploadExcelKeluarga()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold uppercase transition">
-            🚀 Upload ke Database
+          <button type="button" onclick="toggleSidebarAdminty()" class="p-1.5 hover:bg-white/10 rounded-lg transition text-slate-200" title="Toggle Menu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
           </button>
         </div>
+
+        <!-- Profil & Aksi Kanan -->
+        <div class="flex items-center gap-3">
+          <span id="badgeStatusKoneksi" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500 text-white shadow-sm">
+            🟢 Online
+          </span>
+          <button type="button" onclick="picuSinkronisasiManual()" class="px-2.5 py-1 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-lg text-[10px] font-bold uppercase transition flex items-center gap-1 shadow-sm backdrop-blur-sm border border-white/20">
+            🔄 Sinkronkan
+          </button>
+          
+          <div class="h-6 w-px bg-white/20 mx-1"></div>
+
+          <!-- User Dropdown Area -->
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-emerald-400 text-slate-900 font-black text-xs flex items-center justify-center shadow">
+              AD
+            </div>
+            <div class="hidden sm:block text-left leading-tight">
+              <span id="userNameDisplay" class="text-xs font-black uppercase text-white block">SUPER ADMINISTRATOR</span>
+              <span id="roleBadge" class="text-[9.5px] font-semibold text-slate-300 uppercase">SUPER ADMIN</span>
+            </div>
+            <button type="button" onclick="prosesLogout()" title="Keluar Sesi" class="ml-1 p-1.5 bg-rose-500/80 hover:bg-rose-600 active:scale-95 text-white rounded-lg transition text-xs font-bold shadow-sm">
+              🚪
+            </button>
+          </div>
+        </div>
+
       </div>
+    </header>
+
+    <div class="flex min-h-[calc(100vh-4rem)]">
+      
+      <!-- 2. SIDEBAR KIRI BERSIH & TERANG (ADMINTY LIGHT SIDEBAR) -->
+      <aside id="adminty_sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 shadow-sm">
+        <div class="py-3">
+          
+          <div class="px-5 py-2">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Navigasi Utama</p>
+          </div>
+
+          <nav class="space-y-0.5 text-xs font-semibold px-2">
+            <a href="javascript:void(0)" onclick="bukaFormulirPendataan()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#4099ff] hover:bg-blue-50/80 border-l-4 border-transparent hover:border-[#4099ff] transition group">
+              <span class="w-5 text-center text-base text-blue-500 group-hover:scale-110 transition">📝</span>
+              <span class="font-bold">Input Data Keluarga</span>
+            </a>
+            
+            <a href="javascript:void(0)" onclick="bukaHalamanRekapitulasi()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#2ed8b6] hover:bg-teal-50/80 border-l-4 border-transparent hover:border-[#2ed8b6] transition group">
+              <span class="w-5 text-center text-base text-teal-500 group-hover:scale-110 transition">📊</span>
+              <span class="font-bold">Rekapitulasi Capaian</span>
+            </a>
+            
+            <a href="javascript:void(0)" onclick="bukaHalamanCariEdit()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#00bcd4] hover:bg-cyan-50/80 border-l-4 border-transparent hover:border-[#00bcd4] transition group">
+              <span class="w-5 text-center text-base text-cyan-500 group-hover:scale-110 transition">🔍</span>
+              <span class="font-bold">Cari & Edit Sasaran</span>
+            </a>
+            
+            <a href="javascript:void(0)" onclick="bukaHalamanBNBA()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#FFB64D] hover:bg-amber-50/80 border-l-4 border-transparent hover:border-[#FFB64D] transition group">
+              <span class="w-5 text-center text-base text-amber-500 group-hover:scale-110 transition">📋</span>
+              <span class="font-bold">Data By Name Address</span>
+            </a>
+
+            <div class="pt-4 px-3.5 pb-1">
+              <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master & Database</p>
+            </div>
+            
+            <a href="javascript:void(0)" id="sideBtnWilayah" onclick="bukaKelolaWilayah()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#4099ff] hover:bg-blue-50/80 border-l-4 border-transparent hover:border-[#4099ff] transition group">
+              <span class="w-5 text-center text-base text-indigo-500 group-hover:scale-110 transition">📍</span>
+              <span class="font-bold">Master Wilayah</span>
+            </a>
+            
+            <a href="javascript:void(0)" onclick="navigasiKe('kelola_login')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#FF5370] hover:bg-rose-50/80 border-l-4 border-transparent hover:border-[#FF5370] transition group">
+              <span class="w-5 text-center text-base text-rose-500 group-hover:scale-110 transition">🔑</span>
+              <span class="font-bold">Manajemen User</span>
+            </a>
+            
+            <a href="javascript:void(0)" onclick="bukaModalKelolaExcelKeluarga()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#2ed8b6] hover:bg-emerald-50/80 border-l-4 border-transparent hover:border-[#2ed8b6] transition group">
+              <span class="w-5 text-center text-base text-emerald-500 group-hover:scale-110 transition">📁</span>
+              <span class="font-bold">Import / Ekspor Excel</span>
+            </a>
+            
+            <a href="javascript:void(0)" onclick="auditNikIstriGandaKeluarga()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#FF5370] hover:bg-rose-50/80 border-l-4 border-transparent hover:border-[#FF5370] transition group">
+              <span class="w-5 text-center text-base text-red-500 group-hover:scale-110 transition">🔍</span>
+              <span class="font-bold">Audit NIK Istri Ganda</span>
+            </a>
+          </nav>
+        </div>
+
+        <!-- Sidebar Bawah -->
+        <div class="p-3 bg-slate-50 border-t border-slate-200 text-center">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Aplikasi Pendataan 2026</p>
+        </div>
+      </aside>
+
+      <!-- 3. KONTEN AREA UTAMA -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
+        
+        <!-- BREADCRUMB / PAGE TITLE GAYA ADMINTY -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 pb-1">
+          <div>
+            <h1 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-wide">Dashboard Ringkasan Eksekutif</h1>
+            <p class="text-xs text-slate-500 font-medium">Pemantauan data registrasi keluarga, pasangan usia subur, dan indikator KB</p>
+          </div>
+          <div class="flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+            <span>🏠 Home</span>
+            <span>/</span>
+            <span class="text-indigo-600">Dashboard</span>
+          </div>
+        </div>
+
+        <!-- 4. KARTU GRADASI METRIK UTAMA KHAS ADMINTY (4 WARNA CIRI KHAS) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 text-white">
+          
+          <!-- Card 1: Biru Adminty (#4099ff -> #73b4ff) -->
+          <div class="bg-gradient-to-r from-[#4099ff] to-[#73b4ff] p-5 rounded-2xl shadow-lg relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-xs font-bold text-blue-100 uppercase tracking-wider">Total Keluarga</p>
+                <h3 id="tile_total_kk" class="text-3xl font-black mt-1">0</h3>
+                <span class="text-[10px] text-blue-100/90 font-medium">Kepala Keluarga Terdata</span>
+              </div>
+              <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">
+                👥
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Hijau Teal Adminty (#2ed8b6 -> #59e0c5) -->
+          <div class="bg-gradient-to-r from-[#2ed8b6] to-[#59e0c5] p-5 rounded-2xl shadow-lg relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-xs font-bold text-teal-100 uppercase tracking-wider">Pasangan Usia Subur</p>
+                <h3 id="tile_total_pus" class="text-3xl font-black mt-1">0</h3>
+                <span class="text-[10px] text-teal-100/90 font-medium">Sasaran PUS Terdaftar</span>
+              </div>
+              <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">
+                💍
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Kuning-Oranye Adminty (#FFB64D -> #ffcb80) -->
+          <div class="bg-gradient-to-r from-[#FFB64D] to-[#ffcb80] p-5 rounded-2xl shadow-lg relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Peserta KB Aktif</p>
+                <h3 id="tile_total_pa" class="text-3xl font-black mt-1">0</h3>
+                <span class="text-[10px] text-amber-100/90 font-medium">Akseptor Aktif Ber-KB</span>
+              </div>
+              <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">
+                💊
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Merah-Pink Adminty (#FF5370 -> #ff869a) -->
+          <div class="bg-gradient-to-r from-[#FF5370] to-[#ff869a] p-5 rounded-2xl shadow-lg relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-xs font-bold text-rose-100 uppercase tracking-wider">Unmet Need</p>
+                <h3 id="tile_total_unmet" class="text-3xl font-black mt-1">0</h3>
+                <span class="text-[10px] text-rose-100/90 font-medium">Butuh Pelayanan KB</span>
+              </div>
+              <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">
+                ⚠️
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 5. PANEL SHORTCUT MENU (KARTU PUTIH DENGAN HOVER EFFECT ADMINTY) -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 space-y-4">
+          <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+            <div>
+              <h3 class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">Pintas Modul Operasional</h3>
+              <p class="text-[11px] text-slate-400">Akses langsung lembar kerja dan laporan instrumen</p>
+            </div>
+            <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full uppercase">
+              Terintegrasi Supabase
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            
+            <!-- Box 1: Form Input -->
+            <div onclick="bukaFormulirPendataan()" class="cursor-pointer bg-[#fcfdfe] hover:bg-blue-50/60 p-5 rounded-2xl border border-slate-200/80 hover:border-blue-400 transition-all duration-200 hover:-translate-y-1 group shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+                  📝
+                </div>
+                <h4 class="text-xs font-black text-slate-800 uppercase group-hover:text-blue-600 transition">Form Input Keluarga</h4>
+                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Registrasi nomor KK, anggota individu, KB, dan kondisi sanitasi.</p>
+              </div>
+              <div class="pt-4">
+                <span class="text-[11px] font-bold text-blue-600 flex items-center gap-1 group-hover:translate-x-1 transition">
+                  Buka Form &rarr;
+                </span>
+              </div>
+            </div>
+
+            <!-- Box 2: Rekapitulasi -->
+            <div onclick="bukaHalamanRekapitulasi()" class="cursor-pointer bg-[#fcfdfe] hover:bg-teal-50/60 p-5 rounded-2xl border border-slate-200/80 hover:border-teal-400 transition-all duration-200 hover:-translate-y-1 group shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-11 h-11 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+                  📊
+                </div>
+                <h4 class="text-xs font-black text-slate-800 uppercase group-hover:text-teal-600 transition">Rekapitulasi Capaian</h4>
+                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Laporan agregat kepesertaan KB, profil demografi, dan keluarga.</p>
+              </div>
+              <div class="pt-4">
+                <span class="text-[11px] font-bold text-teal-600 flex items-center gap-1 group-hover:translate-x-1 transition">
+                  Lihat Rekap &rarr;
+                </span>
+              </div>
+            </div>
+
+            <!-- Box 3: Cari & Edit -->
+            <div onclick="bukaHalamanCariEdit()" class="cursor-pointer bg-[#fcfdfe] hover:bg-cyan-50/60 p-5 rounded-2xl border border-slate-200/80 hover:border-cyan-400 transition-all duration-200 hover:-translate-y-1 group shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-11 h-11 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+                  🔍
+                </div>
+                <h4 class="text-xs font-black text-slate-800 uppercase group-hover:text-cyan-600 transition">Cari & Edit Data</h4>
+                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Cari cepat NIK/KK, ubah isian formulir, atau edit anggota individu.</p>
+              </div>
+              <div class="pt-4">
+                <span class="text-[11px] font-bold text-cyan-600 flex items-center gap-1 group-hover:translate-x-1 transition">
+                  Pencarian &rarr;
+                </span>
+              </div>
+            </div>
+
+            <!-- Box 4: BNBA -->
+            <div onclick="bukaHalamanBNBA()" class="cursor-pointer bg-[#fcfdfe] hover:bg-amber-50/60 p-5 rounded-2xl border border-slate-200/80 hover:border-amber-400 transition-all duration-200 hover:-translate-y-1 group shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-3 group-hover:scale-110 transition">
+                  📋
+                </div>
+                <h4 class="text-xs font-black text-slate-800 uppercase group-hover:text-amber-600 transition">Data BNBA Sasaran</h4>
+                <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Tampilkan By Name By Address berdasarkan kategori sasaran spesifik.</p>
+              </div>
+              <div class="pt-4">
+                <span class="text-[11px] font-bold text-amber-600 flex items-center gap-1 group-hover:translate-x-1 transition">
+                  Buka BNBA &rarr;
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </main>
     </div>
 
-    <!-- Grid Menu Dashboard -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-      <!-- 1. FORM INPUT DATA KELUARGA (Border Emerald) -->
-      <div onclick="bukaFormulirPendataan()" class="cursor-pointer bg-white hover:bg-emerald-50/60 p-6 rounded-2xl border-2 border-emerald-500 shadow-md hover:shadow-xl transition duration-200 group text-center space-y-3 flex flex-col justify-between">
-        <div class="space-y-3">
-          <div class="w-14 h-14 mx-auto rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-          </div>
-          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide">FORM INPUT DATA KELUARGA</h3>
-          <p class="text-xs text-slate-500 leading-relaxed">Registrasi KK, identitas anggota keluarga, blok KB bertingkat, dan kondisi lingkungan.</p>
-        </div>
-        <div>
-          <span class="inline-block mt-2 text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full uppercase">Mulai Input &rarr;</span>
-        </div>
-      </div>
-
-      <!-- 2. HALAMAN REKAPITULASI (Border Indigo) -->
-      <div onclick="bukaHalamanRekapitulasi()" class="cursor-pointer bg-white hover:bg-indigo-50/60 p-6 rounded-2xl border-2 border-indigo-500 shadow-md hover:shadow-xl transition duration-200 group text-center space-y-3 flex flex-col justify-between">
-        <div class="space-y-3">
-          <div class="w-14 h-14 mx-auto rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide">REKAPITULASI</h3>
-          <p class="text-xs text-slate-500 leading-relaxed">Lihat rekapitulasi kepesertaan KB, demografi sasaran, dan potensi keluarga berjenjang.</p>
-        </div>
-        <div>
-          <span class="inline-block mt-2 text-xs font-bold text-indigo-700 bg-indigo-100 px-3 py-1.5 rounded-full uppercase">Buka Rekap &rarr;</span>
-        </div>
-      </div>
-
-      <!-- 3. CARI & EDIT DATA (Border Cyan) -->
-      <div onclick="bukaHalamanCariEdit()" class="cursor-pointer bg-white hover:bg-cyan-50/60 p-6 rounded-2xl border-2 border-cyan-500 shadow-md hover:shadow-xl transition duration-200 group text-center space-y-3 flex flex-col justify-between">
-        <div class="space-y-3">
-          <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-100 text-cyan-700 flex items-center justify-center group-hover:scale-110 transition">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide">CARI & EDIT DATA</h3>
-          <p class="text-xs text-slate-500 leading-relaxed">Cari data keluarga berdasarkan NIK, No. KK atau nama, serta perbarui lembar isian formulir lengkap.</p>
-        </div>
-        <div>
-          <span class="inline-block mt-2 text-xs font-bold text-cyan-700 bg-cyan-100 px-3 py-1.5 rounded-full uppercase">Buka Modul &rarr;</span>
-        </div>
-      </div>
-
-      <!-- 4. DATA BNBA (Border Amber) -->
-      <div onclick="bukaHalamanBNBA()" class="cursor-pointer bg-white hover:bg-amber-50/60 p-6 rounded-2xl border-2 border-amber-500 shadow-md hover:shadow-xl transition duration-200 group text-center space-y-3 flex flex-col justify-between">
-        <div class="space-y-3">
-          <div class="w-14 h-14 mx-auto rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 transition">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wide">DATA BNBA</h3>
-          <p class="text-xs text-slate-500 leading-relaxed">Tampilkan data sasaran By Name By Address lengkap per desa dan dusun.</p>
-        </div>
-        <div>
-          <span class="inline-block mt-2 text-xs font-bold text-amber-700 bg-amber-100 px-3 py-1.5 rounded-full uppercase">Buka Data &rarr;</span>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ========================================================
@@ -2567,6 +2677,13 @@
       window.scrollTo(0, 0);
     }
 
+    function toggleSidebarAdminty() {
+      const sidebar = document.getElementById('adminty_sidebar');
+      if (sidebar) {
+        sidebar.classList.toggle('-ml-64');
+      }
+    }
+
     function togglePasswordEye() {
       const inputPass = document.getElementById('login_password');
       const svgIcon = document.getElementById('eyeIcon');
@@ -2702,6 +2819,11 @@
       const btnTest = document.getElementById('btnTesting');
       if (btnTest) {
         btnTest.style.display = (userAktif.role === 'SUPER_ADMIN') ? 'inline-flex' : 'none';
+      }
+      
+      const sideBtnWilayah = document.getElementById('sideBtnWilayah');
+      if (sideBtnWilayah && userAktif) {
+        sideBtnWilayah.style.display = (userAktif.role === 'USER_DESA') ? 'none' : 'flex';
       }
     }
 
