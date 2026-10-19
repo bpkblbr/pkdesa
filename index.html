@@ -112,9 +112,9 @@
 
       <form id="formLogin" onsubmit="event.preventDefault(); eksekusiLogin();" class="p-6 sm:p-8 space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Username / Email</label>
-          <div class="relative">
-            <input type="text" id="login_username" required placeholder="superadmin / adminkab / adminkec" autocomplete="username"
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Username</label>
+          <div class="relative">            
+            <input type="text" id="login_username" required placeholder="" autocomplete="username"
                    class="w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium" />
             <div class="absolute left-3.5 top-3.5 text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,9 +125,9 @@
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Kata Sandi (Password)</label>
-          <div class="relative">
-            <input type="password" id="login_password" required placeholder="AdminPus2026!" autocomplete="current-password"
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1.5">Password</label>
+          <div class="relative">            
+            <input type="password" id="login_password" required placeholder="" autocomplete="current-password"
                    class="w-full pl-10 pr-11 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none text-sm font-medium" />
             <div class="absolute left-3.5 top-3.5 text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,19 +149,11 @@
             MASUK KE SISTEM
           </button>
           
-          <!-- TOMBOL KELUAR APLIKASI SEPERTI DI INDEX_KAB.HTML -->
           <button type="button" onclick="exitApp()"
                   class="w-full py-3 bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white font-bold rounded-xl shadow transition uppercase text-xs tracking-wide flex items-center justify-center gap-1.5">
             <span>🚪</span>
             <span>KELUAR APLIKASI</span>
-          </button>
-
-          <div class="p-2.5 bg-slate-50 border rounded-xl text-[11px] text-slate-500 text-center space-y-0.5">
-            <p><strong>Akun Uji Coba:</strong></p>
-            <p>Super Admin: <code>superadmin</code> | Kab: <code>adminkab</code></p>
-            <p>Kec: <code>adminkec</code> | Kader Desa: <code>kaderdesa</code></p>
-            <p>(Password: <code>AdminPus2026!</code> atau min 3 karakter)</p>
-          </div>
+          </button>          
         </div>
       </form>
     </div>
