@@ -144,6 +144,14 @@
                   class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold rounded-xl shadow-lg transition uppercase text-sm tracking-wide">
             MASUK KE SISTEM
           </button>
+          
+          <!-- TOMBOL KELUAR APLIKASI SEPERTI DI INDEX_KAB.HTML -->
+          <button type="button" onclick="exitApp()"
+                  class="w-full py-3 bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white font-bold rounded-xl shadow transition uppercase text-xs tracking-wide flex items-center justify-center gap-1.5">
+            <span>🚪</span>
+            <span>KELUAR APLIKASI</span>
+          </button>
+
           <div class="p-2.5 bg-slate-50 border rounded-xl text-[11px] text-slate-500 text-center space-y-0.5">
             <p><strong>Akun Uji Coba:</strong></p>
             <p>Super Admin: <code>superadmin</code> | Kab: <code>adminkab</code></p>
@@ -2560,6 +2568,31 @@
       window.scrollTo(0, 0);
     }
 
+    function togglePasswordEye() {
+      const inputPass = document.getElementById('login_password');
+      const svgIcon = document.getElementById('eyeIcon');
+      if (!inputPass) return;
+
+      if (inputPass.type === 'password') {        
+        inputPass.type = 'text';
+        
+        if (svgIcon) {
+          svgIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+          `;
+        }
+      } else {        
+        inputPass.type = 'password';
+        
+        if (svgIcon) {
+          svgIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          `;
+        }
+      }
+    }
+
     async function eksekusiLogin() {
       const userEl = document.getElementById('login_username');
       const passEl = document.getElementById('login_password');
@@ -2672,24 +2705,50 @@
 
     function prosesLogout() {
       Swal.fire({
-        title: 'Konfirmasi Keluar',
-        text: 'Apakah Anda yakin ingin keluar dari sistem?',
+        title: 'Konfirmasi Keluar Sesi',
+        text: 'Apakah Anda yakin ingin mengakhiri sesi kerja dan kembali ke halaman login?',
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#e11d48',
+        confirmButtonColor: '#dc2626',
         cancelButtonColor: '#64748b',
-        confirmButtonText: 'Ya, Keluar',
-        cancelButtonText: 'Batal'
+        confirmButtonText: 'Ya, Keluar Sesi',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        focusCancel: true
       }).then((result) => {
-        if (result.isConfirmed) {
-          // HAPUS SESI DARI LOCALSTORAGE
+        if (result.isConfirmed) {          
+          userAktif = null;
+          modeEditKeluargaLuar = false;
+          daftarUrutanAnomali = [];
+          indexAnomaliAktif = 0;
+          
           localStorage.removeItem('pus_app_session');
-
-          // Reset formulir login
-          const form = document.getElementById('formLogin');
-          if (form) form.reset();
-
+          
+          const formLog = document.getElementById('formLogin');
+          if (formLog) formLog.reset();
+          const formPen = document.getElementById('pendataanForm');
+          if (formPen) formPen.reset();
+          
           tampilkanLayar('tampilan_login');
+
+          const inputPass = document.getElementById('login_password');
+          if (inputPass) inputPass.type = 'password';
+          
+          const svgIcon = document.getElementById('eyeIcon');
+          if (svgIcon) {
+            svgIcon.innerHTML = `
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            `;
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Sesi Berakhir',
+            text: 'Anda telah berhasil keluar dari sistem.',
+            timer: 1300,
+            showConfirmButton: false
+          });
         }
       });
     }
@@ -2709,6 +2768,31 @@
         title: 'Menu Terpilih',
         text: `Fitur [${menu.toUpperCase()}] siap dihubungkan ke modul database.`,
         confirmButtonColor: '#059669'
+      });
+    }
+
+    function exitApp() {
+      Swal.fire({
+        title: 'Konfirmasi Tutup Aplikasi',
+        text: 'Apakah Anda yakin ingin menutup dan keluar dari Aplikasi Register PUS & Pendataan Keluarga?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Keluar Aplikasi',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        focusCancel: true
+      }).then((result) => {
+        if (result.isConfirmed) {          
+          localStorage.removeItem("pus_app_session");
+          
+          window.close();
+          
+          setTimeout(() => {
+            window.location.href = "about:blank";
+          }, 300);
+        }
       });
     }
 
