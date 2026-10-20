@@ -3474,6 +3474,48 @@
       }
     }
 
+    function bukaHalamanAdmin(namaModul) {      
+      document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+      
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.className = "nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition";
+      });
+      
+      const targetView = document.getElementById(`sub_view_${namaModul}`);
+      const targetNav = document.getElementById(`sideNav_${namaModul}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      if (targetNav) {
+        targetNav.className = "nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-indigo-600 bg-indigo-50/80 text-indigo-700 font-bold shadow-sm transition";
+      }
+      
+      const judul = document.getElementById('judulHalamanAktif');
+      const subJudul = document.getElementById('subJudulHalamanAktif');
+      const breadcrumb = document.getElementById('breadcrumbLevel2');
+
+      const metaHalaman = {
+        beranda: { judul: 'Ringkasan Eksekutif', sub: 'Pemantauan capaian registrasi kependudukan dan KB', bc: 'Beranda' },
+        rekapitulasi: { judul: 'Rekapitulasi Berjenjang', sub: 'Laporan agregat kependudukan, capaian KB, dan stunting', bc: 'Rekapitulasi' },
+        cari_edit: { judul: 'Cari & Edit Data Keluarga', sub: 'Pencarian terperinci KK dan perbaikan data sasaran', bc: 'Cari & Edit' },
+        bnba: { judul: 'Laporan By Name By Address', sub: 'Penyaringan indikator sasaran spesifik tingkat dusun dan RT', bc: 'Data BNBA' },
+        kelola_wilayah: { judul: 'Master Wilayah', sub: 'Pengaturan hierarki kecamatan, desa, dusun, dan RT', bc: 'Wilayah' },
+        formulir: { judul: 'Form Pendataan Keluarga', sub: 'Registrasi lembar kerja pendataan keluarga lapangan', bc: 'Form Pendataan' }
+      };
+
+      if (metaHalaman[namaModul]) {
+        if (judul) judul.innerText = metaHalaman[namaModul].judul.toUpperCase();
+        if (subJudul) subJudul.innerText = metaHalaman[namaModul].sub;
+        if (breadcrumb) breadcrumb.innerText = metaHalaman[namaModul].bc;
+      }
+      
+      if (namaModul === 'rekapitulasi') initFilterWilayahRekap();
+      if (namaModul === 'cari_edit') initFilterWilayahCariEdit();
+      if (namaModul === 'bnba') initFilterWilayahBnbaLap();
+      if (namaModul === 'kelola_wilayah') bukaKelolaWilayah();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function togglePasswordEye() {
       const inputPass = document.getElementById('login_password');
       const svgIcon = document.getElementById('eyeIcon');
