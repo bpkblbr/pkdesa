@@ -15,9 +15,9 @@
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SheetJS CDN untuk Download & Upload File Excel .xlsx -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>  
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <style>
     .form-uppercase input[type="text"], 
     .form-uppercase textarea, 
@@ -1512,19 +1512,37 @@
       </div>
 
       <div class="p-5 sm:p-6 space-y-5 overflow-y-auto">
+        <!-- Filter Wilayah Download (Jika diperlukan) -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Filter Kecamatan</label>
+            <select id="dl_kel_kecamatan" onchange="saatDlKecamatanBerubah()" class="w-full p-2 border rounded-lg bg-white outline-none">
+              <option value="">-- SEMUA KECAMATAN --</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-slate-600 mb-1">Filter Desa</label>
+            <select id="dl_kel_desa" class="w-full p-2 border rounded-lg bg-white outline-none">
+              <option value="">-- SEMUA DESA --</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Panel Download Data / Template -->
         <div class="p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-3">
           <h4 class="text-xs font-bold text-emerald-800 uppercase flex items-center gap-1.5">
             <span>📥</span> Unduh Format / Data Terisi (.xlsx)
           </h4>
           <p class="text-[11px] text-emerald-700 leading-relaxed">
-            Unduh data keluarga yang sudah terisi di database sesuai wilayah Anda atau unduh template kosong untuk pengisian offline.
+            Unduh data keluarga yang sudah terisi di database atau unduh template kosong untuk pengisian offline.
           </p>
           <div class="flex flex-wrap gap-2 pt-1">
-            <button type="button" onclick="unduhDataExcelKeluargaTerisi()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white rounded-lg text-xs font-bold shadow-sm transition uppercase">
+            <!-- PANGGIL downloadExcelKeluargaTerisi() -->
+            <button type="button" onclick="downloadExcelKeluargaTerisi()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white rounded-lg text-xs font-bold shadow-sm transition uppercase">
               Download Data Terisi (.xlsx)
             </button>
-            <button type="button" onclick="unduhTemplateExcelKeluargaKosong()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 transition uppercase">
+            <!-- PANGGIL downloadTemplateExcelKeluarga() -->
+            <button type="button" onclick="downloadTemplateExcelKeluarga()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 rounded-lg text-xs font-bold border border-slate-300 transition uppercase">
               Template Kosong (.xlsx)
             </button>
           </div>
@@ -1536,15 +1554,12 @@
             <span>🚀</span> Upload Data dari Excel ke Database
           </h4>
           <p class="text-[11px] text-blue-700 leading-relaxed">
-            Pastikan kolom data sesuai template resmi. Data yang diunggah akan otomatis divalidasi dengan batasan wilayah akun Anda.
+            Pastikan kolom data sesuai template resmi (Sheet KELUARGA & ANGGOTA_KELUARGA).
           </p>
           <div class="space-y-2">
-            <input type="file" id="inputBerkasExcelKeluarga" accept=".xlsx, .xls"
+            <!-- PANGGIL uploadDataKeluargaExcel(event) saat file dipilih -->
+            <input type="file" id="inputBerkasExcelKeluarga" accept=".xlsx, .xls" onchange="uploadDataKeluargaExcel(event)"
                    class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer border border-slate-200 rounded-lg p-1 bg-white" />
-            <button type="button" onclick="prosesUploadExcelKeluarga()" id="btnProsesUploadExcel"
-                    class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-lg text-xs font-bold shadow-sm transition uppercase">
-              Unggah & Sinkronkan ke Database
-            </button>
           </div>
         </div>
       </div>
@@ -11611,6 +11626,11 @@
     // FITUR AUDIT NIK ISTRI GANDA (LOGIKA DARI INDEX_KAB)
     // ========================================================
     async function auditNikIstriGandaKeluarga() {
+      if (!supabaseClient) {
+        Swal.fire('Koneksi Gagal', 'Client Supabase belum terhubung!', 'error');
+        return;
+      }
+
       if (!userAktif || userAktif.role === 'USER_DESA') {
         Swal.fire('Akses Ditolak', 'Fitur ini hanya dapat dijalankan oleh Admin!', 'warning');
         return;
@@ -11624,18 +11644,17 @@
       });
 
       try {
-        // 1. Ambil data individu berstatus istri (hubungan_dengan_kk = '2' atau wanita kawin) secara chunked
+        // 1. Ambil data individu berstatus istri (hubungan_dengan_kk = '2')
         let allAnggota = [];
         let fromIdx = 0;
         const step = 1000;
         let hasMore = true;
 
         while (hasMore) {
-          let query = dbClient.from('anggota_keluarga')
+          const { data: chunk, error } = await supabaseClient
+            .from('anggota_keluarga')
             .select('id, nomor_kk, nama_lengkap, nik, jenis_kelamin, hubungan_dengan_kk, status_perkawinan')
-            .eq('hubungan_dengan_kk', '2'); // Khusus Hubungan = 2 (Istri)
-
-          const { data: chunk, error } = await query
+            .eq('hubungan_dengan_kk', '2')
             .order('id', { ascending: true })
             .range(fromIdx, fromIdx + step - 1);
 
@@ -11659,11 +11678,11 @@
         const kkList = [...new Set(allAnggota.map(a => a.nomor_kk).filter(Boolean))];
         let mapKeluarga = new Map();
 
-        // Ambil dalam batch 500 KK
         for (let i = 0; i < kkList.length; i += 500) {
           const sliceKk = kkList.slice(i, i + 500);
-          const { data: dataKk } = await dbClient.from('data_keluarga')
-            .select('nomor_kk, nama_kepala_keluarga, kecamatan, desa_kelurahan, dusun_rw, rt')
+          const { data: dataKk } = await supabaseClient
+            .from('keluarga')
+            .select('nomor_kk, nama_kk, nik_kk, kode_kec, kode_desa, kode_dusun, rt, alamat_detail, status_keluarga')
             .in('nomor_kk', sliceKk);
 
           if (dataKk) {
@@ -11684,20 +11703,24 @@
           const infoKk = mapKeluarga.get(String(item.nomor_kk).trim()) || {};
 
           nikMap.get(nik).push({
+            nomor_kk: item.nomor_kk || '-',
             nik_istri: nik,
             nama_istri: item.nama_lengkap || '-',
-            nomor_kk: item.nomor_kk || '-',
-            nama_suami: infoKk.nama_kepala_keluarga || '-',
-            kecamatan: infoKk.kecamatan || '-',
-            desa: infoKk.desa_kelurahan || '-',
-            dusun: infoKk.dusun_rw || '-',
-            rt: infoKk.rt || '-'
+            nama_suami: infoKk.nama_kk || '-',
+            nik_suami: infoKk.nik_kk || '-',
+            kode_kec: infoKk.kode_kec || '-',
+            kode_desa: infoKk.kode_desa || '-',
+            kode_dusun: infoKk.kode_dusun || '-',
+            rt: infoKk.rt || '-',
+            alamat: infoKk.alamat_detail || '-',
+            status_keluarga: infoKk.status_keluarga || '1',
+            keterangan_audit: 'NIK Istri Ganda pada Lebih dari 1 KK'
           });
         });
 
         // 4. Saring NIK yang terdaftar di lebih dari 1 KK
         const listGanda = [];
-        nikMap.forEach((records, nik) => {
+        nikMap.forEach((records) => {
           if (records.length > 1) {
             records.forEach(r => listGanda.push(r));
           }
@@ -11714,22 +11737,21 @@
           return;
         }
 
-        // Tampilkan preview temuan duplikat
         const previewHtml = listGanda.slice(0, 6).map(d =>
-          `• <b>${d.nama_istri}</b> (NIK: <code>${d.nik_istri}</code>) - Suami: ${d.nama_suami} [KK: ${d.nomor_kk}, Desa ${d.desa}]`
+          `• <b>${d.nama_istri}</b> (NIK: <code>${d.nik_istri}</code>) - Suami: ${d.nama_suami} [KK: ${d.nomor_kk}, Desa: ${d.kode_desa}]`
         ).join('<br>');
 
         Swal.fire({
           icon: 'warning',
-          title: `Ditemukan ${listGanda.length} Rekaman NIK Istri Ganda!`,
+          title: `Ditemukan ${listGanda.length} Rekaman NIK Ganda!`,
           html: `
-            <div style="text-align: left; font-size: 12.5px; color: #334155; line-height: 1.5;">
-              Ditemukan NIK Istri yang terdaftar pada lebih dari satu Kartu Keluarga aktif:<br><br>
-              <div style="background:#fff1f2; padding:8px; border-radius:5px; border:1px solid #fecdd3; max-height:160px; overflow-y:auto; font-size:11.5px;">
+            <div style="text-align: left; font-size: 12px; color: #334155; line-height: 1.5;">
+              Ditemukan NIK Istri yang terdaftar pada lebih dari satu Kartu Keluarga:<br><br>
+              <div style="background:#fff1f2; padding:8px; border-radius:8px; border:1px solid #fecdd3; max-height:160px; overflow-y:auto; font-size:11px;">
                 ${previewHtml}
                 ${listGanda.length > 6 ? `<br><i>...dan ${listGanda.length - 6} rekaman lainnya.</i>` : ''}
               </div>
-              <br>Silakan unduh berkas laporan Excel untuk meneliti dan mengoreksi data.
+              <br>Unduh laporan Excel untuk meneliti dan memverifikasi data.
             </div>
           `,
           showCancelButton: true,
@@ -11737,70 +11759,10 @@
           cancelButtonText: 'Tutup',
           confirmButtonColor: '#e11d48',
           cancelButtonColor: '#64748b'
-        }).then(async (res) => {
-          if (res.isConfirmed && typeof ExcelJS !== 'undefined') {
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet("Audit_NIK_Istri_Ganda");
-
-            worksheet.columns = [
-              { header: "NO", key: "no", width: 6 },
-              { header: "NIK ISTRI", key: "nik_istri", width: 22 },
-              { header: "NAMA ISTRI", key: "nama_istri", width: 25 },
-              { header: "NOMOR KK", key: "nomor_kk", width: 22 },
-              { header: "NAMA SUAMI / KK", key: "nama_suami", width: 25 },
-              { header: "KECAMATAN", key: "kecamatan", width: 20 },
-              { header: "DESA", key: "desa", width: 20 },
-              { header: "DUSUN", key: "dusun", width: 20 },
-              { header: "RT", key: "rt", width: 8 }
-            ];
-
-            const headerRow = worksheet.getRow(1);
-            headerRow.height = 25;
-            headerRow.eachCell(cell => {
-              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };
-              cell.font = { name: 'Segoe UI', color: { argb: 'FFFFFFFF' }, bold: true, size: 9.5 };
-              cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            });
-
-            let currentGroupNik = "";
-            let groupColorIdx = 0;
-            const bgColors = ["FFFFFFFF", "FFF1F5F9"];
-
-            listGanda.forEach((item, idx) => {
-              if (item.nik_istri !== currentGroupNik) {
-                currentGroupNik = item.nik_istri;
-                groupColorIdx = (groupColorIdx + 1) % 2;
-              }
-
-              const row = worksheet.addRow({
-                no: idx + 1,
-                nik_istri: String(item.nik_istri),
-                nama_istri: item.nama_istri,
-                nomor_kk: String(item.nomor_kk),
-                nama_suami: item.nama_suami,
-                kecamatan: item.kecamatan,
-                desa: item.desa,
-                dusun: item.dusun,
-                rt: String(item.rt).padStart(3, '0')
-              });
-
-              row.height = 19;
-              row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgColors[groupColorIdx] } };
-                cell.font = { name: 'Segoe UI', size: 9 };
-                cell.alignment = [1, 2, 4, 9].includes(colNumber) ? { vertical: 'middle', horizontal: 'center' } : { vertical: 'middle', horizontal: 'left' };
-                if ([2, 4, 9].includes(colNumber)) cell.numFmt = '@';
-              });
-            });
-
-            const buffer = await workbook.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `AUDIT_NIK_ISTRI_GANDA_${new Date().toISOString().split('T')[0]}.xlsx`;
-            a.click();
-            window.URL.revokeObjectURL(url);
+        }).then((res) => {
+          if (res.isConfirmed) {
+            // Memanggil fungsi ekspor SheetJS asli yang sudah ada di file Anda
+            unduhLaporanAuditNikExcel(listGanda);
           }
         });
 
