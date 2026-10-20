@@ -12567,6 +12567,25 @@
         return;
       }
 
+      // 1. MUNCULKAN PERINGATAN KONFIRMASI (LANJUTKAN / BATAL)
+      const konfirmasi = await Swal.fire({
+        title: 'Konfirmasi Audit NIK Istri Ganda',
+        text: 'Proses ini akan memindai seluruh data individu istri di database untuk mendeteksi potensi duplikasi NIK. Lanjutkan?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#059669', // Hijau untuk Lanjutkan
+        cancelButtonColor: '#dc2626',  // Merah untuk Batal
+        confirmButtonText: 'Ya, Lanjutkan Audit',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+      });
+
+      // Jika admin memilih Batal, hentikan proses
+      if (!konfirmasi.isConfirmed) {
+        return;
+      }
+
+      // 2. PROSES AUDIT BERJALAN JIKA DIPILIH LANJUTKAN
       Swal.fire({
         title: 'Memeriksa Database...',
         text: 'Mengambil dan menganalisis seluruh data individu istri...',
@@ -12575,7 +12594,6 @@
       });
 
       try {
-        // 1. Ambil data individu berstatus istri (hubungan_dengan_kk = '2')
         let allAnggota = [];
         let fromIdx = 0;
         const step = 1000;
@@ -12605,7 +12623,6 @@
           return;
         }
 
-        // 2. Ambil data keluarga induknya secara terpisah (tanpa foreign key join)
         const kkList = [...new Set(allAnggota.map(a => a.nomor_kk).filter(Boolean))];
         let mapKeluarga = new Map();
 
@@ -12621,7 +12638,6 @@
           }
         }
 
-        // 3. Kelompokkan per NIK Istri
         const nikMap = new Map();
         allAnggota.forEach(item => {
           const nik = String(item.nik || '').trim();
@@ -12649,7 +12665,6 @@
           });
         });
 
-        // 4. Saring NIK yang terdaftar di lebih dari 1 KK
         const listGanda = [];
         nikMap.forEach((records) => {
           if (records.length > 1) {
@@ -12692,7 +12707,6 @@
           cancelButtonColor: '#64748b'
         }).then((res) => {
           if (res.isConfirmed) {
-            // Memanggil fungsi ekspor SheetJS asli yang sudah ada di file Anda
             unduhLaporanAuditNikExcel(listGanda);
           }
         });
