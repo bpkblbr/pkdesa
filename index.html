@@ -8776,39 +8776,24 @@
             const kdKec = String(r.KODE_KEC || r.kode_kec || '').padStart(2, '0');
             const kdDesa = String(r.KODE_DESA || r.kode_desa || '').padStart(4, '0');
             const allowedDusun = String(r.ALLOWED_DUSUN || r.allowed_dusun || '').trim() || null;
-            
+
             if (userAktif.role === 'ADMIN_KECAMATAN' && (role !== 'User Desa' || kdKec !== userAktif.kode_kec)) {
               continue;
             }
 
-            const payload = [];
-            for (let r of rows) {
-              const username = String(r.USERNAME || r.username || '').trim();
-              const password = String(r.PASSWORD || r.password || '').trim();
-              if (!username || !password) continue;
-
-              const role = String(r.ROLE || r.role || 'User Desa').trim();
-              const kdKec = String(r.KODE_KEC || r.kode_kec || '').padStart(2, '0');
-              const kdDesa = String(r.KODE_DESA || r.kode_desa || '').padStart(4, '0');
-              const allowedDusun = String(r.ALLOWED_DUSUN || r.allowed_dusun || '').trim() || null;
-
-              if (userAktif.role === 'ADMIN_KECAMATAN' && (role !== 'User Desa' || kdKec !== userAktif.kode_kec)) {
-                continue;
-              }
-
-              payload.push({
-                username: username,
-                nama_lengkap: String(r.NAMA_LENGKAP || r.nama_lengkap || '').trim() || null,
-                nama_panggilan: String(r.NAMA_PANGGILAN || r.nama_panggilan || '').trim().toLowerCase() || null,
-                password_hash: password,
-                role: role,
-                kode_kab: userAktif.kode_kab || '01',
-                kode_kec: kdKec || null,
-                kode_desa: (role === 'User Desa') ? (kdDesa || null) : null,
-                allowed_dusun: allowedDusun,
-                allowed_wilayah_rt: String(r.ALLOWED_WILAYAH_RT || r.allowed_wilayah_rt || '').trim() || null
-              });
-            }
+            payload.push({
+              username: username,
+              nama_lengkap: String(r.NAMA_LENGKAP || r.nama_lengkap || '').trim() || null,
+              nama_panggilan: String(r.NAMA_PANGGILAN || r.nama_panggilan || '').trim().toLowerCase() || null,
+              password_hash: password,
+              role: role,
+              kode_kab: userAktif.kode_kab || '01',
+              kode_kec: kdKec || null,
+              kode_desa: (role === 'User Desa') ? (kdDesa || null) : null,
+              allowed_dusun: allowedDusun,
+              allowed_wilayah_rt: String(r.ALLOWED_WILAYAH_RT || r.allowed_wilayah_rt || '').trim() || null
+            });
+          }
 
           if (payload.length === 0) throw new Error('Tidak ada baris akun yang valid sesuai wewenang Anda.');
 
