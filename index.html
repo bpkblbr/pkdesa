@@ -233,11 +233,36 @@
               <span>Input Data Keluarga</span>
             </a>
             
-            <a href="javascript:void(0)" onclick="bukaHalamanAdmin('rekapitulasi')" id="sideNav_rekapitulasi" 
-               class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#2ed8b6] hover:bg-teal-50/80 transition">
-              <span class="w-5 text-center text-base text-teal-500">📊</span>
-              <span>Rekapitulasi Capaian</span>
-            </a>
+            <!-- PARENT MENU: REKAPITULASI CAPAIAN (DROPDOWN / COLLAPSIBLE) -->
+            <div>
+              <button type="button" onclick="toggleSubmenuSidebar('submenuRekapitulasi', 'arrowRekapitulasi')" id="sideNav_rekapitulasi_parent" 
+                      class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#2ed8b6] hover:bg-teal-50/80 transition group">
+                <div class="flex items-center gap-3">
+                  <span class="w-5 text-center text-base text-teal-500">📊</span>
+                  <span class="font-bold">Rekapitulasi Capaian</span>
+                </div>
+                <span id="arrowRekapitulasi" class="text-[10px] text-slate-400 group-hover:text-teal-600 transition-transform duration-200">▼</span>
+              </button>
+
+              <!-- SUB-MENU ANAK (COLLAPSIBLE) -->
+              <div id="submenuRekapitulasi" class="hidden pl-9 pr-2 py-1 space-y-1 bg-slate-50/60 rounded-xl mt-0.5 border border-slate-100">
+                <a href="javascript:void(0)" onclick="bukaRekapSubTab('demo')" id="subNavLink_rekap_demo" 
+                   class="sub-nav-item flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:text-indigo-600 hover:bg-white text-[11px] font-semibold transition">
+                  <span>👨‍👩‍👧‍👦</span>
+                  <span>Kependudukan</span>
+                </a>
+                <a href="javascript:void(0)" onclick="bukaRekapSubTab('kb')" id="subNavLink_rekap_kb" 
+                   class="sub-nav-item flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:text-teal-600 hover:bg-white text-[11px] font-semibold transition">
+                  <span>💊</span>
+                  <span>Data KB</span>
+                </a>
+                <a href="javascript:void(0)" onclick="bukaRekapSubTab('lingkungan')" id="subNavLink_rekap_lingkungan" 
+                   class="sub-nav-item flex items-center gap-2 px-3 py-2 rounded-lg text-slate-600 hover:text-emerald-600 hover:bg-white text-[11px] font-semibold transition">
+                  <span>🏡</span>
+                  <span>Sanitasi & Lingkungan</span>
+                </a>
+              </div>
+            </div>
             
             <a href="javascript:void(0)" onclick="bukaHalamanAdmin('cari_edit')" id="sideNav_cari_edit" 
                class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#00bcd4] hover:bg-cyan-50/80 transition">
@@ -3536,6 +3561,57 @@
       if (namaModul === 'formulir') bukaFormulirPendataan();
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleSubmenuSidebar(idSubmenu, idPanah) {
+      const sub = document.getElementById(idSubmenu);
+      const panah = document.getElementById(idPanah);
+      if (!sub) return;
+
+      const sedangTutup = sub.classList.contains('hidden');
+      if (sedangTutup) {
+        sub.classList.remove('hidden');
+        if (panah) panah.style.transform = 'rotate(180deg)';
+      } else {
+        sub.classList.add('hidden');
+        if (panah) panah.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    function bukaRekapSubTab(namaTab) {
+      bukaHalamanAdmin('rekapitulasi');
+
+      const sub = document.getElementById('submenuRekapitulasi');
+      const panah = document.getElementById('arrowRekapitulasi');
+      if (sub && sub.classList.contains('hidden')) {
+        sub.classList.remove('hidden');
+        if (panah) panah.style.transform = 'rotate(180deg)';
+      }
+
+      if (typeof gantiTabRekap === 'function') {
+        gantiTabRekap(namaTab);
+      }
+
+      document.querySelectorAll('.sub-nav-item').forEach(el => {
+        el.classList.remove('bg-white', 'text-indigo-600', 'font-bold', 'shadow-xs');
+        el.classList.add('text-slate-600');
+      });
+
+      const activeLink = document.getElementById(`subNavLink_rekap_${namaTab}`);
+      if (activeLink) {
+        activeLink.classList.add('bg-white', 'text-indigo-600', 'font-bold', 'shadow-xs');
+        activeLink.classList.remove('text-slate-600');
+      }
+
+      const breadcrumb = document.getElementById('breadcrumbLevel2');
+      const labelTab = {
+        demo: 'Rekap Demografi & Sasaran',
+        kb: 'Rekap Pelayanan KB & Unmet Need',
+        lingkungan: 'Rekap Sanitasi & Lingkungan'
+      };
+      if (breadcrumb && labelTab[namaTab]) {
+        breadcrumb.innerText = labelTab[namaTab];
+      }
     }
 
     function togglePasswordEye() {
