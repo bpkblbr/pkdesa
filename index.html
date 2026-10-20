@@ -3219,10 +3219,14 @@
     });
 
     function bukaFormulirPendataan() {
-      modeEditKeluargaLuar = false;
-      tampilkanLayar('tampilan_formulir');
+      modeEditKeluargaLuar = false;      
+      
+      document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+      const targetSub = document.getElementById('sub_view_formulir');
+      if (targetSub) targetSub.classList.remove('hidden');
+
       pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
-      inisialisasiWilayahSesuaiRole()
+      inisialisasiWilayahSesuaiRole();
       
       const selStatus = document.getElementById('status_keluarga');
       if (selStatus) {
@@ -3231,13 +3235,13 @@
         selStatus.classList.add('bg-slate-100', 'cursor-not-allowed');
       }
 
-      indexStepKB = 0
-      riwayatStepKB = []
-      indexStepPK = 0
-      riwayatStepPK = []
-      tampilkanStepKB()
-      tampilkanStepPK()
-      evaluasiStatusKeluarga()
+      indexStepKB = 0;
+      riwayatStepKB = [];
+      indexStepPK = 0;
+      riwayatStepPK = [];
+      tampilkanStepKB();
+      tampilkanStepPK();
+      evaluasiStatusKeluarga();
     }
 
     function isiDataUjiCobaOtomatis() {
