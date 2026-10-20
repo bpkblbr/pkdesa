@@ -338,12 +338,14 @@
              ======================================================== -->
         <div id="sub_view_beranda" class="sub-view-admin space-y-6">
           
-          <!-- KARTU GRADASI METRIK UTAMA ADMINTY -->
+          <!-- KARTU GRADASI METRIK UTAMA 8 INDIKATOR -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 text-white">
+            
+            <!-- 1. Jumlah Keluarga -->
             <div class="bg-gradient-to-r from-[#4099ff] to-[#73b4ff] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
               <div class="flex justify-between items-center">
                 <div>
-                  <p class="text-xs font-bold text-blue-100 uppercase tracking-wider">Total Keluarga</p>
+                  <p class="text-xs font-bold text-blue-100 uppercase tracking-wider">Jumlah Keluarga</p>
                   <h3 id="tile_total_kk" class="text-3xl font-black mt-1">0</h3>
                   <span class="text-[10px] text-blue-100/90 font-medium">Kepala Keluarga Terdata</span>
                 </div>
@@ -351,18 +353,80 @@
               </div>
             </div>
 
+            <!-- 2. Jumlah Jiwa -->
             <div class="bg-gradient-to-r from-[#2ed8b6] to-[#59e0c5] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
               <div class="flex justify-between items-center">
                 <div>
-                  <p class="text-xs font-bold text-teal-100 uppercase tracking-wider">Pasangan Usia Subur</p>
+                  <p class="text-xs font-bold text-teal-100 uppercase tracking-wider">Jumlah Jiwa</p>
+                  <h3 id="tile_total_jiwa" class="text-3xl font-black mt-1">0</h3>
+                  <span class="text-[10px] text-teal-100/90 font-medium">Total Anggota Individu</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">🧍</div>
+              </div>
+            </div>
+
+            <!-- 3. Pasangan Usia Subur -->
+            <div class="bg-gradient-to-r from-[#FFB64D] to-[#ffcb80] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Pasangan Usia Subur</p>
                   <h3 id="tile_total_pus" class="text-3xl font-black mt-1">0</h3>
-                  <span class="text-[10px] text-teal-100/90 font-medium">Sasaran PUS Terdaftar</span>
+                  <span class="text-[10px] text-amber-100/90 font-medium">Sasaran PUS Terdaftar</span>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">💍</div>
               </div>
             </div>
 
-            <div class="bg-gradient-to-r from-[#FFB64D] to-[#ffcb80] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
+            <!-- 4. Baduta (0-23 bulan) -->
+            <div class="bg-gradient-to-r from-[#FF5370] to-[#ff869a] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs font-bold text-rose-100 uppercase tracking-wider">Baduta (0-23 Bln)</p>
+                  <h3 id="tile_total_baduta" class="text-3xl font-black mt-1">0</h3>
+                  <span class="text-[10px] text-rose-100/90 font-medium">Usia Dibawah 2 Tahun</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">👶</div>
+              </div>
+            </div>
+
+            <!-- 5. Balita (24-59 bulan) -->
+            <div class="bg-gradient-to-r from-[#9368e9] to-[#b492ff] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs font-bold text-purple-100 uppercase tracking-wider">Balita (24-59 Bln)</p>
+                  <h3 id="tile_total_balita" class="text-3xl font-black mt-1">0</h3>
+                  <span class="text-[10px] text-purple-100/90 font-medium">Usia 2 s.d 5 Tahun</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">🧒</div>
+              </div>
+            </div>
+
+            <!-- 6. Remaja -->
+            <div class="bg-gradient-to-r from-[#3c8dbc] to-[#60b0df] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs font-bold text-sky-100 uppercase tracking-wider">Remaja (10-24 Th)</p>
+                  <h3 id="tile_total_remaja" class="text-3xl font-black mt-1">0</h3>
+                  <span class="text-[10px] text-sky-100/90 font-medium">Belum Menikah</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">🧢</div>
+              </div>
+            </div>
+
+            <!-- 7. Lansia -->
+            <div class="bg-gradient-to-r from-[#00897b] to-[#26a69a] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-xs font-bold text-teal-100 uppercase tracking-wider">Lansia (&gt;= 60 Th)</p>
+                  <h3 id="tile_total_lansia" class="text-3xl font-black mt-1">0</h3>
+                  <span class="text-[10px] text-teal-100/90 font-medium">Penduduk Lanjut Usia</span>
+                </div>
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">👴</div>
+              </div>
+            </div>
+
+            <!-- 8. Peserta KB Aktif -->
+            <div class="bg-gradient-to-r from-[#f0ad4e] to-[#f8d082] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
               <div class="flex justify-between items-center">
                 <div>
                   <p class="text-xs font-bold text-amber-100 uppercase tracking-wider">Peserta KB Aktif</p>
@@ -373,16 +437,6 @@
               </div>
             </div>
 
-            <div class="bg-gradient-to-r from-[#FF5370] to-[#ff869a] p-5 rounded-2xl shadow-lg relative overflow-hidden transition hover:-translate-y-1">
-              <div class="flex justify-between items-center">
-                <div>
-                  <p class="text-xs font-bold text-rose-100 uppercase tracking-wider">Unmet Need</p>
-                  <h3 id="tile_total_unmet" class="text-3xl font-black mt-1">0</h3>
-                  <span class="text-[10px] text-rose-100/90 font-medium">Butuh Pelayanan KB</span>
-                </div>
-                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm">⚠️</div>
-              </div>
-            </div>
           </div>
 
           <!-- PANEL PINTAS MODUL OPERASIONAL -->
@@ -3606,7 +3660,7 @@
     async function muatMetrikRingkasanEksekutif() {
       if (!supabaseClient) return;
 
-      try {        
+      try {
         let query = supabaseClient.from('keluarga').select(`
           nomor_kk,
           status_keluarga,
@@ -3614,13 +3668,12 @@
           kode_kab,
           kode_kec,
           kode_desa,
-          kb_03_sedang_hamil,
-          kb_03_keinginan_anak_lagi,
           kb_04_sedang_kb,
           anggota_keluarga (
             hubungan_dengan_kk,
             status_perkawinan,
-            tanggal_lahir
+            tanggal_lahir,
+            jenis_kelamin
           )
         `);
 
@@ -3640,9 +3693,13 @@
         if (error) throw error;
 
         let totalKK = 0;
+        let totalJiwa = 0;
         let totalPUS = 0;
-        let totalPA = 0;
-        let totalUnmet = 0;
+        let totalBaduta = 0; // 0 - 23 bulan (< 2 tahun)
+        let totalBalita = 0; // 24 - 59 bulan (2 s.d < 5 tahun)
+        let totalRemaja = 0; // 10 - 24 tahun, belum kawin
+        let totalLansia = 0; // >= 60 tahun
+        let totalPA = 0;     // Peserta KB aktif
 
         (data || []).forEach(k => {
           totalKK++;
@@ -3650,7 +3707,8 @@
           const listAng = k.anggota_keluarga || [];
           const istri = listAng.find(a => String(a.hubungan_dengan_kk) === '2');
           let isPUS = false;
-          
+
+          // 1. Evaluasi PUS
           if (istri && istri.tanggal_lahir) {
             const usiaIstri = hitungUsiaTahun(istri.tanggal_lahir);
             const kawin = ['2', '3'].includes(String(istri.status_perkawinan || ''));
@@ -3658,35 +3716,64 @@
           } else if (k.kb_04_sedang_kb) {
             isPUS = true;
           }
-
           if (isPUS) totalPUS++;
 
-          const isHamil = (k.kb_03_sedang_hamil === true || String(k.kb_03_sedang_hamil) === '1');
-          const sedangKB = (k.kb_04_sedang_kb === true || String(k.kb_04_sedang_kb) === '1');
-
-          if (sedangKB) {
+          // 2. Evaluasi Peserta KB Aktif
+          if (k.kb_04_sedang_kb === true || String(k.kb_04_sedang_kb) === '1') {
             totalPA++;
-          } else if (isPUS && !isHamil) {
-            const ingin = String(k.kb_03_keinginan_anak_lagi || '');
-            // Unmet Need: Ingin anak tunda (2) atau Tidak ingin anak lagi (3)
-            if (ingin === '2' || ingin === '3') {
-              totalUnmet++;
-            }
           }
-        });
-        
-        const elKK = document.getElementById('tile_total_kk');
-        const elPUS = document.getElementById('tile_total_pus');
-        const elPA = document.getElementById('tile_total_pa');
-        const elUnmet = document.getElementById('tile_total_unmet');
 
-        if (elKK) elKK.innerText = totalKK.toLocaleString('id-ID');
-        if (elPUS) elPUS.innerText = totalPUS.toLocaleString('id-ID');
-        if (elPA) elPA.innerText = totalPA.toLocaleString('id-ID');
-        if (elUnmet) elUnmet.innerText = totalUnmet.toLocaleString('id-ID');
+          // 3. Evaluasi Anggota Individu
+          listAng.forEach(a => {
+            totalJiwa++;
+            if (!a.tanggal_lahir) return;
+
+            const tglLahir = new Date(a.tanggal_lahir);
+            const sekarang = new Date();
+            
+            // Hitung selisih dalam bulan secara persis untuk Baduta & Balita
+            const selisihBulan = (sekarang.getFullYear() - tglLahir.getFullYear()) * 12 + (sekarang.getMonth() - tglLahir.getMonth());
+            const usiaTh = hitungUsiaTahun(a.tanggal_lahir);
+            const statusKawin = String(a.status_perkawinan || '1');
+
+            // Baduta: 0 s.d 23 bulan
+            if (selisihBulan >= 0 && selisihBulan <= 23) {
+              totalBaduta++;
+            }
+            // Balita: 24 s.d 59 bulan
+            else if (selisihBulan >= 24 && selisihBulan <= 59) {
+              totalBalita++;
+            }
+
+            // Remaja: Usia 10 - 24 tahun dan belum kawin (status 1)
+            if (usiaTh >= 10 && usiaTh <= 24 && statusKawin === '1') {
+              totalRemaja++;
+            }
+
+            // Lansia: Usia >= 60 tahun
+            if (usiaTh >= 60) {
+              totalLansia++;
+            }
+          });
+        });
+
+        // Terapkan hasil ke elemen HTML kartu metrik
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.innerText = val.toLocaleString('id-ID');
+        };
+
+        setVal('tile_total_kk', totalKK);
+        setVal('tile_total_jiwa', totalJiwa);
+        setVal('tile_total_pus', totalPUS);
+        setVal('tile_total_baduta', totalBaduta);
+        setVal('tile_total_balita', totalBalita);
+        setVal('tile_total_remaja', totalRemaja);
+        setVal('tile_total_lansia', totalLansia);
+        setVal('tile_total_pa', totalPA);
 
       } catch (err) {
-        console.warn("Gagal menghitung metrik ringkasan eksekutif:", err);
+        console.warn("Gagal menghitung 8 metrik ringkasan eksekutif:", err);
       }
     }
 
