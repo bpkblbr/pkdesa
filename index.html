@@ -1205,20 +1205,20 @@
             <!-- TAB 1: FORM INPUT & EDIT AKUN -->
             <div id="userTabForm" class="space-y-4 text-xs">
               <form id="formUserAkun" onsubmit="event.preventDefault(); simpanAkunUser();" class="space-y-3">
-                <input type="hidden" id="user_id" value="" />
-
-                <div>
-                  <label class="block font-bold text-slate-700 uppercase mb-1">Nama Lengkap</label>
-                  <input type="text" id="user_namalengkap" placeholder="Contoh: Budi Santoso"
-                         class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium" />
-                </div>
+                <input type="hidden" id="user_id" value="" />                
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Username *</label>
-                    <input type="text" id="user_username" required placeholder="kader_lembar_01"
-                           class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold" />
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Nama Lengkap</label>
+                    <input type="text" id="user_namalengkap" oninput="generateUsernameOtomatis()" placeholder="Contoh: Budi Santoso" ... />
+                           class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium uppercase" />
                   </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Nama User *</label>
+                    <input type="text" id="user_namapanggilan" oninput="generateUsernameOtomatis()" placeholder="Contoh: budi"
+                           class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium lowercase" />
+                  </div>
+                </div>
                   <div>
                     <label class="block font-bold text-slate-700 uppercase mb-1">Password *</label>
                     <input type="text" id="user_password" required placeholder="Min 6 karakter"
@@ -7797,8 +7797,7 @@
     // MODUL KELOLA USER (MENGADOPSI LOGIKA INDEX_KAB.HTML)
     // ========================================================
     let dataAkunUserCache = [];
-
-    // Trigger tombol menu "KELOLA USER" di dashboard
+    
     function navigasiKe(menu) {
       if (menu === 'kelola_login') {
         bukaModalKelolaUser();
@@ -7809,6 +7808,58 @@
           text: `Fitur [${menu.toUpperCase()}] siap dihubungkan ke modul database.`,
           confirmButtonColor: '#059669'
         });
+      }
+    }
+
+    function generateUsernameOtomatis() {
+      const role = document.getElementById('user_role')?.value;
+      const inputPanggilan = document.getElementById('user_namapanggilan')?.value || '';
+      const inputUsername = document.getElementById('user_username');
+      if (!inputUsername || !role) return;
+      
+      const namaBersih = inputPanggilan.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!namaBersih) return;
+
+      let kodeProv = '';
+      let kodeKab = document.getElementById('user_kab')?.value || '';
+      let kodeKec = document.getElementById('user_kec')?.value || '';
+      let kodeDesa = document.getElementById('user_desa')?.value || '';
+
+      let namaKabUnik = '';
+      let namaKecUnik = '';
+
+      const selKab = document.getElementById('user_kab');
+      if (selKab && selKab.selectedIndex >= 0) {
+        const textKab = selKab.options[selKab.selectedIndex]?.text || '';
+        namaKabUnik = textKab.split('-')[1] ? textKab.split('-')[1].trim().toLowerCase().replace(/\s+/g, '') : '';
+      }
+
+      const selKec = document.getElementById('user_kec');
+      if (selKec && selKec.selectedIndex >= 0) {
+        const textKec = selKec.options[selKec.selectedIndex]?.text || '';
+        namaKecUnik = textKec.split('-')[1] ? textKec.split('-')[1].trim().toLowerCase().replace(/\s+/g, '') : '';
+      }
+
+      let generated = '';
+
+      if (role === 'User Desa') {        
+        generated = `dat${kodeKab}${kodeKec}${kodeDesa}${namaBersih}`;
+      } 
+      else if (role === 'Admin Kab') {        
+        generated = `adm${kodeProv}${kodeKab}${namaKabUnik}`;
+      } 
+      else if (role === 'Admin Kec') {        
+        generated = `adm${kodeProv}${kodeKab}${kodeKec}${namaKecUnik}`;
+      } 
+      else if (role === 'Admin Desa') {        
+        generated = `adm${kodeProv}${kodeKab}${kodeKec}${kodeDesa}${namaKecUnik}`;
+      } 
+      else if (role === 'Admin Prov') {
+        generated = `adm${kodeProv}${namaBersih}`;
+      }
+
+      if (generated) {
+        inputUsername.value = generated;
       }
     }
 
@@ -7938,6 +7989,8 @@
       if (role === 'User Desa') {
         rowDusun.classList.remove('hidden');
       }
+
+      generateUsernameOtomatis();
     }
 
     function saatUserKabBerubah() {
@@ -8025,6 +8078,8 @@
         opt.setAttribute('data-rt', d.jumlah_rt || 1);
         selDusun.add(opt);
       });
+
+      generateUsernameOtomatis();
     }
 
     // 2. Saat Dusun Dipilih -> Munculkan Checkbox RT Sesuai Jumlah RT Dusun Tersebut
@@ -8149,8 +8204,7 @@
       renderDaftarWilayahTerpilih();
       saatRoleUserBerubah();
     }
-
-    // Simpan Akun ke Supabase
+    
     async function simpanAkunUser() {
       const btn = document.getElementById('btnSimpanAkun');
       btn.disabled = true;
@@ -8161,16 +8215,14 @@
       const username = document.getElementById('user_username').value.trim();
       const password = document.getElementById('user_password').value.trim();
       const role = document.getElementById('user_role').value;
-
-      // Validasi kelengkapan isian pokok
+      
       if (!username || !password || !role) {
         Swal.fire('Peringatan', 'Username, password, dan role wajib diisi!', 'warning');
         btn.disabled = false;
         btn.innerText = userId ? '💾 PERBARUI AKUN' : '💾 SIMPAN AKUN';
         return;
       }
-
-      // Pemetaan kode wilayah berdasarkan tingkatan role
+      
       const kdKab = (['Admin Kab', 'Admin Kec', 'Admin Desa', 'User Desa'].includes(role)) 
         ? (document.getElementById('user_kab')?.value || userAktif.kode_kab || null) : null;
 
@@ -8179,8 +8231,7 @@
 
       const kdDesa = (['Admin Desa', 'User Desa'].includes(role)) 
         ? (document.getElementById('user_desa')?.value || userAktif.kode_desa || null) : null;
-
-      // Validasi khusus Role User Desa (Kader)
+      
       let wilayahKaderJson = null;
       let allowedDusunRingkas = null;
 
@@ -8198,16 +8249,17 @@
           btn.innerText = userId ? '💾 PERBARUI AKUN' : '💾 SIMPAN AKUN';
           return;
         }
-
-        // Serialisasi penugasan multi-dusun dan multi-RT
+        
         wilayahKaderJson = JSON.stringify(penugasanWilayahKaderForm);
         allowedDusunRingkas = penugasanWilayahKaderForm.map(w => w.kode_dusun).join(',');
       }
 
-      // Susun Payload untuk tabel users di Supabase
+      const namaPanggilan = document.getElementById('user_namapanggilan').value.trim().toLowerCase();
+      
       const payload = {
         username: username,
         nama_lengkap: nama || null,
+        nama_panggilan: namaPanggilan || null,
         password_hash: password,
         role: role,
         kode_prov: userAktif.kode_prov || '52',
@@ -8592,6 +8644,7 @@
       // Isi kolom form
       document.getElementById('user_id').value = u.id;
       document.getElementById('user_namalengkap').value = u.nama_lengkap || '';
+      document.getElementById('user_namapanggilan').value = u.nama_panggilan || '';
       document.getElementById('user_username').value = u.username;
       document.getElementById('user_username').readOnly = true;
       document.getElementById('user_password').value = u.password_hash || '';
@@ -8667,8 +8720,9 @@
     function downloadTemplateUserExcel() {
       const data = [
         {
-          "NAMA_LENGKAP": "Kader Dusun Hubbal",
-          "USERNAME": "kader_hubbal_01",
+          "NAMA_LENGKAP": "BUDI SANTOSO, S.Pd",
+          "NAMA_PANGGILAN": "budi",
+          "USERNAME": "dat01082001budi",
           "PASSWORD": "password123",
           "ROLE": "User Desa",
           "KODE_KEC": "08",
@@ -8677,8 +8731,9 @@
           "ALLOWED_WILAYAH_RT": '[{"kode_dusun":"0100","dusun":"HUBBAL KHAIR","rt":["001","002"]}]'
         },
         {
-          "NAMA_LENGKAP": "Admin Kecamatan Lembar",
-          "USERNAME": "adminkec_lembar",
+          "NAMA_LENGKAP": "AHMAD FADHLI, S.Sos",
+          "NAMA_PANGGILAN": "ahmad",
+          "USERNAME": "adm520108lembar",
           "PASSWORD": "password123",
           "ROLE": "Admin Kec",
           "KODE_KEC": "08",
@@ -8691,7 +8746,7 @@
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Template_Users");
-      XLSX.writeFile(wb, "Template_Akun_Pengguna.xlsx");
+      XLSX.writeFile(wb, "Template_Akun_Pengguna_Terbaru.xlsx");
     }
 
     async function uploadUserExcel(file) {
@@ -8721,24 +8776,39 @@
             const kdKec = String(r.KODE_KEC || r.kode_kec || '').padStart(2, '0');
             const kdDesa = String(r.KODE_DESA || r.kode_desa || '').padStart(4, '0');
             const allowedDusun = String(r.ALLOWED_DUSUN || r.allowed_dusun || '').trim() || null;
-
-            // Batasi sesuai peran login
+            
             if (userAktif.role === 'ADMIN_KECAMATAN' && (role !== 'User Desa' || kdKec !== userAktif.kode_kec)) {
               continue;
             }
 
-            payload.push({
-              username: username,
-              nama_lengkap: String(r.NAMA_LENGKAP || r.nama_lengkap || '').trim() || null,
-              password_hash: password,
-              role: role,
-              kode_kab: userAktif.kode_kab || '01',
-              kode_kec: kdKec || null,
-              kode_desa: (role === 'User Desa') ? (kdDesa || null) : null,
-              allowed_dusun: allowedDusun,
-              allowed_wilayah_rt: String(r.ALLOWED_WILAYAH_RT || r.allowed_wilayah_rt || '').trim() || null
-            });
-          }
+            const payload = [];
+            for (let r of rows) {
+              const username = String(r.USERNAME || r.username || '').trim();
+              const password = String(r.PASSWORD || r.password || '').trim();
+              if (!username || !password) continue;
+
+              const role = String(r.ROLE || r.role || 'User Desa').trim();
+              const kdKec = String(r.KODE_KEC || r.kode_kec || '').padStart(2, '0');
+              const kdDesa = String(r.KODE_DESA || r.kode_desa || '').padStart(4, '0');
+              const allowedDusun = String(r.ALLOWED_DUSUN || r.allowed_dusun || '').trim() || null;
+
+              if (userAktif.role === 'ADMIN_KECAMATAN' && (role !== 'User Desa' || kdKec !== userAktif.kode_kec)) {
+                continue;
+              }
+
+              payload.push({
+                username: username,
+                nama_lengkap: String(r.NAMA_LENGKAP || r.nama_lengkap || '').trim() || null,
+                nama_panggilan: String(r.NAMA_PANGGILAN || r.nama_panggilan || '').trim().toLowerCase() || null,
+                password_hash: password,
+                role: role,
+                kode_kab: userAktif.kode_kab || '01',
+                kode_kec: kdKec || null,
+                kode_desa: (role === 'User Desa') ? (kdDesa || null) : null,
+                allowed_dusun: allowedDusun,
+                allowed_wilayah_rt: String(r.ALLOWED_WILAYAH_RT || r.allowed_wilayah_rt || '').trim() || null
+              });
+            }
 
           if (payload.length === 0) throw new Error('Tidak ada baris akun yang valid sesuai wewenang Anda.');
 
