@@ -3549,6 +3549,10 @@
       if (namaModul === 'kelola_user') gantiTabUser('form', true);
       if (namaModul === 'formulir') bukaFormulirPendataan();
 
+      if (namaModul === 'beranda') {
+        muatMetrikRingkasanEksekutif();
+      }
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -3600,6 +3604,93 @@
       };
       if (breadcrumb && labelTab[namaTab]) {
         breadcrumb.innerText = labelTab[namaTab];
+      }
+    }
+    
+    async function muatMetrikRingkasanEksekutif() {
+      if (!supabaseClient) return;
+
+      try {        
+        let query = supabaseClient.from('keluarga').select(`
+          nomor_kk,
+          status_keluarga,
+          kode_prov,
+          kode_kab,
+          kode_kec,
+          kode_desa,
+          kb_03_sedang_hamil,
+          kb_03_keinginan_anak_lagi,
+          kb_04_sedang_kb,
+          anggota_keluarga (
+            hubungan_dengan_kk,
+            status_perkawinan,
+            tanggal_lahir
+          )
+        `);
+
+        if (userAktif) {
+          if (userAktif.role === 'ADMIN_PROVINSI' && userAktif.kode_prov) {
+            query = query.eq('kode_prov', userAktif.kode_prov);
+          } else if (userAktif.role === 'ADMIN_KABUPATEN' && userAktif.kode_kab) {
+            query = query.eq('kode_kab', userAktif.kode_kab);
+          } else if (userAktif.role === 'ADMIN_KECAMATAN' && userAktif.kode_kec) {
+            query = query.eq('kode_kec', userAktif.kode_kec);
+          } else if ((userAktif.role === 'ADMIN_DESA' || userAktif.role === 'USER_DESA') && userAktif.kode_desa) {
+            query = query.eq('kode_desa', userAktif.kode_desa);
+          }
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        let totalKK = 0;
+        let totalPUS = 0;
+        let totalPA = 0;
+        let totalUnmet = 0;
+
+        (data || []).forEach(k => {
+          totalKK++;
+
+          const listAng = k.anggota_keluarga || [];
+          const istri = listAng.find(a => String(a.hubungan_dengan_kk) === '2');
+          let isPUS = false;
+          
+          if (istri && istri.tanggal_lahir) {
+            const usiaIstri = hitungUsiaTahun(istri.tanggal_lahir);
+            const kawin = ['2', '3'].includes(String(istri.status_perkawinan || ''));
+            isPUS = kawin && (usiaIstri >= 10 && usiaIstri <= 49);
+          } else if (k.kb_04_sedang_kb) {
+            isPUS = true;
+          }
+
+          if (isPUS) totalPUS++;
+
+          const isHamil = (k.kb_03_sedang_hamil === true || String(k.kb_03_sedang_hamil) === '1');
+          const sedangKB = (k.kb_04_sedang_kb === true || String(k.kb_04_sedang_kb) === '1');
+
+          if (sedangKB) {
+            totalPA++;
+          } else if (isPUS && !isHamil) {
+            const ingin = String(k.kb_03_keinginan_anak_lagi || '');
+            // Unmet Need: Ingin anak tunda (2) atau Tidak ingin anak lagi (3)
+            if (ingin === '2' || ingin === '3') {
+              totalUnmet++;
+            }
+          }
+        });
+        
+        const elKK = document.getElementById('tile_total_kk');
+        const elPUS = document.getElementById('tile_total_pus');
+        const elPA = document.getElementById('tile_total_pa');
+        const elUnmet = document.getElementById('tile_total_unmet');
+
+        if (elKK) elKK.innerText = totalKK.toLocaleString('id-ID');
+        if (elPUS) elPUS.innerText = totalPUS.toLocaleString('id-ID');
+        if (elPA) elPA.innerText = totalPA.toLocaleString('id-ID');
+        if (elUnmet) elUnmet.innerText = totalUnmet.toLocaleString('id-ID');
+
+      } catch (err) {
+        console.warn("Gagal menghitung metrik ringkasan eksekutif:", err);
       }
     }
 
@@ -3729,6 +3820,8 @@
 
       const roleBadge = document.getElementById('roleBadge');
       if (roleBadge) roleBadge.innerText = userAktif.role.replace('_', ' ');
+
+      muatMetrikRingkasanEksekutif();
 
       const btnPill = document.getElementById('btnPillKelolaWilayah');
       if (btnPill) {
