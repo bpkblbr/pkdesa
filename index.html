@@ -249,34 +249,38 @@
                class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#FFB64D] hover:bg-amber-50/80 transition">
               <span class="w-5 text-center text-base text-amber-500">📋</span>
               <span>Data By Name Address</span>
-            </a>
-
+            </a>            
+            
             <div class="pt-4 px-3.5 pb-1">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master & Database</p>
             </div>
             
-            <a href="javascript:void(0)" id="sideBtnWilayah" onclick="bukaHalamanAdmin('kelola_wilayah')" 
-               class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#4099ff] hover:bg-blue-50/80 transition">
+            <!-- MASTER WILAYAH -->
+            <a href="javascript:void(0)" id="sideNav_kelola_wilayah" onclick="bukaHalamanAdmin('kelola_wilayah')" 
+               class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#4099ff] hover:bg-blue-50/80 transition group">
               <span class="w-5 text-center text-base text-indigo-500">📍</span>
-              <span>Master Wilayah</span>
+              <span class="font-bold">Master Wilayah</span>
             </a>
             
-            <a href="javascript:void(0)" onclick="bukaModalKelolaUser()" 
-               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#FF5370] hover:bg-rose-50/80 transition">
+            <!-- MANAJEMEN USER -->
+            <a href="javascript:void(0)" id="sideNav_kelola_user" onclick="bukaHalamanAdmin('kelola_user')" 
+               class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#FF5370] hover:bg-rose-50/80 transition group">
               <span class="w-5 text-center text-base text-rose-500">🔑</span>
-              <span>Manajemen User</span>
+              <span class="font-bold">Manajemen User</span>
             </a>
             
-            <a href="javascript:void(0)" onclick="bukaModalKelolaExcelKeluarga()" 
-               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#2ed8b6] hover:bg-emerald-50/80 transition">
+            <!-- IMPORT / EKSPOR EXCEL -->
+            <a href="javascript:void(0)" id="sideNav_kelola_excel" onclick="bukaHalamanAdmin('kelola_excel')" 
+               class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#2ed8b6] hover:bg-emerald-50/80 transition group">
               <span class="w-5 text-center text-base text-emerald-500">📁</span>
-              <span>Import / Ekspor Excel</span>
+              <span class="font-bold">Import / Ekspor Excel</span>
             </a>
             
+            <!-- AUDIT NIK -->
             <a href="javascript:void(0)" onclick="auditNikIstriGandaKeluarga()" 
-               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#FF5370] hover:bg-rose-50/80 transition">
+               class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:text-[#FF5370] hover:bg-rose-50/80 transition group">
               <span class="w-5 text-center text-base text-red-500">🛡️</span>
-              <span>Audit NIK Istri Ganda</span>
+              <span class="font-bold">Audit NIK Istri Ganda</span>
             </a>
           </nav>
         </div>
@@ -1166,6 +1170,234 @@
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- ==================== SUB-VIEW 7: MANAJEMEN USER ==================== -->
+        <div id="sub_view_kelola_user" class="sub-view-admin hidden space-y-5">
+          <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-5 sm:p-6 space-y-4">
+            
+            <!-- Tab Switcher Header -->
+            <div class="flex gap-2 border-b pb-3 text-xs font-bold">
+              <button type="button" id="tabBtnUserForm" onclick="gantiTabUser('form')" 
+                      class="px-4 py-2 rounded-xl bg-amber-600 text-white transition shadow-sm uppercase">
+                ➕ Input / Edit Akun
+              </button>
+              <button type="button" id="tabBtnUserList" onclick="gantiTabUser('list')" 
+                      class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition uppercase">
+                📋 Daftar Akun
+              </button>
+            </div>
+
+            <!-- TAB 1: FORM INPUT & EDIT AKUN -->
+            <div id="userTabForm" class="space-y-4 text-xs">
+              <form id="formUserAkun" onsubmit="event.preventDefault(); simpanAkunUser();" class="space-y-3">
+                <input type="hidden" id="user_id" value="" />
+
+                <div>
+                  <label class="block font-bold text-slate-700 uppercase mb-1">Nama Lengkap</label>
+                  <input type="text" id="user_namalengkap" placeholder="Contoh: Budi Santoso"
+                         class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium" />
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Username *</label>
+                    <input type="text" id="user_username" required placeholder="kader_lembar_01"
+                           class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold" />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Password *</label>
+                    <input type="text" id="user_password" required placeholder="Min 6 karakter"
+                           class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-mono" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 uppercase mb-1">Peran / Role Pengguna *</label>
+                  <select id="user_role" required onchange="saatRoleUserBerubah()" 
+                          class="w-full p-2.5 border rounded-xl bg-white outline-none font-bold text-slate-800">
+                    <option value="">-- PILIH ROLE --</option>
+                    <option value="Admin Prov">Admin Provinsi</option>
+                    <option value="Admin Kab">Admin Kabupaten</option>
+                    <option value="Admin Kec">Admin Kecamatan</option>
+                    <option value="Admin Desa">Admin Desa / Kelurahan</option>
+                    <option value="User Desa">Kader Pendata (Lapangan)</option>
+                  </select>
+                </div>
+
+                <div id="userRowKab" class="hidden">
+                  <label class="block font-bold text-slate-700 uppercase mb-1">Kabupaten / Kota *</label>
+                  <select id="user_kab" onchange="saatUserKabBerubah()" class="w-full p-2.5 border rounded-xl bg-white outline-none font-semibold">
+                    <option value="">-- PILIH KABUPATEN --</option>
+                  </select>
+                </div>
+
+                <div id="userRowKec" class="hidden">
+                  <label class="block font-bold text-slate-700 uppercase mb-1">Kecamatan Otoritas *</label>
+                  <select id="user_kec" onchange="saatUserKecBerubah()" class="w-full p-2.5 border rounded-xl bg-white outline-none font-semibold">
+                    <option value="">-- PILIH KECAMATAN --</option>
+                  </select>
+                </div>
+
+                <div id="userRowDesa" class="hidden">
+                  <label class="block font-bold text-slate-700 uppercase mb-1">Desa Otoritas *</label>
+                  <select id="user_desa" onchange="saatUserDesaBerubah()" class="w-full p-2.5 border rounded-xl bg-white outline-none font-semibold">
+                    <option value="">-- PILIH DESA --</option>
+                  </select>
+                </div>
+
+                <div id="userRowDusun" class="hidden space-y-3 pt-1">
+                  <label class="block font-bold text-slate-700 uppercase text-xs">Penugasan Dusun & RT Kader *</label>
+                  <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs">
+                    <div>
+                      <label class="block font-semibold text-slate-600 mb-1">Pilih Dusun / RW</label>
+                      <select id="user_pilih_dusun" onchange="saatUserPilihDusunBerubah()" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl outline-none font-semibold text-slate-800">
+                        <option value="">-- PILIH DUSUN --</option>
+                      </select>
+                    </div>
+
+                    <div id="areaCheckboxRtPerDusun" class="hidden space-y-2 pt-1 border-t border-slate-200">
+                      <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-700 text-[11px]">Pilih RT yang Ditugaskan:</span>
+                        <button type="button" onclick="toggleSemuaRtDusunTerpilih()" class="text-[10px] text-indigo-600 font-bold hover:underline">Pilih / Batalkan Semua</button>
+                      </div>
+                      <div id="gridCheckboxRtDusun" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+                      <div class="pt-1">
+                        <button type="button" onclick="tambahkanPenugasanDusunRt()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-sm uppercase flex items-center justify-center gap-1.5">
+                          <span>➕ Tambahkan ke Wilayah Tugas</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="space-y-1.5">
+                    <span class="text-[11px] font-bold text-slate-600">Daftar Wilayah Tugas Terpilih:</span>
+                    <div id="wadahListWilayahTerpilih" class="min-h-[50px] p-2 bg-white border border-slate-200 rounded-xl space-y-1.5 max-h-36 overflow-y-auto">
+                      <span class="text-slate-400 italic text-[11px]">Belum ada dusun/RT yang ditambahkan.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                  <button type="submit" id="btnSimpanAkun" class="flex-1 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow transition uppercase">
+                    💾 SIMPAN AKUN
+                  </button>
+                  <button type="button" onclick="resetFormUser()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition uppercase">
+                    Bersihkan
+                  </button>
+                </div>
+              </form>
+
+              <!-- Upload Massal Excel Akun -->
+              <div class="border-t pt-3 space-y-2">
+                <div class="flex justify-between items-center bg-slate-50 border p-3 rounded-xl">
+                  <span class="font-bold text-slate-700 uppercase">Kelola Akun Massal:</span>
+                  <button type="button" onclick="downloadTemplateUserExcel()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold uppercase text-[11px] transition">
+                    📥 Unduh Template
+                  </button>
+                </div>
+                <div class="flex gap-2">
+                  <input type="file" id="inputExcelUser" accept=".xlsx, .xls" class="flex-1 p-2 border rounded-xl bg-white text-xs" />
+                  <button type="button" onclick="uploadUserExcel(document.getElementById('inputExcelUser').files[0])" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl uppercase transition">
+                    🚀 Upload
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: DAFTAR AKUN TERDAFTAR -->
+            <div id="userTabList" class="hidden space-y-3 text-xs">
+              <div class="bg-slate-50 border rounded-2xl p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <select id="filterAkunRole" onchange="renderTabelUser()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
+                  <option value="">-- SEMUA ROLE --</option>
+                  <option value="Super Admin">Super Admin</option>
+                  <option value="Admin Prov">Admin Provinsi</option>
+                  <option value="Admin Kab">Admin Kabupaten</option>
+                  <option value="Admin Kec">Admin Kecamatan</option>
+                  <option value="Admin Desa">Admin Desa</option>
+                  <option value="User Desa">Kader Pendata</option>
+                </select>
+                <select id="filterAkunKab" onchange="onFilterAkunKabChange()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
+                  <option value="">-- SEMUA KABUPATEN --</option>
+                </select>
+                <select id="filterAkunKec" onchange="onFilterAkunKecChange()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
+                  <option value="">-- SEMUA KECAMATAN --</option>
+                </select>
+                <select id="filterAkunDesa" onchange="renderTabelUser()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
+                  <option value="">-- SEMUA DESA --</option>
+                </select>
+              </div>
+
+              <div class="flex gap-2">
+                <input type="text" id="cariAkunKeyword" oninput="renderTabelUser()" placeholder="Cari Nama / Username / Wilayah..."
+                       class="flex-1 p-2 border rounded-xl outline-none font-medium uppercase" />
+                <button type="button" onclick="muatDaftarAkunUser()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition">
+                  🔄 Segarkan
+                </button>
+              </div>
+
+              <div class="overflow-x-auto border rounded-2xl max-h-80 overflow-y-auto">
+                <table class="w-full text-left border-collapse text-[11px]">
+                  <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs uppercase font-bold sticky top-0">
+                    <tr>
+                      <th class="p-2.5 text-center w-12">No</th>
+                      <th class="p-2.5 text-left">Nama & Username</th>
+                      <th class="p-2.5 text-center">Peran</th>
+                      <th class="p-2.5 text-left">Wilayah Administratif</th>
+                      <th class="p-2.5 text-left">Wilayah Tugas (RT)</th>
+                      <th class="p-2.5 text-center w-28">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbodyDaftarUser" class="divide-y divide-slate-100">
+                    <tr><td colspan="6" class="p-4 text-center text-slate-400">Memuat data akun...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ==================== SUB-VIEW 8: IMPORT / EKSPOR EXCEL ==================== -->
+        <div id="sub_view_kelola_excel" class="sub-view-admin hidden space-y-5">
+          <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-5 sm:p-7 space-y-5 text-xs">
+            <h3 class="font-black text-sm uppercase text-slate-800 flex items-center gap-2">
+              <span>📁</span>
+              <span>Import / Ekspor Data Keluarga Terpadu</span>
+            </h3>
+
+            <!-- Panel Unduh Data & Template -->
+            <div class="p-5 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-3">
+              <h4 class="text-xs font-bold text-emerald-800 uppercase flex items-center gap-1.5">
+                <span>📥</span> Unduh Format / Data Terisi (.xlsx)
+              </h4>
+              <p class="text-[11px] text-emerald-700 leading-relaxed">
+                Unduh data keluarga yang sudah terisi di database sesuai wilayah Anda atau unduh template kosong untuk pengisian offline.
+              </p>
+              <div class="flex flex-wrap gap-2 pt-1">
+                <button type="button" onclick="downloadExcelKeluargaTerisi()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-sm transition uppercase">
+                  Download Data Terisi (.xlsx)
+                </button>
+                <button type="button" onclick="downloadTemplateExcelKeluarga()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold border border-slate-300 transition uppercase">
+                  Template Kosong (.xlsx)
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel Unggah File Excel -->
+            <div class="p-5 bg-blue-50/70 border border-blue-200 rounded-2xl space-y-3">
+              <h4 class="text-xs font-bold text-blue-800 uppercase flex items-center gap-1.5">
+                <span>🚀</span> Upload Data dari Excel ke Database
+              </h4>
+              <p class="text-[11px] text-blue-700 leading-relaxed">
+                Pastikan kolom data sesuai template resmi (Sheet KELUARGA & ANGGOTA_KELUARGA). Berkas akan divalidasi langsung secara otomatis.
+              </p>
+              <div class="space-y-2">
+                <input type="file" id="inputBerkasExcelKeluarga" accept=".xlsx, .xls" onchange="uploadDataKeluargaExcel(event)"
+                       class="block w-full text-xs text-slate-500 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer border border-slate-200 rounded-xl p-1.5 bg-white" />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -2438,228 +2670,8 @@
     </div>
   </div>
 
-  <!-- ========================================================
-       MODAL KELOLA USER (GAYA INDEX_KAB)
-       ======================================================== -->
-  <div id="modalKelolaUser" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
-      
-      <!-- Header Modal -->
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase flex items-center gap-2">
-          <span>🔑 KELOLA USER PENGGUNA</span>
-        </h3>
-        <button type="button" onclick="tutupModalKelolaUser()" class="text-slate-400 hover:text-slate-700 font-bold text-xl px-2">&times;</button>
-      </div>
-
-      <!-- Tab Switcher -->
-      <div class="flex gap-2 border-b pb-3 text-xs font-bold">
-        <button type="button" id="tabBtnUserForm" onclick="gantiTabUser('form')" 
-                class="px-4 py-2 rounded-xl bg-amber-600 text-white transition shadow-sm uppercase">
-          ➕ Input / Edit Akun
-        </button>
-        <button type="button" id="tabBtnUserList" onclick="gantiTabUser('list')" 
-                class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition uppercase">
-          📋 Daftar Akun
-        </button>
-      </div>
-
-      <!-- TAB 1: FORM INPUT & EDIT AKUN -->
-      <div id="userTabForm" class="space-y-4 text-xs">
-        <form id="formUserAkun" onsubmit="event.preventDefault(); simpanAkunUser();" class="space-y-3">
-          <input type="hidden" id="user_id" value="" />
-
-          <div>
-            <label class="block font-bold text-slate-700 uppercase mb-1">Nama Lengkap</label>
-            <input type="text" id="user_namalengkap" placeholder="Contoh: Budi Santoso"
-                   class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium" />
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 uppercase mb-1">Username *</label>
-              <input type="text" id="user_username" required placeholder="kader_lembar_01"
-                     class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold" />
-            </div>
-            <div>
-              <label class="block font-bold text-slate-700 uppercase mb-1">Password *</label>
-              <input type="text" id="user_password" required placeholder="Min 6 karakter"
-                     class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-mono" />
-            </div>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 uppercase mb-1">Peran / Role Pengguna *</label>
-            <select id="user_role" required onchange="saatRoleUserBerubah()" 
-                    class="w-full p-2.5 border rounded-xl bg-white outline-none font-bold text-slate-800">
-              <option value="">-- PILIH ROLE --</option>
-              <option value="Admin Prov">Admin Provinsi</option>
-              <option value="Admin Kab">Admin Kabupaten</option>
-              <option value="Admin Kec">Admin Kecamatan</option>
-              <option value="Admin Desa">Admin Desa / Kelurahan</option>
-              <option value="User Desa">Kader Pendata (Lapangan)</option>
-            </select>
-          </div>
-
-          <!-- Pilihan Wilayah Bertingkat -->
-          <div id="userRowKab" class="hidden">
-            <label class="block font-bold text-slate-700 uppercase mb-1">Kabupaten / Kota *</label>
-            <select id="user_kab" onchange="saatUserKabBerubah()" 
-                    class="w-full p-2.5 border rounded-xl bg-white outline-none font-semibold">
-              <option value="">-- PILIH KABUPATEN --</option>
-            </select>
-          </div>
-
-          <div id="userRowKec" class="hidden">
-            <label class="block font-bold text-slate-700 uppercase mb-1">Kecamatan Otoritas *</label>
-            <select id="user_kec" onchange="saatUserKecBerubah()" 
-                    class="w-full p-2.5 border rounded-xl bg-white outline-none font-semibold">
-              <option value="">-- PILIH KECAMATAN --</option>
-            </select>
-          </div>
-
-          <div id="userRowDesa" class="hidden">
-            <label class="block font-bold text-slate-700 uppercase mb-1">Desa Otoritas *</label>
-            <select id="user_desa" onchange="saatUserDesaBerubah()" 
-                    class="w-full p-2.5 border rounded-xl bg-white outline-none font-semibold">
-              <option value="">-- PILIH DESA --</option>
-            </select>
-          </div>
-
-          <div id="userRowDusun" class="hidden space-y-3 pt-1">
-            <label class="block font-bold text-slate-700 uppercase text-xs">Penugasan Dusun & RT Kader *</label>
-            
-            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-3 text-xs">
-              <!-- 1. Dropdown Dusun -->
-              <div>
-                <label class="block font-semibold text-slate-600 mb-1">Pilih Dusun / RW</label>
-                <select id="user_pilih_dusun" onchange="saatUserPilihDusunBerubah()" 
-                        class="w-full p-2.5 bg-white border border-slate-300 rounded-xl outline-none font-semibold text-slate-800">
-                  <option value="">-- PILIH DUSUN --</option>
-                </select>
-              </div>
-
-              <!-- 2. Kontainer Checkbox RT (Muncul setelah dusun dipilih) -->
-              <div id="areaCheckboxRtPerDusun" class="hidden space-y-2 pt-1 border-t border-slate-200">
-                <div class="flex justify-between items-center">
-                  <span class="font-bold text-slate-700 text-[11px]">Pilih RT yang Ditugaskan:</span>
-                  <button type="button" onclick="toggleSemuaRtDusunTerpilih()" class="text-[10px] text-indigo-600 font-bold hover:underline">
-                    Pilih / Batalkan Semua
-                  </button>
-                </div>
-                
-                <div id="gridCheckboxRtDusun" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  <!-- Checkbox RT dimuat dinamis -->
-                </div>
-
-                <div class="pt-1">
-                  <button type="button" onclick="tambahkanPenugasanDusunRt()" 
-                          class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition shadow-sm uppercase flex items-center justify-center gap-1.5 active:scale-95">
-                    <span>➕ Tambahkan ke Wilayah Tugas</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- 3. Daftar Ringkasan Dusun & RT yang Sudah Ditambahkan -->
-            <div class="space-y-1.5">
-              <span class="text-[11px] font-bold text-slate-600">Daftar Wilayah Tugas Terpilih:</span>
-              <div id="wadahListWilayahTerpilih" class="min-h-[50px] p-2 bg-white border border-slate-200 rounded-xl space-y-1.5 max-h-36 overflow-y-auto">
-                <span class="text-slate-400 italic text-[11px]">Belum ada dusun/RT yang ditambahkan.</span>
-              </div>
-            </div>
-            <p class="text-[10px] text-slate-500 italic">*Pilih dusun lain dan centang RT-nya lagi jika kader bertugas di lebih dari 1 dusun.</p>
-          </div>
-
-          <!-- Tombol Aksi Form -->
-          <div class="flex gap-2 pt-2">
-            <button type="submit" id="btnSimpanAkun" 
-                    class="flex-1 py-3 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-bold rounded-xl shadow transition uppercase">
-              💾 SIMPAN AKUN
-            </button>
-            <button type="button" onclick="resetFormUser()" 
-                    class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition uppercase">
-              Bersihkan
-            </button>
-          </div>
-        </form>
-
-        <!-- Template & Upload Massal Akun via Excel -->
-        <div class="border-t pt-3 space-y-2">
-          <div class="flex justify-between items-center bg-slate-50 border p-3 rounded-xl">
-            <span class="font-bold text-slate-700 uppercase">Kelola Akun Massal:</span>
-            <button type="button" onclick="downloadTemplateUserExcel()" 
-                    class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold uppercase text-[11px] transition">
-              📥 Unduh Template
-            </button>
-          </div>
-          <div class="flex gap-2">
-            <input type="file" id="inputExcelUser" accept=".xlsx, .xls" class="flex-1 p-2 border rounded-xl bg-white text-xs" />
-            <button type="button" onclick="uploadUserExcel(document.getElementById('inputExcelUser').files[0])" 
-                    class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl uppercase transition">
-              🚀 Upload
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 2: DAFTAR AKUN TERDAFTAR -->
-      <div id="userTabList" class="hidden space-y-3 text-xs">
-        <!-- Filter Baris -->
-        <div class="bg-slate-50 border rounded-2xl p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
-          <select id="filterAkunRole" onchange="renderTabelUser()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
-            <option value="">-- SEMUA ROLE --</option>
-            <option value="Super Admin">Super Admin</option>
-            <option value="Admin Prov">Admin Provinsi</option>
-            <option value="Admin Kab">Admin Kabupaten</option>
-            <option value="Admin Kec">Admin Kecamatan</option>
-            <option value="Admin Desa">Admin Desa</option>
-            <option value="User Desa">Kader Pendata</option>
-          </select>
-          <select id="filterAkunKab" onchange="onFilterAkunKabChange()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
-            <option value="">-- SEMUA KABUPATEN --</option>
-          </select>
-          <select id="filterAkunKec" onchange="onFilterAkunKecChange()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
-            <option value="">-- SEMUA KECAMATAN --</option>
-          </select>
-          <select id="filterAkunDesa" onchange="renderTabelUser()" class="p-2 border rounded-lg bg-white outline-none font-semibold">
-            <option value="">-- SEMUA DESA --</option>
-          </select>
-        </div>
-
-        <div class="flex gap-2">
-          <input type="text" id="cariAkunKeyword" oninput="renderTabelUser()" placeholder="Cari Nama / Username / Wilayah..."
-                 class="flex-1 p-2 border rounded-xl outline-none font-medium uppercase" />
-          <button type="button" onclick="muatDaftarAkunUser()" class="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition">
-            🔄 Segarkan
-          </button>
-        </div>
-
-        <!-- Tabel Daftar Akun -->
-        <div class="overflow-x-auto border rounded-2xl max-h-80 overflow-y-auto">
-          <table class="w-full text-left border-collapse text-[11px]">
-            
-            <!-- THEAD BARU (6 KOLOM TERPISAH): -->
-            <thead class="bg-slate-50 border-b border-slate-200 text-slate-700 text-xs uppercase font-bold sticky top-0">
-              <tr>
-                <th class="p-2.5 text-center w-12">No</th>
-                <th class="p-2.5 text-left">Nama & Username</th>
-                <th class="p-2.5 text-center">Peran (Role)</th>
-                <th class="p-2.5 text-left">Wilayah Administratif</th>
-                <th class="p-2.5 text-left">Wilayah Tugas (RT)</th>
-                <th class="p-2.5 text-center w-28">Aksi</th>
-              </tr>
-            </thead>
-            
-            <tbody id="tbodyDaftarUser" class="divide-y divide-slate-100">
-              <tr><td colspan="6" class="p-4 text-center text-slate-400">Memuat data akun...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
+  
+  
 
   <!-- ========================================================
        4. HALAMAN WIZARD FORMULIR PENDATAAN KELUARGA
@@ -3478,7 +3490,7 @@
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
       
       document.querySelectorAll('.nav-item').forEach(el => {
-        el.className = "nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition";
+        el.className = "nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition";
       });
       
       const targetView = document.getElementById(`sub_view_${namaModul}`);
@@ -3494,11 +3506,13 @@
       const breadcrumb = document.getElementById('breadcrumbLevel2');
 
       const metaHalaman = {
-        beranda: { judul: 'Ringkasan Eksekutif', sub: 'Pemantauan capaian registrasi kependudukan dan KB', bc: 'Beranda' },
-        rekapitulasi: { judul: 'Rekapitulasi Berjenjang', sub: 'Laporan agregat kependudukan, capaian KB, dan stunting', bc: 'Rekapitulasi' },
+        beranda: { judul: 'Ringkasan Eksekutif', sub: 'Pemantauan data registrasi keluarga, pasangan usia subur, dan indikator KB', bc: 'Beranda' },
+        rekapitulasi: { judul: 'Rekapitulasi Berjenjang', sub: 'Laporan agregat kependudukan, capaian KB, dan sanitasi', bc: 'Rekapitulasi' },
         cari_edit: { judul: 'Cari & Edit Data Keluarga', sub: 'Pencarian terperinci KK dan perbaikan data sasaran', bc: 'Cari & Edit' },
         bnba: { judul: 'Laporan By Name By Address', sub: 'Penyaringan indikator sasaran spesifik tingkat dusun dan RT', bc: 'Data BNBA' },
-        kelola_wilayah: { judul: 'Master Wilayah', sub: 'Pengaturan hierarki kecamatan, desa, dusun, dan RT', bc: 'Wilayah' },
+        kelola_wilayah: { judul: 'Master Wilayah', sub: 'Pengaturan hierarki kecamatan, desa, dusun, dan RT', bc: 'Master Wilayah' },
+        kelola_user: { judul: 'Manajemen User Pengguna', sub: 'Pengaturan otorisasi akun administrator dan kader pendata', bc: 'Manajemen User' },
+        kelola_excel: { judul: 'Import / Ekspor Excel', sub: 'Unduh template resmi dan unggah data keluarga secara massal', bc: 'Kelola Excel' },
         formulir: { judul: 'Form Pendataan Keluarga', sub: 'Registrasi lembar kerja pendataan keluarga lapangan', bc: 'Form Pendataan' }
       };
 
@@ -3512,6 +3526,8 @@
       if (namaModul === 'cari_edit') initFilterWilayahCariEdit();
       if (namaModul === 'bnba') initFilterWilayahBnbaLap();
       if (namaModul === 'kelola_wilayah') bukaKelolaWilayah();
+      if (namaModul === 'kelola_user') gantiTabUser('form', true);
+      if (namaModul === 'formulir') bukaFormulirPendataan();
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -3653,7 +3669,7 @@
         btnTest.style.display = (userAktif.role === 'SUPER_ADMIN') ? 'inline-flex' : 'none';
       }
       
-      const sideBtnWilayah = document.getElementById('sideBtnWilayah');
+      const sideBtnWilayah = document.getElementById('sideNav_kelola_wilayah');
       if (sideBtnWilayah && userAktif) {
         sideBtnWilayah.style.display = (userAktif.role === 'USER_DESA') ? 'none' : 'flex';
       }
@@ -4507,7 +4523,7 @@
     // 4. PEMANGGILAN FILTER PADA SAAT BUKA KELOLA WILAYAH
     // ========================================================
     async function bukaKelolaWilayah() {
-      if (userAktif.role === 'USER_DESA') {
+      if (userAktif && userAktif.role === 'USER_DESA') {
         Swal.fire({
           icon: 'error',
           title: 'Akses Ditolak',
@@ -4515,12 +4531,10 @@
           confirmButtonColor: '#e11d48'
         });
         return;
-      }
-
-      tampilkanLayar('tampilan_kelola_wilayah');
+      }      
       
       const labelCakupan = document.getElementById('labelCakupanWilayah');
-      if (labelCakupan) {
+      if (labelCakupan && userAktif) {
         if (userAktif.role === 'SUPER_ADMIN') {
           labelCakupan.innerText = "Cakupan Akses: SEMUA WILAYAH (SUPER ADMIN)";
         } else if (userAktif.role === 'ADMIN_KABUPATEN') {
@@ -4531,11 +4545,6 @@
       }
 
       resetMwForm();
-
-      const tbody = document.getElementById('tbodyMasterWilayah');
-      if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500 font-semibold animate-pulse uppercase">Mengambil data master wilayah dari database...</td></tr>`;
-      }
 
       try {
         await loadMasterWilayahFromDB();
@@ -7702,9 +7711,9 @@
       saatRoleUserBerubah();
     }
 
-    function tutupModalKelolaUser() {
-      document.getElementById('modalKelolaUser').classList.add('hidden');
-      resetFormUser();
+    function tutupModalKelolaUser() {      
+      resetFormUser();      
+      bukaHalamanAdmin('beranda');
     }
 
     function gantiTabUser(tab, reset = true) {
