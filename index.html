@@ -389,10 +389,9 @@
           <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 space-y-4">
             <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
               <div>
-                <h3 class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">Pintas Modul Operasional</h3>
+                <h3 class="text-xs sm:text-sm font-black text-slate-800 uppercase tracking-wide">Modul Operasional</h3>
                 <p class="text-[11px] text-slate-400">Akses langsung lembar kerja dan laporan instrumen</p>
-              </div>
-              <span class="text-[10px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-full uppercase">Terintegrasi Supabase</span>
+              </div>              
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -440,7 +439,7 @@
              ======================================================== -->
         <div id="sub_view_cari_edit" class="sub-view-admin hidden space-y-5">
           <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="text-sm font-black text-slate-800 uppercase">Panel Pencarian & Filter Wilayah</h3>
+            <h3 class="text-sm font-black text-slate-800 uppercase">Panel Pencarian</h3>
             <span class="text-xs font-bold text-slate-500 uppercase" id="labelOtoritasCariEdit">Otoritas Wilayah</span>
           </div>
 
@@ -522,8 +521,8 @@
                 <div class="flex flex-wrap items-center gap-2 text-xs">
                   <label class="font-bold text-slate-700 uppercase">Cakupan Cetak:</label>
                   <select id="cari_edit_cakupan_cetak" class="p-2 border border-slate-300 rounded-lg bg-white font-semibold text-slate-800 outline-none">
-                    <option value="kk">Data Kepala Keluarga (KK) Saja</option>
-                    <option value="anggota">Semua Anggota Keluarga (Lengkap)</option>
+                    <option value="kk">Data KK</option>
+                    <option value="anggota">Semua Anggota Keluarga</option>
                   </select>
                   <button type="button" onclick="cetakPdfCariEdit()" class="px-4 py-2 bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold rounded-lg transition uppercase shadow-sm">
                     📄 Cetak PDF
@@ -3598,8 +3597,8 @@
 
       const breadcrumb = document.getElementById('breadcrumbLevel2');
       const labelTab = {
-        demo: 'Rekap Demografi & Sasaran',
-        kb: 'Rekap Pelayanan KB & Unmet Need',
+        demo: 'Rekap Kependudukan',
+        kb: 'Rekap Data KB',
         lingkungan: 'Rekap Sanitasi & Lingkungan'
       };
       if (breadcrumb && labelTab[namaTab]) {
