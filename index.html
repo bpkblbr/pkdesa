@@ -172,7 +172,7 @@
         <div class="flex items-center gap-4">
           <a href="javascript:void(0)" onclick="bukaHalamanAdmin('beranda')" class="flex items-center gap-2.5 hover:opacity-90 transition">
             <img src="https://raw.githubusercontent.com/bpkblbr/pdptpk/refs/heads/main/Logo3.png" alt="Logo" class="h-9 w-auto object-contain drop-shadow" />
-            <span class="font-black text-sm tracking-widest uppercase text-white truncate">ADMINTY DESA</span>
+            <span class="font-black text-sm tracking-widest uppercase text-white truncate">DATA KELUARGA DESA</span>
           </a>
           <button type="button" onclick="toggleSidebarAdminty()" class="p-1.5 hover:bg-white/10 rounded-lg transition text-slate-200" title="Toggle Menu">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,10 +210,10 @@
       </div>
     </header>
 
-    <div class="flex min-h-[calc(100vh-4rem)]">
+    <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
       
       <!-- 2. SIDEBAR KIRI TETAP (ADMINTY PERSISTENT SIDEBAR) -->
-      <aside id="adminty_sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 shadow-sm">
+      <aside id="adminty_sidebar" class="w-64 h-full bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 shadow-sm overflow-y-auto">
         <div class="py-3">
           
           <div class="px-5 py-2">
@@ -249,8 +249,8 @@
                class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-[#FFB64D] hover:bg-amber-50/80 transition">
               <span class="w-5 text-center text-base text-amber-500">📋</span>
               <span>Data By Name Address</span>
-            </a>            
-            
+            </a>
+
             <div class="pt-4 px-3.5 pb-1">
               <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Master & Database</p>
             </div>
@@ -283,10 +283,12 @@
               <span class="font-bold">Audit NIK Istri Ganda</span>
             </a>
           </nav>
-        </div>
 
-        <div class="p-3 bg-slate-50 border-t border-slate-200 text-center">
-          <p class="text-[10px] font-bold text-slate-400 uppercase">Aplikasi Pendataan 2026</p>
+        </div> <!-- Penutup <div class="py-3"> -->
+
+        <!-- Bagian Footer Bawah Sidebar -->
+        <div class="p-3 bg-slate-50 border-t border-slate-200 text-center shrink-0">
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Data Keluarga Desa</p>
         </div>
       </aside>
 
