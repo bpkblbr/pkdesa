@@ -6537,6 +6537,7 @@
                   <option value="2" ${String(targetAnggota.jenis_kelamin) === '2' ? 'selected' : ''}>2. Perempuan</option>
                 </select>
               </div>
+            </div>
 
             <!-- BARIS 2: (4) TANGGAL LAHIR & USIA (OTOMATIS & TERKUNCI) -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -9993,16 +9994,6 @@
         elRt.disabled = false;
         elRt.classList.remove('bg-slate-100', 'cursor-not-allowed', 'hidden');
       });
-    }
-
-      // DEFAULT UNTUK ADMIN: Munculkan 001 s/d jumlah RT dusun
-      const jumlahRt = parseInt(selectedOpt?.getAttribute('data-rt'), 10) || 1;
-      for (let i = 1; i <= jumlahRt; i++) {
-        const strRt = String(i).padStart(3, '0');
-        elRt.add(new Option(`${strRt} - ${strRt}`, strRt));
-      }
-      elRt.disabled = false;
-      elRt.classList.remove('bg-slate-100', 'cursor-not-allowed');
     }
 
     function sinkronkanLabelWilayah() {
