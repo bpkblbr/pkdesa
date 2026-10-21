@@ -3537,11 +3537,14 @@
     }
 
     function pindahHalamanForm(idTarget, labelJudul) {
-      sembunyikanSemuaHalamanForm();
-      const target = document.getElementById(idTarget);
-      if (target) target.classList.add('aktif');
-      const label = document.getElementById('labelTotalTahap');
-      if (label) label.innerText = labelJudul.toUpperCase();
+      sembunyikanSemuaHalamanForm();      
+      
+      const targets = document.querySelectorAll(`[id="${idTarget}"]`);
+      targets.forEach(el => el.classList.add('aktif'));
+      
+      const labels = document.querySelectorAll('#labelTotalTahap');
+      labels.forEach(lbl => lbl.innerText = labelJudul.toUpperCase());
+
       window.scrollTo(0, 0);
     }
 
@@ -5048,8 +5051,9 @@
         const kdKab = document.getElementById('cari_edit_kab')?.value;
         const kdKec = document.getElementById('cari_edit_kec')?.value;
         const kdDusun = document.getElementById('cari_edit_dusun')?.value;
-        const noRt = document.getElementById('cari_edit_rt')?.value; // <-- Membaca dari dropdown
+        const noRt = document.getElementById('cari_edit_rt')?.value;
 
+        // Tarik data dengan range besar agar tidak terpotong 1000 limit bawaan
         let query = supabaseClient.from('keluarga').select(`
           kode_keluarga,
           nomor_kk,
@@ -5067,14 +5071,28 @@
           kb_04_sedang_kb,
           kb_03_sedang_hamil,
           anggota_keluarga (*)
-        `).order('kode_keluarga', { ascending: true });
+        `).order('kode_keluarga', { ascending: true }).range(0, 99999);
 
-        if (kdDesa) query = query.eq('kode_desa', kdDesa);
-        if (kdKab) query = query.eq('kode_kab', kdKab);
-        if (kdKec) query = query.eq('kode_kec', kdKec);
-        if (kdDusun) query = query.eq('kode_dusun', kdDusun);
-        if (noRt) query = query.eq('rt', noRt);
-        if (inputNik) query = query.or(`nik_kk.eq.${inputNik},nomor_kk.eq.${inputNik}`);
+        // Filter desa fleksibel (mencocokkan baik "2001" maupun "02001")
+        if (kdDesa) {
+          const cleanDesa = String(parseInt(kdDesa, 10));
+          query = query.or(`kode_desa.eq.${kdDesa},kode_desa.eq.${cleanDesa}`);
+        }
+        if (kdKec) {
+          const cleanKec = String(parseInt(kdKec, 10));
+          query = query.or(`kode_kec.eq.${kdKec},kode_kec.eq.${cleanKec}`);
+        }
+        if (kdDusun) {
+          const cleanDusun = String(parseInt(kdDusun, 10));
+          query = query.or(`kode_dusun.eq.${kdDusun},kode_dusun.eq.${cleanDusun}`);
+        }
+        if (noRt) {
+          const cleanRt = String(parseInt(noRt, 10));
+          query = query.or(`rt.eq.${noRt},rt.eq.${cleanRt}`);
+        }
+        if (inputNik) {
+          query = query.or(`nik_kk.eq.${inputNik},nomor_kk.eq.${inputNik}`);
+        }
 
         const { data, error } = await query;
         if (error) throw error;
