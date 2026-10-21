@@ -3660,11 +3660,7 @@
       if (!supabaseClient) return;
 
       try {
-        // Tentukan parameter wilayah berdasarkan role akun yang sedang login
-        let pProv = null;
-        let pKab = null;
-        let pKec = null;
-        let pDesa = null;
+        let pProv = null, pKab = null, pKec = null, pDesa = null;
 
         if (userAktif) {
           if (userAktif.role === 'ADMIN_PROVINSI') {
@@ -3684,7 +3680,7 @@
           }
         }
 
-        // Panggil fungsi agregasi di sisi database PostgreSQL
+        // 1. Coba hitung via RPC Database
         const { data, error } = await supabaseClient.rpc('hitung_ringkasan_eksekutif', {
           p_kode_prov: pProv,
           p_kode_kab: pKab,
@@ -3692,10 +3688,7 @@
           p_kode_desa: pDesa
         });
 
-        if (error) throw error;
-
-        // Pasang hasil kalkulasi server langsung ke elemen HTML masing-masing kartu
-        if (data) {
+        if (!error && data) {
           const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el) el.innerText = (val || 0).toLocaleString('id-ID');
@@ -3709,10 +3702,89 @@
           setVal('tile_total_remaja', data.total_remaja);
           setVal('tile_total_lansia', data.total_lansia);
           setVal('tile_total_pa', data.total_pa);
+          return;
         }
 
+        if (error) {
+          console.warn("RPC belum siap atau gagal, beralih ke query langsung:", error.message);
+        }
+
+        // 2. Fallback: Hitung langsung di client jika RPC belum ada/error
+        let query = supabaseClient.from('keluarga').select(`
+          kode_keluarga,
+          nomor_kk,
+          kb_04_sedang_kb,
+          anggota_keluarga (
+            hubungan_dengan_kk,
+            status_perkawinan,
+            tanggal_lahir,
+            jenis_kelamin
+          )
+        `).range(0, 9999999);
+
+        if (pProv) query = query.eq('kode_prov', pProv);
+        if (pKab) query = query.eq('kode_kab', pKab);
+        if (pKec) query = query.eq('kode_kec', pKec);
+        if (pDesa) query = query.eq('kode_desa', pDesa);
+
+        const { data: rawKeluarga, error: errDirect } = await query;
+        if (errDirect) throw errDirect;
+
+        let totalKK = 0, totalJiwa = 0, totalPUS = 0, totalPA = 0;
+        let totalBaduta = 0, totalBalita = 0, totalRemaja = 0, totalLansia = 0;
+
+        (rawKeluarga || []).forEach(k => {
+          totalKK++;
+          const listAng = k.anggota_keluarga || [];
+          const istri = listAng.find(a => String(a.hubungan_dengan_kk) === '2');
+          let isPUS = false;
+
+          if (istri && istri.tanggal_lahir) {
+            const usiaIstri = hitungUsiaTahun(istri.tanggal_lahir);
+            const kawin = ['2', '3'].includes(String(istri.status_perkawinan || ''));
+            isPUS = kawin && (usiaIstri >= 10 && usiaIstri <= 49);
+          } else if (k.kb_04_sedang_kb === true || String(k.kb_04_sedang_kb) === '1') {
+            isPUS = true;
+          }
+          if (isPUS) totalPUS++;
+
+          if (k.kb_04_sedang_kb === true || String(k.kb_04_sedang_kb) === '1') {
+            totalPA++;
+          }
+
+          listAng.forEach(a => {
+            totalJiwa++;
+            if (!a.tanggal_lahir) return;
+            const tglLahir = new Date(a.tanggal_lahir);
+            const sekarang = new Date();
+            const selisihBulan = (sekarang.getFullYear() - tglLahir.getFullYear()) * 12 + (sekarang.getMonth() - tglLahir.getMonth());
+            const usiaTh = hitungUsiaTahun(a.tanggal_lahir);
+            const statusKawin = String(a.status_perkawinan || '1');
+
+            if (selisihBulan >= 0 && selisihBulan <= 23) totalBaduta++;
+            else if (selisihBulan >= 24 && selisihBulan <= 59) totalBalita++;
+
+            if (usiaTh >= 10 && usiaTh <= 24 && statusKawin === '1') totalRemaja++;
+            if (usiaTh >= 60) totalLansia++;
+          });
+        });
+
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el) el.innerText = val.toLocaleString('id-ID');
+        };
+
+        setVal('tile_total_kk', totalKK);
+        setVal('tile_total_jiwa', totalJiwa);
+        setVal('tile_total_pus', totalPUS);
+        setVal('tile_total_baduta', totalBaduta);
+        setVal('tile_total_balita', totalBalita);
+        setVal('tile_total_remaja', totalRemaja);
+        setVal('tile_total_lansia', totalLansia);
+        setVal('tile_total_pa', totalPA);
+
       } catch (err) {
-        console.warn("Gagal memuat ringkasan eksekutif via RPC:", err);
+        console.warn("Gagal menghitung metrik ringkasan eksekutif:", err);
       }
     }
 
