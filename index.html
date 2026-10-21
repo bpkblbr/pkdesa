@@ -5121,7 +5121,6 @@
       if (keywordNama) data = data.filter(k => (k.nama_kk || '').toLowerCase().includes(keywordNama));
       if (keywordNik) data = data.filter(k => (k.nik_kk || '').includes(keywordNik) || (k.nomor_kk || '').includes(keywordNik));
 
-      // Reset checkbox header saat merender
       const cbAll = document.getElementById('cb_pilih_semua_ce');
       if (cbAll) {
         cbAll.checked = false;
@@ -5139,25 +5138,6 @@
       let html = '';
       data.forEach((k, idx) => {
         const listAng = k.anggota_keluarga || [];
-        const daftarAnomali = periksaSeluruhAnomaliKeluarga(listAng);
-        const isTerkonfirmasi = k.anomali_status === 'TERKONFIRMASI';
-
-        let badgeAnomali = '';
-        if (daftarAnomali.length > 0) {
-          if (isTerkonfirmasi) {
-            badgeAnomali = `
-              <span class="inline-block px-2 py-0.5 mt-1 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full font-bold text-[9px] uppercase tracking-wider">
-                ✅ Anomali Terkonfirmasi
-              </span>
-            `;
-          } else {
-            badgeAnomali = `
-              <span class="inline-block px-2 py-0.5 mt-1 bg-rose-100 text-rose-700 border border-rose-300 rounded-full font-bold text-[9px] uppercase tracking-wider animate-pulse">
-                ⚠️ Perlu Konfirmasi (${daftarAnomali.length})
-              </span>
-            `;
-          }
-        }
         const kepala = listAng.find(a => String(a.hubungan_dengan_kk) === '1') || {};
         const tglLahir = kepala.tanggal_lahir ? formatTglIndo(kepala.tanggal_lahir) : '-';
         const usia = kepala.tanggal_lahir ? hitungUsiaTahun(kepala.tanggal_lahir) : '-';
@@ -5165,32 +5145,26 @@
 
         html += `
           <tr class="hover:bg-slate-50 transition border-b">
-            <!-- 1. KOLOM CHECKBOX TUNGGAL -->
             <td class="p-2.5 text-center">
               <input type="checkbox" name="cb_baris_ce" value="${kodeKeluarga}" onchange="perbaruiStatusCheckboxHeaderCE()" 
                      class="w-4 h-4 rounded border-slate-300 text-cyan-600 focus:ring-0 cursor-pointer accent-cyan-600 mx-auto block" />
             </td>
-
-            <!-- 2. KOLOM NO MANDIRI -->
             <td class="p-2.5 text-center font-bold text-slate-500">${idx + 1}</td>
-
-            <!-- 3. AKSI -->
             <td class="p-2.5 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button type="button" onclick="bukaDetailKeluargaCariEdit(decodeURIComponent('${encodeURIComponent(kodeKeluarga)}'))" 
+                <!-- Memanggil ByIndex agar kebal dari error spasi atau tanda kutip string -->
+                <button type="button" onclick="bukaDetailKeluargaCariEditByIndex(${idx})" 
                         title="Buka Rincian Anggota Keluarga"
                         class="px-2 py-1 bg-[#205493] hover:bg-[#163f73] active:scale-95 text-white rounded-lg font-bold text-[10px] shadow-sm transition">
                   👨‍👩‍👧‍👦 Rincian
                 </button>
-                <button type="button" onclick="editFormulirKeluargaLengkap(decodeURIComponent('${encodeURIComponent(kodeKeluarga)}'))" 
+                <button type="button" onclick="editFormulirKeluargaLengkapByIndex(${idx})" 
                         title="Edit Formulir Lengkap"
                         class="px-2 py-1 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white rounded-lg font-bold text-[10px] shadow-sm transition">
                   ✏️ Edit
                 </button>
               </div>
             </td>
-
-            <!-- 4. DATA IDENTITAS -->
             <td class="p-2.5 font-bold text-slate-800 uppercase">${k.nama_kk || '-'}</td>
             <td class="p-2.5 font-mono text-slate-600 font-semibold">${k.nik_kk || '-'}</td>
             <td class="p-2.5 font-mono font-bold text-slate-700 text-[10.5px]">${kodeKeluarga}</td>
@@ -5200,6 +5174,22 @@
         `;
       });
       tbody.innerHTML = html;
+    }
+
+    // Helper membuka detail via index cache
+    function bukaDetailKeluargaCariEditByIndex(idx) {
+      const kel = dataCariEditCache[idx];
+      if (kel) {
+        bukaDetailKeluargaCariEdit(kel.kode_keluarga || kel.nomor_kk);
+      }
+    }
+
+    // Helper membuka edit form via index cache
+    function editFormulirKeluargaLengkapByIndex(idx) {
+      const kel = dataCariEditCache[idx];
+      if (kel) {
+        editFormulirKeluargaLengkap(kel.kode_keluarga || kel.nomor_kk);
+      }
     }
 
     // 1. Pilih Semua / Batalkan Semua (Select / Unselect All)
@@ -9935,130 +9925,76 @@
     }
 
     function updateFormDusun() {
-      const rawKab = document.getElementById('kode_kab')?.value || document.getElementById('kabupaten')?.value;
-      const rawKec = document.getElementById('kode_kec')?.value || document.getElementById('kecamatan')?.value;
-      const rawDesa = document.getElementById('desa')?.value;
+      // Ambil nilai wilayah dari salah satu dropdown yang terisi
+      let rawKab = '', rawKec = '', rawDesa = '';
+      document.querySelectorAll('[id="kabupaten"]').forEach(el => { if (el.value) rawKab = el.value; });
+      document.querySelectorAll('[id="kecamatan"]').forEach(el => { if (el.value) rawKec = el.value; });
+      document.querySelectorAll('[id="desa"]').forEach(el => { if (el.value) rawDesa = el.value; });
 
       const kdKab = rawKab ? String(rawKab).padStart(2, '0') : '';
       const kdKec = rawKec ? String(rawKec).padStart(2, '0') : '';
       const kdDesa = rawDesa ? String(rawDesa).padStart(4, '0') : '';
-      if (document.getElementById('kode_desa')) document.getElementById('kode_desa').value = kdDesa;
+      
+      document.querySelectorAll('[id="kode_desa"]').forEach(el => el.value = kdDesa);
+      document.querySelectorAll('[id="kode_dusun"]').forEach(el => el.value = '');
 
-      const elDusun = document.getElementById('dusun');
-      if (!elDusun) return;
-
-      elDusun.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
-      if (document.getElementById('kode_dusun')) document.getElementById('kode_dusun').value = '';
-      resetFormDropdowns(['rt']);
-
-      const dsnKey = kdKab + "_" + kdKec + "_" + kdDesa;
-      if (!kdDesa || !dataDusun[dsnKey]) {
-        elDusun.disabled = true;
-        return;
-      }
-
-      // ------------------------------------------------------------------
-      // LOGIKA PENGUNCIAN KHUSUS KADER PENDATA (USER_DESA)
-      // ------------------------------------------------------------------
-      if (userAktif && userAktif.role === 'USER_DESA' && userAktif.allowed_wilayah_rt) {
-        try {
-          const listTugas = JSON.parse(userAktif.allowed_wilayah_rt);
-
-          if (Array.isArray(listTugas) && listTugas.length > 0) {
-            // Tampilkan HANYA dusun yang tercantum dalam penugasan kader
-            listTugas.forEach(t => {
-              const cleanKd = String(t.kode_dusun).padStart(4, '0');
-              const itemMaster = dataDusun[dsnKey][cleanKd];
-              const namaDsn = (t.dusun || itemMaster?.nama || cleanKd).toUpperCase();
-
-              const opt = new Option(`${cleanKd} - ${namaDsn}`, cleanKd);
-              opt.setAttribute('data-rt-allowed', JSON.stringify(t.rt || []));
-              opt.setAttribute('data-rt', t.rt?.length || 1);
-              elDusun.add(opt);
-            });
-
-            // Jika kader hanya ditugaskan di 1 Dusun: Otomatis pilih dan Kunci (Lock)
-            if (listTugas.length === 1) {
-              elDusun.selectedIndex = 1;
-              elDusun.disabled = true;
-              elDusun.classList.add('bg-slate-100', 'cursor-not-allowed');
-              if (document.getElementById('kode_dusun')) {
-                document.getElementById('kode_dusun').value = elDusun.value;
-              }
-              updateFormRT();
-            } else {
-              // Jika bertugas di > 1 dusun: Buka pilihan tapi hanya dusun tugasnya
-              elDusun.disabled = false;
-              elDusun.classList.remove('bg-slate-100', 'cursor-not-allowed');
-            }
-            return;
-          }
-        } catch (e) {
-          console.warn("Gagal membaca penugasan dusun kader:", e);
-        }
-      }
-
-      // UNTUK ROLE ADMIN (Tampilkan seluruh dusun di desa tersebut seperti biasa)
-      const listKodeDsn = Object.keys(dataDusun[dsnKey]).sort((a, b) => 
-        a.localeCompare(b, undefined, { numeric: true })
+      const dsnSaring = (rawWilayahList || []).filter(w => 
+        String(w.kode_kab).padStart(2, '0') === kdKab &&
+        String(w.kode_kec).padStart(2, '0') === kdKec &&
+        String(w.kode_desa).padStart(4, '0') === kdDesa
       );
 
-      listKodeDsn.forEach(kd => {
-        const item = dataDusun[dsnKey][kd];
-        const opt = new Option(`${kd} - ${item.nama.toUpperCase()}`, kd);
-        opt.setAttribute('data-rt', item.jumlah_rt || 1);
-        elDusun.add(opt);
+      document.querySelectorAll('[id="dusun"]').forEach(elDusun => {
+        elDusun.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
+        if (!kdDesa || dsnSaring.length === 0) {
+          elDusun.disabled = true;
+          return;
+        }
+
+        dsnSaring.forEach(item => {
+          const cKd = String(item.kode_dusun).padStart(4, '0');
+          const opt = new Option(`${cKd} - ${item.dusun.toUpperCase()}`, cKd);
+          opt.setAttribute('data-rt', item.jumlah_rt || 1);
+          elDusun.add(opt);
+        });
+
+        elDusun.disabled = false;
+        elDusun.classList.remove('bg-slate-100', 'cursor-not-allowed', 'hidden');
       });
 
-      elDusun.disabled = false;
-      elDusun.classList.remove('bg-slate-100', 'cursor-not-allowed');
+      updateFormRT();
     }
 
     function updateFormRT() {
-      const elDusun = document.getElementById('dusun');
-      const kdDusun = elDusun?.value;
-      if (document.getElementById('kode_dusun')) {
-        document.getElementById('kode_dusun').value = kdDusun || '';
-      }
+      let kdDusun = '';
+      let jmlRtMax = 1;
 
-      const elRt = document.getElementById('rt');
-      if (!elRt) return;
-
-      elRt.innerHTML = '<option value="">-- PILIH RT --</option>';
-
-      if (!kdDusun) { 
-        elRt.disabled = true; 
-        return; 
-      }
-
-      const selectedOpt = elDusun.selectedOptions[0];
-
-      // JIKA ROLE KADER: Ambil daftar RT spesifik penugasan dari atribut data-rt-allowed
-      const rawRtAllowed = selectedOpt?.getAttribute('data-rt-allowed');
-      if (userAktif && userAktif.role === 'USER_DESA' && rawRtAllowed) {
-        try {
-          const arrRt = JSON.parse(rawRtAllowed);
-          if (Array.isArray(arrRt) && arrRt.length > 0) {
-            arrRt.sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(r => {
-              const strRt = String(r).padStart(3, '0');
-              elRt.add(new Option(`RT ${strRt} - ${strRt}`, strRt));
-            });
-
-            // Jika hanya ditugaskan di 1 RT saja pada dusun ini, kunci RT tersebut
-            if (arrRt.length === 1) {
-              elRt.selectedIndex = 1;
-              elRt.disabled = true;
-              elRt.classList.add('bg-slate-100', 'cursor-not-allowed');
-            } else {
-              elRt.disabled = false;
-              elRt.classList.remove('bg-slate-100', 'cursor-not-allowed');
-            }
-            return;
-          }
-        } catch (e) {
-          console.warn("Gagal parse RT allowed:", e);
+      document.querySelectorAll('[id="dusun"]').forEach(el => {
+        if (el.value) {
+          kdDusun = el.value;
+          const opt = el.selectedOptions[0];
+          if (opt) jmlRtMax = parseInt(opt.getAttribute('data-rt'), 10) || 1;
         }
-      }
+      });
+
+      document.querySelectorAll('[id="kode_dusun"]').forEach(el => el.value = kdDusun);
+
+      document.querySelectorAll('[id="rt"]').forEach(elRt => {
+        elRt.innerHTML = '<option value="">-- PILIH RT --</option>';
+        if (!kdDusun) {
+          elRt.disabled = true;
+          return;
+        }
+
+        for (let i = 1; i <= jmlRtMax; i++) {
+          const strRt = String(i).padStart(3, '0');
+          elRt.add(new Option(`RT ${strRt} - ${strRt}`, strRt));
+        }
+
+        elRt.disabled = false;
+        elRt.classList.remove('bg-slate-100', 'cursor-not-allowed', 'hidden');
+      });
+    }
 
       // DEFAULT UNTUK ADMIN: Munculkan 001 s/d jumlah RT dusun
       const jumlahRt = parseInt(selectedOpt?.getAttribute('data-rt'), 10) || 1;
@@ -10118,19 +10054,37 @@
     }
 
     async function prosesAksiWilayah() {
-      const status = document.getElementById('status_keluarga').value;
+      const kontainerFormAktif = (userAktif && userAktif.role === 'USER_DESA') 
+      ? document.querySelector('#tampilan_formulir')
+      : document.querySelector('#sub_view_formulir');
 
-      const noKK = document.getElementById('nomor_kk').value.trim();
-      const kdProv = document.getElementById('kode_prov').value.trim();
-      const kdKab = document.getElementById('kode_kab').value.trim();
-      const kdKec = document.getElementById('kode_kec').value.trim();
-      const kdDesa = document.getElementById('kode_desa').value.trim();
-      const kdDusun = document.getElementById('kode_dusun').value.trim();
-      const rt = document.getElementById('rt').value.trim();
-      const kodeRumah = document.getElementById('kode_rumah').value.trim().padStart(3, '0');
-      const noUrutKel = document.getElementById('no_urut_keluarga').value.trim().padStart(3, '0');
-      const alamat = document.getElementById('alamat_detail').value.trim().toUpperCase();
-      const noHp = document.getElementById('no_hp').value.trim();
+      const getInp = (id) => {
+        const el = kontainerFormAktif.querySelector(`[id="${id}"]`);
+        return el ? el.value.trim() : '';
+      };
+
+      const status = getInp('status_keluarga') || '1';
+      const noKK = getInp('nomor_kk');
+      const kdProv = getInp('kode_prov') || getInp('provinsi');
+      const kdKab = getInp('kode_kab') || getInp('kabupaten');
+      const kdKec = getInp('kode_kec') || getInp('kecamatan');
+      const kdDesa = getInp('kode_desa') || getInp('desa');
+      const kdDusun = getInp('kode_dusun') || getInp('dusun');
+      const rt = getInp('rt');
+      const kodeRumah = (getInp('kode_rumah') || '001').padStart(3, '0');
+      const noUrutKel = (getInp('no_urut_keluarga') || '001').padStart(3, '0');
+      const alamat = getInp('alamat_detail').toUpperCase();
+      const noHp = getInp('no_hp');
+
+      // Sinkronkan ke seluruh form terduplikasi agar data tidak timpang
+      document.querySelectorAll('[id="kode_prov"]').forEach(el => el.value = kdProv);
+      document.querySelectorAll('[id="kode_kab"]').forEach(el => el.value = kdKab);
+      document.querySelectorAll('[id="kode_kec"]').forEach(el => el.value = kdKec);
+      document.querySelectorAll('[id="kode_desa"]').forEach(el => el.value = kdDesa);
+      document.querySelectorAll('[id="kode_dusun"]').forEach(el => el.value = kdDusun);
+      document.querySelectorAll('[id="rt"]').forEach(el => el.value = rt);
+      document.querySelectorAll('[id="kode_rumah"]').forEach(el => el.value = kodeRumah);
+      document.querySelectorAll('[id="no_urut_keluarga"]').forEach(el => el.value = noUrutKel);
       
       if (!noKK || !kdDusun || !rt || !kodeRumah || !noUrutKel || !alamat || !noHp) {
         Swal.fire({
