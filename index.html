@@ -5177,12 +5177,12 @@
             <!-- 3. AKSI -->
             <td class="p-2.5 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button type="button" onclick="bukaDetailKeluargaCariEdit('${kodeKeluarga}')" 
+                <button type="button" onclick="bukaDetailKeluargaCariEdit(decodeURIComponent('${encodeURIComponent(kodeKeluarga)}'))" 
                         title="Buka Rincian Anggota Keluarga"
                         class="px-2 py-1 bg-[#205493] hover:bg-[#163f73] active:scale-95 text-white rounded-lg font-bold text-[10px] shadow-sm transition">
                   👨‍👩‍👧‍👦 Rincian
                 </button>
-                <button type="button" onclick="editFormulirKeluargaLengkap('${kodeKeluarga}')" 
+                <button type="button" onclick="editFormulirKeluargaLengkap(decodeURIComponent('${encodeURIComponent(kodeKeluarga)}'))" 
                         title="Edit Formulir Lengkap"
                         class="px-2 py-1 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white rounded-lg font-bold text-[10px] shadow-sm transition">
                   ✏️ Edit
@@ -5848,17 +5848,110 @@
         };
 
         // 2. Isi Data Wilayah pada SEMUA form (Admin & Pendata)
-        document.querySelectorAll('[id="provinsi"]').forEach(el => { el.value = kdProv; });
-        updateFormKabupaten();
-        document.querySelectorAll('[id="kabupaten"]').forEach(el => { el.value = kdKab; });
-        updateFormKecamatan();
-        document.querySelectorAll('[id="kecamatan"]').forEach(el => { el.value = kdKec; });
-        updateFormDesa();
-        document.querySelectorAll('[id="desa"]').forEach(el => { el.value = kdDesa; });
-        updateFormDusun();
-        document.querySelectorAll('[id="dusun"]').forEach(el => { el.value = kdDsn; });
-        updateFormRT();
-        document.querySelectorAll('[id="rt"]').forEach(el => { el.value = String(kel.rt || '001').padStart(3, '0'); });
+        const dsnKey = kdKab + "_" + kdKec + "_" + kdDesa;
+        const dsnObj = (dataDusun && dataDusun[dsnKey]) ? dataDusun[dsnKey] : {};
+
+        // a. Isi Provinsi
+        document.querySelectorAll('[id="provinsi"]').forEach(el => {
+          el.value = kdProv;
+          el.classList.remove('hidden');
+          el.disabled = false;
+        });
+
+        // b. Isi Kabupaten
+        document.querySelectorAll('[id="kabupaten"]').forEach(el => {
+          el.innerHTML = '<option value="">-- PILIH KABUPATEN --</option>';
+          if (dataKabupaten[kdProv]) {
+            Object.keys(dataKabupaten[kdProv]).sort().forEach(k => {
+              el.add(new Option(`${k} - ${dataKabupaten[kdProv][k].toUpperCase()}`, k));
+            });
+          }
+          el.value = kdKab;
+          el.classList.remove('hidden');
+          el.disabled = false;
+        });
+
+        // c. Isi Kecamatan
+        document.querySelectorAll('[id="kecamatan"]').forEach(el => {
+          el.innerHTML = '<option value="">-- PILIH KECAMATAN --</option>';
+          if (dataKecamatan[kdKab]) {
+            Object.keys(dataKecamatan[kdKab]).sort().forEach(k => {
+              el.add(new Option(`${k} - ${dataKecamatan[kdKab][k].toUpperCase()}`, k));
+            });
+          }
+          el.value = kdKec;
+          el.classList.remove('hidden');
+          el.disabled = false;
+        });
+
+        // d. Isi Desa
+        const desaKey = kdKab + "_" + kdKec;
+        document.querySelectorAll('[id="desa"]').forEach(el => {
+          el.innerHTML = '<option value="">-- PILIH DESA --</option>';
+          if (dataDesa[desaKey]) {
+            Object.keys(dataDesa[desaKey]).sort().forEach(k => {
+              el.add(new Option(`${k} - ${dataDesa[desaKey][k].toUpperCase()}`, k));
+            });
+          }
+          el.value = kdDesa;
+          el.classList.remove('hidden');
+          el.disabled = false;
+        });
+
+        // e. Isi Dusun Langsung
+        document.querySelectorAll('[id="dusun"]').forEach(el => {
+          el.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
+          Object.keys(dsnObj).sort().forEach(k => {
+            const itemDsn = dsnObj[k];
+            const opt = new Option(`${k} - ${itemDsn.nama.toUpperCase()}`, k);
+            opt.setAttribute('data-rt', itemDsn.jumlah_rt || 1);
+            el.add(opt);
+          });
+          el.value = kdDsn;
+          el.disabled = false;
+          el.classList.remove('bg-slate-100', 'cursor-not-allowed', 'hidden');
+        });
+
+        // f. Isi RT Langsung Sesuai Jumlah RT Dusun Tersebut
+        const jmlRtDusun = dsnObj[kdDsn]?.jumlah_rt || 10;
+        const targetRt = String(parseInt(kel.rt || 1, 10)).padStart(3, '0');
+
+        document.querySelectorAll('[id="rt"]').forEach(el => {
+          el.innerHTML = '<option value="">-- PILIH RT --</option>';
+          for (let r = 1; r <= Math.max(jmlRtDusun, parseInt(kel.rt || 1, 10)); r++) {
+            const strR = String(r).padStart(3, '0');
+            el.add(new Option(`RT ${strR} - ${strR}`, strR));
+          }
+          el.value = targetRt;
+          el.disabled = false;
+          el.classList.remove('bg-slate-100', 'cursor-not-allowed', 'hidden');
+        });
+
+        // Pastikan label tersembunyi dan dropdown tampil
+        document.querySelectorAll('#label_provinsi, #label_kabupaten, #label_kecamatan, #label_desa').forEach(lbl => {
+          lbl.classList.add('hidden');
+        });
+
+        sinkronkanLabelWilayah();
+
+        setValAll('kode_prov', kdProv);
+        setValAll('kode_kab', kdKab);
+        setValAll('kode_kec', kdKec);
+        setValAll('kode_desa', kdDesa);
+        setValAll('kode_dusun', kdDsn);
+        setValAll('nomor_kk', kel.nomor_kk || '');
+        setValAll('kode_rumah', kel.kode_rumah || '001');
+        setValAll('no_urut_keluarga', kel.no_urut_keluarga || '001');
+        setValAll('no_hp', kel.no_hp || '');
+        setValAll('alamat_detail', kel.alamat_detail || '');
+
+        document.querySelectorAll('[id="status_keluarga"]').forEach(sel => {
+          sel.value = String(kel.status_keluarga || '1');
+          sel.disabled = false;
+          sel.classList.remove('bg-slate-100', 'cursor-not-allowed');
+        });
+
+        evaluasiStatusKeluarga();
 
         sinkronkanLabelWilayah();
 
