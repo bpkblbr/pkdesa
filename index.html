@@ -3680,56 +3680,45 @@
           }
         }
 
-        // 1. Coba hitung via RPC Database
-        const { data, error } = await supabaseClient.rpc('hitung_ringkasan_eksekutif', {
-          p_kode_prov: pProv,
-          p_kode_kab: pKab,
-          p_kode_kec: pKec,
-          p_kode_desa: pDesa
-        });
+        // 1. Ambil data secara bertahap (Loop Chunking per 1.000 baris agar menembus limit server)
+        let rawKeluarga = [];
+        let fromIdx = 0;
+        const step = 1000;
+        let adaDataLagi = true;
 
-        if (!error && data) {
-          const setVal = (id, val) => {
-            const el = document.getElementById(id);
-            if (el) el.innerText = (val || 0).toLocaleString('id-ID');
-          };
+        while (adaDataLagi) {
+          let query = supabaseClient.from('keluarga').select(`
+            kode_keluarga,
+            nomor_kk,
+            kb_04_sedang_kb,
+            anggota_keluarga (
+              hubungan_dengan_kk,
+              status_perkawinan,
+              tanggal_lahir,
+              jenis_kelamin
+            )
+          `).range(fromIdx, fromIdx + step - 1);
 
-          setVal('tile_total_kk', data.total_kk);
-          setVal('tile_total_jiwa', data.total_jiwa);
-          setVal('tile_total_pus', data.total_pus);
-          setVal('tile_total_baduta', data.total_baduta);
-          setVal('tile_total_balita', data.total_balita);
-          setVal('tile_total_remaja', data.total_remaja);
-          setVal('tile_total_lansia', data.total_lansia);
-          setVal('tile_total_pa', data.total_pa);
-          return;
+          if (pProv) query = query.eq('kode_prov', pProv);
+          if (pKab) query = query.eq('kode_kab', pKab);
+          if (pKec) query = query.eq('kode_kec', pKec);
+          if (pDesa) query = query.eq('kode_desa', pDesa);
+
+          const { data: batch, error: errDirect } = await query;
+          if (errDirect) throw errDirect;
+
+          if (batch && batch.length > 0) {
+            rawKeluarga = rawKeluarga.concat(batch);
+            fromIdx += step;
+            if (batch.length < step) {
+              adaDataLagi = false; // Data di server sudah selesai ditarik semua
+            }
+          } else {
+            adaDataLagi = false;
+          }
         }
 
-        if (error) {
-          console.warn("RPC belum siap atau gagal, beralih ke query langsung:", error.message);
-        }
-
-        // 2. Fallback: Hitung langsung di client jika RPC belum ada/error
-        let query = supabaseClient.from('keluarga').select(`
-          kode_keluarga,
-          nomor_kk,
-          kb_04_sedang_kb,
-          anggota_keluarga (
-            hubungan_dengan_kk,
-            status_perkawinan,
-            tanggal_lahir,
-            jenis_kelamin
-          )
-        `).range(0, 9999999);
-
-        if (pProv) query = query.eq('kode_prov', pProv);
-        if (pKab) query = query.eq('kode_kab', pKab);
-        if (pKec) query = query.eq('kode_kec', pKec);
-        if (pDesa) query = query.eq('kode_desa', pDesa);
-
-        const { data: rawKeluarga, error: errDirect } = await query;
-        if (errDirect) throw errDirect;
-
+        // 2. Hitung Metrik Agregasi dari seluruh data yang terkumpul
         let totalKK = 0, totalJiwa = 0, totalPUS = 0, totalPA = 0;
         let totalBaduta = 0, totalBalita = 0, totalRemaja = 0, totalLansia = 0;
 
@@ -3769,6 +3758,7 @@
           });
         });
 
+        // 3. Pasang nilai hasil kalkulasi ke masing-masing elemen kartu metrik
         const setVal = (id, val) => {
           const el = document.getElementById(id);
           if (el) el.innerText = val.toLocaleString('id-ID');
