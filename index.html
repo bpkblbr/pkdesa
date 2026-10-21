@@ -9305,41 +9305,69 @@
           const payloadKeluargaBatch = [];
           const payloadAnggotaBatch = [];
 
-          rawKeluarga.forEach(k => {
-            const noKK = String(k.NOMOR_KK || k.nomor_kk || '').trim();
-            if (!noKK) return;
+          rawKeluarga.forEach((k, idx) => {
+            // Ambil nomor KK dan Kode Keluarga secara fleksibel (mengantisipasi variasi nama kolom)
+            const noKK = String(k.NOMOR_KK || k.nomor_kk || k['NO KK'] || k['NO. KK'] || '').trim();
+            let kodeKel = String(k.KODE_KELUARGA || k.kode_keluarga || k['KODE KELUARGA'] || '').trim();
 
-            // Cari kepala keluarga dan istri
-            const listAng = mapAnggotaPerKK.get(noKK) || [];
-            const kk = listAng.find(a => a.hub === '1');
-            const istri = listAng.find(a => a.hub === '2');
+            const kdProv = String(k.KODE_PROV || k.kode_prov || '52').padStart(2, '0');
+            const kdKab  = String(k.KODE_KAB || k.kode_kab || '01').padStart(2, '0');
+            const kdKec  = String(k.KODE_KEC || k.kode_kec || '08').padStart(2, '0');
+            const kdDesa = String(k.KODE_DESA || k.kode_desa || '2001').padStart(4, '0');
+            const kdDsn  = String(k.KODE_DUSUN || k.kode_dusun || '0100').padStart(4, '0');
+            const rt     = String(k.RT || k.rt || '001').padStart(3, '0');
+            const kdRmh  = String(k.KODE_RUMAH || k.kode_rumah || '001').padStart(3, '0');
+            const noUrut = String(k.NO_URUT_KELUARGA || k.no_urut_keluarga || '001').padStart(3, '0');
+
+            // Jika kode keluarga kosong di Excel, buat otomatis dari hierarki wilayah
+            if (!kodeKel) {
+              kodeKel = `${kdProv}${kdKab}${kdKec}${kdDesa}${kdDsn} ${rt}${kdRmh}${noUrut}`;
+            }
+
+            if (!noKK && !kodeKel) return;
+
+            // Validasi hak akses wilayah login
+            if (userAktif && userAktif.role === 'ADMIN_KABUPATEN') {
+              if (kdKab !== String(userAktif.kode_kab).padStart(2, '0')) return;
+            }
+            if (userAktif && userAktif.role === 'ADMIN_KECAMATAN') {
+              if (kdKec !== String(userAktif.kode_kec).padStart(2, '0')) return;
+            }
+            if (userAktif && userAktif.role === 'USER_DESA') {
+              if (kdDesa !== String(userAktif.kode_desa).padStart(4, '0')) return;
+            }
+
+            // Ambil anggota keluarga (cocokkan via kode_keluarga ATAU nomor_kk sebagai fallback)
+            const listAng = mapAnggotaPerKeluarga.get(kodeKel) || mapAnggotaPerKeluarga.get(noKK) || [];
+            const kk = listAng.find(a => String(a.hub) === '1');
 
             payloadKeluargaBatch.push({
-              nomor_kk: noKK,
-              nama_kk: kk ? kk.nama : '',
-              nik_kk: kk ? kk.nik : '',
-              kode_prov: String(k.KODE_PROV || '52').padStart(2, '0'),
-              kode_kab: String(k.KODE_KAB || '01').padStart(2, '0'),
-              kode_kec: String(k.KODE_KEC || '08').padStart(2, '0'),
-              kode_desa: String(k.KODE_DESA || '2001').padStart(4, '0'),
-              kode_dusun: String(k.KODE_DUSUN || '0100').padStart(4, '0'),
-              rt: String(k.RT || '001').padStart(3, '0'),
-              kode_rumah: String(k.KODE_RUMAH || '001').padStart(3, '0'),
-              no_urut_keluarga: String(k.NO_URUT_KELUARGA || '001').padStart(3, '0'),
-              status_keluarga: String(k.STATUS_KELUARGA || '1'),
-              alamat_detail: String(k.ALAMAT_DETAIL || '').toUpperCase(),
-              no_hp: String(k.NO_HP || ''),
-              latitude: parseFloat(k.LATITUDE) || null,
-              longitude: parseFloat(k.LONGITUDE) || null,
+              kode_keluarga: kodeKel,
+              nomor_kk: noKK || '9999999999999999',
+              nama_kk: kk ? String(kk.nama).toUpperCase() : String(k.NAMA_KK || k.nama_kk || '').toUpperCase(),
+              nik_kk: kk ? String(kk.nik) : String(k.NIK_KK || k.nik_kk || ''),
+              kode_prov: kdProv,
+              kode_kab: kdKab,
+              kode_kec: kdKec,
+              kode_desa: kdDesa,
+              kode_dusun: kdDsn,
+              rt: rt,
+              kode_rumah: kdRmh,
+              no_urut_keluarga: noUrut,
+              status_keluarga: String(k.STATUS_KELUARGA || k.status_keluarga || '1'),
+              alamat_detail: String(k.ALAMAT_DETAIL || k.alamat_detail || '').toUpperCase(),
+              no_hp: String(k.NO_HP || k.no_hp || ''),
+              latitude: parseFloat(k.LATITUDE || k.latitude) || null,
+              longitude: parseFloat(k.LONGITUDE || k.longitude) || null,
 
               // Blok IV: PK
               pk_01_ibadah: String(k.PK_01_IBADAH || k.PK_01 || '') || null,
               pk_02_toleransi_agama: String(k.PK_02_TOLERANSI_AGAMA || k.PK_02 || '') || null,
-              pk_03_1_tanpa_sapa: String(k.PK_03_1_TANPA_SAPA || k.PK_03_A_TANPA_SAPA || '') || null,
-              pk_03_2_pisah_ranjang: String(k.PK_03_2_PISAH_RANJANG || k.PK_03_B_PISAH_RANJANG || '') || null,
-              pk_03_3_pergi_rumah: String(k.PK_03_3_PERGI_RUMAH || k.PK_03_C_MINGGAT || '') || null,
-              pk_03_4_kdrt: String(k.PK_03_4_KDRT || k.PK_03_D_KDRT || '') || null,
-              pk_03_5_kekerasan_anak: String(k.PK_03_5_KEKERASAN_ANAK || '') || null,
+              pk_03_1_tanpa_sapa: String(k.PK_03_1_TANPA_SAPA || k.PK_03_1 || '') || null,
+              pk_03_2_pisah_ranjang: String(k.PK_03_2_PISAH_RANJANG || k.PK_03_2 || '') || null,
+              pk_03_3_pergi_rumah: String(k.PK_03_3_PERGI_RUMAH || k.PK_03_3 || '') || null,
+              pk_03_4_kdrt: String(k.PK_03_4_KDRT || k.PK_03_4 || '') || null,
+              pk_03_5_kekerasan_anak: String(k.PK_03_5_KEKERASAN_ANAK || k.PK_03_5 || '') || null,
               pk_04_anggota_sakit: String(k.PK_04_ANGGOTA_SAKIT || k.PK_04 || '') || null,
               pk_05_rekreasi: String(k.PK_05_REKREASI || k.PK_05 || '') || null,
               pk_06_kegiatan_sosial: String(k.PK_06_KEGIATAN_SOSIAL || k.PK_06 || '') || null,
@@ -9351,40 +9379,40 @@
               pk_11_akses_internet: String(k.PK_11_AKSES_INTERNET || k.PK_11 || '') || null,
               pk_12_internet_anak: String(k.PK_12_INTERNET_ANAK || k.PK_12 || '') || null,
               pk_13_sumber_penghasilan: String(k.PK_13_SUMBER_PENGHASILAN || k.PK_13 || '') || null,
-              pk_14_memiliki_aset: String(k.PK_14_MEMILIKI_ASET || k.PK_06_ASET || '') || null,
-              pk_14_1_jenis_aset: String(k.PK_14_1_JENIS_ASET || k.PK_06_ASET_JENIS || '') || null,
+              pk_14_memiliki_aset: String(k.PK_14_MEMILIKI_ASET || k.PK_14 || '') || null,
+              pk_14_1_jenis_aset: String(k.PK_14_1_JENIS_ASET || k.PK_14_1 || '') || null,
               pk_15_interaksi_harian: String(k.PK_15_INTERAKSI_HARIAN || k.PK_15 || '') || null,
               pk_15_1_jenis_interaksi: String(k.PK_15_1_JENIS_INTERAKSI || k.PK_15_1 || '') || null,
               pk_16_1_ayah_menemani_anak: String(k.PK_16_1_AYAH_MENEMANI_ANAK || k.PK_16_1 || '') || null,
               pk_16_2_ayah_komunikasi: String(k.PK_16_2_AYAH_KOMUNIKASI || k.PK_16_2 || '') || null,
               pk_16_3_ayah_hak_dasar: String(k.PK_16_3_AYAH_HAK_DASAR || k.PK_16_3 || '') || null,
               pk_16_4_ayah_pekerjaan_rumah: String(k.PK_16_4_AYAH_PEKERJAAN_RUMAH || k.PK_16_4 || '') || null,
-              pk_17_1_jenis_atap: String(k.PK_17_1_JENIS_ATAP || k.PK_14_1_ATAP || '') || null,
-              pk_17_2_kondisi_atap: String(k.PK_17_2_KONDISI_ATAP || k.PK_14_2_KONDISI_ATAP || '') || null,
-              pk_18_1_jenis_dinding: String(k.PK_18_1_JENIS_DINDING || k.PK_15_1_DINDING || '') || null,
-              pk_18_2_kondisi_dinding: String(k.PK_18_2_KONDISI_DINDING || k.PK_15_2_KONDISI_DINDING || '') || null,
-              pk_19_1_jenis_lantai: String(k.PK_19_1_JENIS_LANTAI || k.PK_16_1_LANTAI || '') || null,
-              pk_19_2_kondisi_lantai: String(k.PK_19_2_KONDISI_LANTAI || k.PK_16_2_KONDISI_LANTAI || '') || null,
-              pk_20_1_sumber_penerangan: String(k.PK_20_1_SUMBER_PENERANGAN || k.PK_17_1_PENERANGAN || '') || null,
-              pk_20_2_daya_listrik: String(k.PK_20_2_DAYA_LISTRIK || k.PK_17_2_DAYA_PLN || '') || null,
-              pk_21_1_sumber_air_minum: String(k.PK_21_1_SUMBER_AIR_MINUM || k.PK_18_AIR_MINUM || '') || null,
-              pk_21_2_jarak_tinja: String(k.PK_21_2_JARAK_TINJA || '') || null,
-              pk_22_fasilitas_jamban: String(k.PK_22_FASILITAS_JAMBAN || k.PK_19_JAMBAN || '') || null,
-              pk_23_luas_rumah: parseInt(k.PK_23_LUAS_RUMAH || k.PK_20_LUAS_RUMAH, 10) || null,
-              pk_24_jumlah_menetap: parseInt(k.PK_24_JUMLAH_MENETAP || k.PK_21_JUMLAH_PENGHUNI, 10) || null,
-              pk_25_bahan_bakar_masak: String(k.PK_25_BAHAN_BAKAR_MASAK || k.PK_22_BAHAN_BAKAR || '') || null,
-              pk_26_kepemilikan_rumah: String(k.PK_26_KEPEMILIKAN_RUMAH || k.PK_23_KEPEMILIKAN_RUMAH || '') || null,
-              pk_27_pesan_informasi: String(k.PK_27_PESAN_INFORMASI || k.PK_24_INFO_MEDIA || '') || null,
-              pk_28_sumber_informasi: String(k.PK_28_SUMBER_INFORMASI || k.PK_25_MEDIA_SUMBER || '') || null,
-              pk_29_persetujuan_keluarga: String(k.PK_29_PERSETUJUAN_KELUARGA || '') || null,
+              pk_17_1_jenis_atap: String(k.PK_17_1_JENIS_ATAP || k.PK_17_1 || '') || null,
+              pk_17_2_kondisi_atap: String(k.PK_17_2_KONDISI_ATAP || k.PK_17_2 || '') || null,
+              pk_18_1_jenis_dinding: String(k.PK_18_1_JENIS_DINDING || k.PK_18_1 || '') || null,
+              pk_18_2_kondisi_dinding: String(k.PK_18_2_KONDISI_DINDING || k.PK_18_2 || '') || null,
+              pk_19_1_jenis_lantai: String(k.PK_19_1_JENIS_LANTAI || k.PK_19_1 || '') || null,
+              pk_19_2_kondisi_lantai: String(k.PK_19_2_KONDISI_LANTAI || k.PK_19_2 || '') || null,
+              pk_20_1_sumber_penerangan: String(k.PK_20_1_SUMBER_PENERANGAN || k.PK_20_1 || '') || null,
+              pk_20_2_daya_listrik: String(k.PK_20_2_DAYA_LISTRIK || k.PK_20_2 || '') || null,
+              pk_21_1_sumber_air_minum: String(k.PK_21_1_SUMBER_AIR_MINUM || k.PK_21_1 || '') || null,
+              pk_21_2_jarak_tinja: String(k.PK_21_2_JARAK_TINJA || k.PK_21_2 || '') || null,
+              pk_22_fasilitas_jamban: String(k.PK_22_FASILITAS_JAMBAN || k.PK_22 || '') || null,
+              pk_23_luas_rumah: parseInt(k.PK_23_LUAS_RUMAH || k.PK_23 || 0, 10) || null,
+              pk_24_jumlah_menetap: parseInt(k.PK_24_JUMLAH_MENETAP || k.PK_24 || 0, 10) || null,
+              pk_25_bahan_bakar_masak: String(k.PK_25_BAHAN_BAKAR_MASAK || k.PK_25 || '') || null,
+              pk_26_kepemilikan_rumah: String(k.PK_26_KEPEMILIKAN_RUMAH || k.PK_26 || '') || null,
+              pk_27_pesan_informasi: String(k.PK_27_PESAN_INFORMASI || k.PK_27 || '') || null,
+              pk_28_sumber_informasi: String(k.PK_28_SUMBER_INFORMASI || k.PK_28 || '') || null,
+              pk_29_persetujuan_keluarga: String(k.PK_29_PERSETUJUAN_KELUARGA || k.PK_29 || '') || null,
 
               // Blok III: KB
-              kb_01_melahirkan: parseInt(k.KB_01_MELAHIRKAN, 10) || 0,
-              kb_01_hidup_laki: parseInt(k.KB_01_MASIH_LAKI, 10) || 0,
-              kb_01_hidup_perempuan: parseInt(k.KB_01_MASIH_PEREMPUAN, 10) || 0,
-              kb_01_masih_laki: parseInt(k.KB_01_MASIH_LAKI, 10) || 0,
-              kb_01_masih_perempuan: parseInt(k.KB_01_MASIH_PEREMPUAN, 10) || 0,
-              kb_02_anak_ideal: parseInt(k.KB_02_ANAK_IDEAL, 10) || 0,
+              kb_01_melahirkan: parseInt(k.KB_01_MELAHIRKAN || 0, 10),
+              kb_01_hidup_laki: parseInt(k.KB_01_HIDUP_LAKI || 0, 10),
+              kb_01_hidup_perempuan: parseInt(k.KB_01_HIDUP_PEREMPUAN || 0, 10),
+              kb_01_masih_laki: parseInt(k.KB_01_MASIH_LAKI || 0, 10),
+              kb_01_masih_perempuan: parseInt(k.KB_01_MASIH_PEREMPUAN || 0, 10),
+              kb_02_anak_ideal: parseInt(k.KB_02_ANAK_IDEAL || 0, 10),
               kb_03_sedang_hamil: String(k.KB_03_SEDANG_HAMIL) === '1',
               kb_03_usia_kehamilan: parseInt(k.KB_03_USIA_KEHAMILAN, 10) || null,
               kb_03_status_ingin_hamil: String(k.KB_03_STATUS_INGIN_HAMIL || '') || null,
@@ -9392,7 +9420,7 @@
               kb_04_sedang_kb: String(k.KB_04_SEDANG_KB) === '1',
               kb_04_mulai_bulan: String(k.KB_04_MULAI_BULAN || '') || null,
               kb_04_mulai_tahun: parseInt(k.KB_04_MULAI_TAHUN, 10) || null,
-              kb_05_pernah_kb: String(k.KB_05_PERNAH_KB || k.KB_05_PERNAH_KB_12_BULAN || '') === '1' ? '1' : (String(k.KB_05_PERNAH_KB || k.KB_05_PERNAH_KB_12_BULAN || '') === '2' ? '2' : null),
+              kb_05_pernah_kb: String(k.KB_05_PERNAH_KB || '') || null,
               kb_05_mulai_bulan: String(k.KB_05_MULAI_BULAN || '') || null,
               kb_05_mulai_tahun: parseInt(k.KB_05_MULAI_TAHUN, 10) || null,
               kb_05_berhenti_bulan: String(k.KB_05_BERHENTI_BULAN || '') || null,
@@ -9406,28 +9434,36 @@
               diperbarui_pada: new Date()
             });
 
-            // Susun anggota keluarga
-            listAng.forEach((a, idx) => {
+            // Masukkan seluruh anggota keluarga yang cocok
+            listAng.forEach((a, iAng) => {
               payloadAnggotaBatch.push({
-                nomor_kk: noKK,
-                nomor_anggota_keluarga: parseInt(a.NO_URUT || (idx + 1), 10),
+                kode_keluarga: kodeKel,
+                nomor_kk: noKK || '9999999999999999',
+                nomor_anggota_keluarga: parseInt(a.NO_URUT || a.nomor_anggota_keluarga || (iAng + 1), 10),
                 nama_lengkap: a.nama,
                 nik: a.nik,
-                jenis_kelamin: String(a.JENIS_KELAMIN || '1'),
-                tanggal_lahir: a.TANGGAL_LAHIR,
-                status_perkawinan: String(a.STATUS_PERKAWINAN || '1'),
-                usia_kawin_pertama: parseInt(a.USIA_KAWIN_PERTAMA, 10) || null,
-                hubungan_dengan_kk: a.hub,
-                kode_ibu_kandung: String(a.KODE_IBU_KANDUNG || '00'),
-                jenis_pekerjaan: String(a.JENIS_PEKERJAAN || '1'),
-                pendidikan: String(a.PENDIDIKAN || '8'),
-                bekerja_luar_negeri: String(a.BEKERJA_LUAR_NEGERI || '4'),
-                mutasi_anggota: String(a.MUTASI_ANGGOTA || '0'),
-                gangguan_fungsional: String(a.GANGGUAN_FUNGSIONAL || '5'),
-                kemampuan_mengurus_diri: String(a.MENGURUS_DIRI || '4')
+                jenis_kelamin: String(a.JENIS_KELAMIN || a.jenis_kelamin || '1'),
+                tanggal_lahir: a.TANGGAL_LAHIR || a.tanggal_lahir,
+                status_perkawinan: String(a.STATUS_PERKAWINAN || a.status_perkawinan || '1'),
+                usia_kawin_pertama: parseInt(a.USIA_KAWIN_PERTAMA || a.usia_kawin_pertama, 10) || null,
+                memiliki_akta_lahir: String(a.MEMILIKI_AKTA_LAHIR || a.memiliki_akta_lahir || '1'),
+                hubungan_dengan_kk: String(a.hub || '3'),
+                kode_ibu_kandung: String(a.KODE_IBU_KANDUNG || a.kode_ibu_kandung || '00'),
+                agama: String(a.AGAMA || a.agama || '1'),
+                jenis_pekerjaan: String(a.JENIS_PEKERJAAN || a.jenis_pekerjaan || '1'),
+                pendidikan: String(a.PENDIDIKAN || a.pendidikan || '8'),
+                kesertaan_jkn: String(a.KESERTAAN_JKN || a.kesertaan_jkn || '1'),
+                bekerja_luar_negeri: String(a.BEKERJA_LUAR_NEGERI || a.bekerja_luar_negeri || '4'),
+                mutasi_anggota: String(a.MUTASI_ANGGOTA || a.mutasi_anggota || '0'),
+                gangguan_fungsional: String(a.GANGGUAN_FUNGSIONAL || a.gangguan_fungsional || '5'),
+                kemampuan_mengurus_diri: String(a.MENGURUS_DIRI || a.kemampuan_mengurus_diri || '4')
               });
             });
           });
+
+          console.log("Jumlah Raw Keluarga Excel:", rawKeluarga.length);
+          console.log("Jumlah Payload Keluarga Siap Simpan:", payloadKeluargaBatch.length);
+          console.log("Jumlah Payload Anggota Siap Simpan:", payloadAnggotaBatch.length);
 
           // 4. Kirim Data ke Supabase
           const { error: errKel } = await supabaseClient.from('keluarga').upsert(payloadKeluargaBatch, { onConflict: 'kode_keluarga' });
