@@ -2902,11 +2902,14 @@
           </div>
 
           <!-- Tombol Aksi di Kanan Bawah (Sesuai Gaya KRS) -->
-          <div class="flex justify-end pt-5">
-            <button type="button" id="btnAksiWilayah" onclick="prosesAksiWilayah()"
-                    class="px-6 py-2.5 bg-[#0284c7] hover:bg-[#0369a1] active:scale-95 text-white font-semibold rounded-lg shadow-sm transition text-xs sm:text-sm flex items-center gap-1.5">
-              <span>Selanjutnya</span>
-              <span>&rarr;</span>
+          <div class="flex justify-between items-center pt-5">
+            <button type="button" onclick="kembaliKeDashboard()" 
+                    class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 font-semibold rounded-lg text-xs sm:text-sm transition flex items-center gap-1.5">
+              <span>← Batal / Kembali</span>
+            </button>
+            <button type="button" id="btnAksiWilayah" onclick="prosesAksiWilayah()" 
+                    class="px-6 py-2.5 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-lg shadow-sm transition text-xs sm:text-sm">
+              Selanjutnya &rarr;
             </button>
           </div>
         </div>
@@ -3980,7 +3983,8 @@
 
     function kembaliKeDashboard() {
       if (userAktif && userAktif.role === 'USER_DESA') {
-        inisialisasiLayarKader();
+        tampilkanLayar('tampilan_kader_app');
+        navigasiKaderTab('data');
       } else {
         terapkanDataSesiUser();
         tampilkanLayar('tampilan_dashboard');
@@ -5793,8 +5797,16 @@
           throw new Error('Data keluarga tidak ditemukan di database.');
         }
 
-        // Tampilkan Form
-        tampilkanLayar('tampilan_formulir');
+        if (userAktif && userAktif.role === 'USER_DESA') {
+          // Untuk Kader: Tampilkan layar penuh formulir
+          tampilkanLayar('tampilan_formulir');
+        } else {
+          // Untuk Admin: Buka sub-view formulir di dalam dashboard
+          tampilkanLayar('tampilan_dashboard');
+          bukaHalamanAdmin('formulir');
+        }
+
+        // 2. Pastikan sub-halaman wilayah aktif dan terlihat
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');        
 
         // 2. Isi Data Wilayah
