@@ -9122,6 +9122,41 @@
       XLSX.writeFile(wb, "Template_Pendataan_Keluarga_Desa_Lengkap.xlsx");
     }
 
+    function downloadLogNikIstriGandaExcel(dataList) {
+      if (!dataList || dataList.length === 0) return;
+
+      const rows = dataList.map((d, idx) => ({
+        "NO": idx + 1,
+        "BARIS EXCEL": d.baris || '-',
+        "KODE KELUARGA": d.kodeKel || '-',
+        "NOMOR KK": d.noKK || '-',
+        "NIK ISTRI": d.nik || '-',
+        "NAMA ISTRI": d.namaIstri || '-',
+        "BENTROK DENGAN": d.bentrokDengan || '-',
+        "STATUS": "DITOLAK / GANDA"
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+
+      // Pastikan format teks string untuk kode keluarga, no kk, dan NIK
+      if (ws['!ref']) {
+        const range = XLSX.utils.decode_range(ws['!ref']);
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+          [2, 3, 4].forEach(C => {
+            const cell = XLSX.utils.encode_cell({ r: R, c: C });
+            if (ws[cell]) {
+              ws[cell].t = 's';
+              ws[cell].z = '@';
+            }
+          });
+        }
+      }
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "NIK_Istri_Ganda");
+      XLSX.writeFile(wb, `Error_NIK_Istri_Ganda_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
     // ========================================================
     // UPLOAD EXCEL KELUARGA & ANGGOTA DENGAN PROTEKSI NIK GANDA
     // ========================================================
@@ -9235,7 +9270,7 @@
           // JIKA ADA PELANGGARAN NIK ISTRI GANDA DENGAN ISTRI LAIN: TOLAK PROSES
           if (pelanggaranIstriGanda.length > 0) {
             let errorHtml = pelanggaranIstriGanda.slice(0, 5).map(p => 
-              `<li><b>${p.namaIstri}</b> (NIK: ${p.nik}) di KK ${p.noKK} &rarr; Sama dengan Istri: ${p.bentrokDengan}</li>`
+              `<li><b>${p.namaIstri}</b> (NIK: ${p.nik}) di KK ${p.noKK || p.kodeKel} &rarr; Sama dengan: ${p.bentrokDengan}</li>`
             ).join('');
 
             if (pelanggaranIstriGanda.length > 5) {
@@ -9247,11 +9282,21 @@
               title: 'Upload Ditolak: NIK Istri Ganda!',
               html: `
                 <div class="text-left text-xs space-y-2">
-                  <p class="text-slate-700">NIK Istri <b>tidak boleh ganda</b> antar sesama istri, kecuali NIK <code>9999999999999999</code>:</p>
-                  <ul class="text-rose-600 space-y-1 list-disc pl-4">${errorHtml}</ul>
-                  <p class="text-slate-500 italic pt-1">Silakan koreksi data NIK Istri pada file Excel Anda terlebih dahulu.</p>
+                  <p class="text-slate-700">Ditemukan <b>${pelanggaranIstriGanda.length}</b> data NIK Istri yang ganda/kembar, kecuali NIK <code>9999999999999999</code>:</p>
+                  <ul class="text-rose-600 space-y-1 list-disc pl-4 max-h-40 overflow-y-auto">${errorHtml}</ul>
+                  <p class="text-slate-500 italic pt-1">Klik tombol di bawah untuk mengunduh daftar seluruh NIK yang bentrok agar mudah diperbaiki.</p>
                 </div>
-              `
+              `,
+              showCancelButton: true,
+              confirmButtonText: '📥 Unduh Daftar Error (.xlsx)',
+              cancelButtonText: 'Tutup',
+              confirmButtonColor: '#059669',
+              cancelButtonColor: '#64748b',
+              reverseButtons: true
+            }).then((res) => {
+              if (res.isConfirmed) {
+                downloadLogNikIstriGandaExcel(pelanggaranIstriGanda);
+              }
             });
             return;
           }
