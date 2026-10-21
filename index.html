@@ -1261,16 +1261,21 @@
               <form id="formUserAkun" onsubmit="event.preventDefault(); simpanAkunUser();" class="space-y-3">
                 <input type="hidden" id="user_id" value="" />                
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label class="block font-bold text-slate-700 uppercase mb-1">Nama Lengkap</label>
                     <input type="text" id="user_namalengkap" oninput="generateUsernameOtomatis()" placeholder="Contoh: Budi Santoso"
                           class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium uppercase" />
                   </div>
                   <div>
-                    <label class="block font-bold text-slate-700 uppercase mb-1">Nama User *</label>
-                    <input type="text" id="user_namapanggilan" oninput="generateUsernameOtomatis()" placeholder="Contoh: budi"
-                          class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium lowercase" />
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Nama Singkat *</label>
+                    <input type="text" id="user_namapanggilan" oninput="generateUsernameOtomatis()" placeholder="Contoh: Budi"
+                          class="w-full p-2.5 border rounded-xl outline-none focus:ring-1 focus:ring-amber-500 font-medium" />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 uppercase mb-1">Username *</label>
+                    <input type="text" id="user_username" readonly placeholder="Terisi otomatis..."
+                          class="w-full p-2.5 border rounded-xl bg-slate-100 font-mono font-bold text-amber-800 outline-none cursor-not-allowed" />
                   </div>
                 </div>
 
@@ -7925,7 +7930,8 @@
       const inputUsername = document.getElementById('user_username');
       if (!inputUsername || !role) return;
       
-      const namaBersih = inputPanggilan.toLowerCase().replace(/[^a-z0-9]/g, '');
+      // Mengambil karakter alfanumerik dengan mempertahankan huruf besar dan kecil
+      const namaBersih = inputPanggilan.replace(/[^a-zA-Z0-9]/g, '');
       if (!namaBersih) return;
 
       let kodeProv = '';
@@ -8362,7 +8368,7 @@
         allowedDusunRingkas = penugasanWilayahKaderForm.map(w => w.kode_dusun).join(',');
       }
 
-      const namaPanggilan = document.getElementById('user_namapanggilan').value.trim().toLowerCase();
+      const namaPanggilan = document.getElementById('user_namapanggilan').value.trim();
       
       const payload = {
         username: username,
