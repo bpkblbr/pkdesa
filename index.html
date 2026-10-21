@@ -1841,345 +1841,7 @@
       </nav>
 
     </div>
-  </div>
-
-  <!-- ========================================================
-       5. HALAMAN CARI & EDIT DATA (MASTER-DETAIL)
-       ======================================================== -->
-  <div id="tampilan_cari_edit" class="halaman-tampilan max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-    
-    <!-- Header Halaman -->
-    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-      <div>        
-        <h1 class="text-lg font-black text-slate-800 uppercase">Cari & Edit Data Keluarga</h1>
-      </div>      
-    </div>
-
-    <!-- PANEL PENCARIAN & FILTER WILAYAH -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden text-xs">
-      <div class="bg-[#2b4c80] text-white px-4 py-2.5 font-bold flex justify-between items-center cursor-pointer">
-        <span>Pencarian</span>
-        <span>▲</span>
-      </div>
-
-      <div class="p-4 space-y-3">
-        <!-- Baris Periode & Nama KK -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Periode</label>
-            <div class="grid grid-cols-2 gap-2">
-              <select id="cari_edit_filter_bulan" class="p-2 border rounded-lg bg-white outline-none">
-                <option value="10" selected>Oktober</option>
-              </select>
-              <select id="cari_edit_filter_tahun" class="p-2 border rounded-lg bg-white outline-none">
-                <option value="2026" selected>2026</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Nama Kepala Keluarga</label>
-            <input type="text" id="cari_edit_cari_nama" placeholder="Cari Nama KK..." class="w-full p-2 border rounded-lg uppercase outline-none" />
-          </div>
-        </div>
-
-        <div>
-          <label class="block font-semibold text-slate-600 mb-1">NIK</label>
-          <input type="text" id="cari_edit_cari_nik" placeholder="Cari 16 Digit NIK..." class="w-full p-2 border rounded-lg font-mono outline-none" />
-        </div>
-
-        <!-- Filter Wilayah Berjenjang -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Provinsi</label>
-            <select id="cari_edit_prov" disabled class="w-full p-2 border rounded-lg bg-slate-100 font-bold text-slate-700 outline-none">
-              <option value="52">52 - NUSA TENGGARA BARAT</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Kab/Kota</label>
-            <select id="cari_edit_kab" onchange="saatCariEditKabBerubah()" class="w-full p-2 border rounded-lg bg-white font-bold text-slate-700 outline-none">
-              <option value="">-- SEMUA KABUPATEN --</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Kecamatan</label>
-            <select id="cari_edit_kec" onchange="saatCariEditKecBerubah()" class="w-full p-2 border rounded-lg bg-white font-semibold text-slate-700 outline-none">
-              <option value="">-- SEMUA KECAMATAN --</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Desa/Kel</label>
-            <select id="cari_edit_desa" onchange="saatCariEditDesaBerubah()" class="w-full p-2 border rounded-lg bg-white font-semibold text-slate-700 outline-none">
-              <option value="">-- SEMUA DESA --</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">Dusun/RW</label>
-            <select id="cari_edit_dusun" onchange="saatCariEditDusunBerubah()" class="w-full p-2 border rounded-lg bg-white outline-none">
-              <option value="">-- SEMUA DUSUN --</option>
-            </select>
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">RT</label>
-            <select id="cari_edit_rt" class="w-full p-2 border rounded-lg bg-white font-mono outline-none">
-              <option value="">-- SEMUA RT --</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Tombol Toggle Pencarian Lanjutan -->
-        <div class="pt-1">
-          <button type="button" onclick="togglePencarianLanjutanCariEdit()" 
-                  class="text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1.5 transition text-xs">
-            <span class="w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] leading-none">+</span>
-            <span>Pencarian Lanjutan</span>
-          </button>
-        </div>
-
-        <!-- Panel Pencarian Lanjutan -->
-        <div id="panelPencarianLanjutanCariEdit" class="hidden pt-1">
-          <div class="flex items-center gap-2">
-            <div class="w-1/2">
-              <select id="cari_edit_lanjutan_kategori" onchange="saatKategoriLanjutanCariEditBerubah()" 
-                      class="w-full p-2 border border-slate-300 rounded-lg bg-white outline-none font-semibold text-slate-700">
-                <option value="">Select...</option>
-                <option value="jkn">Kesertaan JKN</option>
-                <option value="pus">Status PUS</option>
-                <option value="hamil">Status Hamil</option>
-                <option value="metode_kb">Metode Kontrasepsi</option>
-                <option value="jalur_pelayanan">Jalur Pelayanan</option>
-                <option value="anak_segera">Ingin Anak Segera</option>
-                <option value="anak_kemudian">Ingin Anak Kemudian</option>
-                <option value="tidak_ingin_anak">Tidak Ingin Anak Lagi</option>
-                <option value="pb_pa">Status PB/PA</option>
-                <option value="hamil_saat_itu">Ingin Hamil Saat Itu</option>
-                <option value="hamil_nanti">Ingin Hamil Nanti</option>
-                <option value="tidak_ingin_hamil">Tidak Ingin Hamil Lagi</option>
-                <option value="unmet_need">Unmet Need</option>
-              </select>
-            </div>
-
-            <div class="w-1/2">
-              <select id="cari_edit_lanjutan_nilai" 
-                      class="w-full p-2 border border-slate-300 rounded-lg bg-white outline-none font-semibold text-slate-700">
-                <option value="">Select...</option>
-              </select>
-            </div>
-
-            <button type="button" onclick="resetPencarianLanjutanCariEdit()" title="Hapus Kriteria Lanjutan"
-                    class="px-3 py-2 bg-[#b22222] hover:bg-[#8b0000] active:scale-95 text-white font-black rounded-lg transition text-xs shadow-sm flex items-center justify-center">
-              ✖
-            </button>
-          </div>
-        </div>
-
-        <!-- Tombol Aksi Filter & Cetak -->        
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t">
-          <div class="flex gap-2">
-            <button type="button" onclick="muatDataCariEditKeluarga()" 
-                    class="px-6 py-2 bg-[#1e70bf] hover:bg-[#165a9b] text-white font-bold rounded-lg transition uppercase flex items-center gap-1.5 shadow-sm">
-              🔍 Cari
-            </button>
-          </div>
-
-          <!-- OPSI PILIHAN CETAK / EKSPOR -->
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <label class="font-bold text-slate-700 uppercase">Cakupan Cetak:</label>
-            <select id="cari_edit_cakupan_cetak" class="p-2 border border-slate-300 rounded-lg bg-white font-semibold text-slate-800 outline-none">
-              <option value="kk">Data Kepala Keluarga (KK) Saja</option>
-              <option value="anggota">Semua Anggota Keluarga (Lengkap)</option>
-            </select>
-
-            <button type="button" onclick="cetakPdfCariEdit()" 
-                    class="px-4 py-2 bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold rounded-lg transition uppercase flex items-center gap-1 shadow-sm">
-              📄 Cetak PDF
-            </button>
-            <button type="button" onclick="eksporExcelCariEdit()" 
-                    class="px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white font-bold rounded-lg transition uppercase flex items-center gap-1 shadow-sm">
-              📊 Unduh Excel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TABEL MASTER: DAFTAR KEPALA KELUARGA -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden text-xs">
-      <div class="p-3 border-b bg-slate-50 font-bold text-slate-700 uppercase flex justify-between items-center">
-        <span>📋 Data Keluarga & Individu</span>
-        <span id="labelTotalCariEdit" class="text-slate-500 font-semibold">Total: 0 Keluarga</span>
-      </div>
-
-      <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
-        <table class="w-full text-left border-collapse text-[11px]">
-          <thead class="bg-slate-100 text-slate-600 uppercase font-bold sticky top-0 border-b">
-            <tr>
-              <!-- 1. KOLOM KHUSUS CHECKBOX PILIH -->
-              <th class="p-2.5 text-center w-10">
-                <input type="checkbox" id="cb_pilih_semua_ce" onchange="togglePilihSemuaCariEdit(this)" 
-                       class="w-4 h-4 rounded border-slate-300 text-cyan-600 focus:ring-0 cursor-pointer accent-cyan-600 mx-auto block" />
-              </th>
-              <!-- 2. KOLOM NO URUT -->
-              <th class="p-2.5 text-center w-12">NO</th>
-              <th class="p-2.5 text-center w-28">AKSI</th>
-              <th class="p-2.5">NAMA KK</th>
-              <th class="p-2.5 font-mono">NIK</th>
-              <th class="p-2.5 font-mono">KODE KELUARGA</th>
-              <th class="p-2.5 text-center">TANGGAL LAHIR</th>
-              <th class="p-2.5 text-center">USIA</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyCariEditKeluarga" class="divide-y divide-slate-100">
-            <tr>
-              <td colspan="8" class="p-6 text-center text-slate-400">Silakan klik tombol <b>Cari</b> untuk menampilkan data.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- MODAL DETAIL KELUARGA & POTENSI -->
-    <div id="modalDetailCariEdit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
-      <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto text-xs">
-        
-        <div class="flex justify-between items-center border-b pb-3">
-          <div>
-            <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase flex items-center gap-2">
-              <span>👨‍👩‍👧‍👦 Detail Anggota Keluarga</span>
-            </h3>
-            <p id="subDetailKeluargaCariEdit" class="text-[11px] text-slate-500 font-semibold"></p>
-          </div>
-          <button type="button" onclick="tutupModalDetailCariEdit()" class="text-slate-400 hover:text-slate-700 font-bold text-2xl px-2">&times;</button>
-        </div>
-
-        <div class="flex justify-end pt-1">
-          <button type="button" onclick="bukaModalTambahAnggotaDariAdmin()" 
-                  class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
-            <span>➕ Tambah Anggota Baru</span>
-          </button>
-        </div>
-
-        <!-- Tabel Anggota Keluarga (Bisa Edit & Hapus Masing-Masing Anggota) -->
-        <div class="overflow-x-auto border rounded-xl">
-          <table class="w-full text-left border-collapse text-[11px]">
-            <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b">
-              <tr>
-                <th class="p-2.5 text-center w-20">Aksi</th>
-                <th class="p-2.5">Nama</th>
-                <th class="p-2.5 font-mono">NIK</th>
-                <th class="p-2.5 text-center">Hub. Dgn KK</th>
-                <th class="p-2.5 text-center">Tanggal Lahir</th>
-                <th class="p-2.5 text-center">Usia</th>
-                <th class="p-2.5 text-center">Mutasi</th>
-              </tr>
-            </thead>
-            <tbody id="tbodyDetailAnggotaCariEdit" class="divide-y divide-slate-100">
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Informasi Ringkasan Keluarga Sesuai Format Rekap -->
-        <div class="pt-4 space-y-3.5 text-xs text-slate-700">
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Anak</label>
-            <div class="sm:col-span-9">
-              <input type="text" id="ce_det_jml_anak" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Baduta</label>
-            <div class="sm:col-span-9">
-              <input type="text" id="ce_det_jml_baduta" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Balita</label>
-            <div class="sm:col-span-9">
-              <input type="text" id="ce_det_jml_balita" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Jumlah WUS</label>
-            <div class="sm:col-span-9">
-              <input type="text" id="ce_det_jml_wus" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Kode Keluarga</label>
-            <div class="sm:col-span-9 font-mono font-bold text-slate-800 italic" id="ce_det_kode_keluarga">
-              -
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Mutasi Keluarga</label>
-            <div class="sm:col-span-9">
-              <select id="ce_det_mutasi_keluarga" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 outline-none">
-                <option value="">Select...</option>
-                <option value="1">1. Anggota Pindah Keluar</option>
-                <option value="2">2. Meninggal Dunia</option>
-                <option value="3">3. Anggota Baru Lahir</option>
-                <option value="4">4. Anggota Baru Pindah Datang</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Kesertaan JKN</label>
-            <div class="sm:col-span-9">
-              <select id="ce_det_kesertaan_jkn" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold outline-none cursor-not-allowed">
-                <option value="">Select...</option>
-                <option value="1">1. PBI</option>
-                <option value="2">2. Bukan PBI</option>
-                <option value="3">3. Swasta</option>
-                <option value="4">4. Tidak Memiliki</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Status PUS</label>
-            <div class="sm:col-span-9 flex items-center gap-6">
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_ya" disabled class="accent-slate-500" />
-                <span>Ya</span>
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_tidak" disabled class="accent-slate-500" />
-                <span>Tidak</span>
-              </label>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-            <label class="sm:col-span-3 font-medium text-slate-600">Status Hamil</label>
-            <div class="sm:col-span-9 flex items-center gap-6">
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_ya" disabled class="accent-slate-500" />
-                <span>Ya</span>
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_tidak" disabled class="accent-slate-500" />
-                <span>Tidak</span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
+  </div>  
 
   <!-- ========================================================
       MODUL LAPORAN BNBA DINAMIS (READ-ONLY & EKSPOR)
@@ -5241,69 +4903,123 @@
     }
 
     async function bukaDetailKeluargaCariEdit(kodeKeluargaTarget) {
-      if (!kodeKeluargaTarget) return;
-      const targetBersih = String(kodeKeluargaTarget).trim();
-      
-      const kel = dataCariEditCache.find(k => 
-        String(k.kode_keluarga || '').trim() === targetBersih || 
-        String(k.nomor_kk || '').trim() === targetBersih
-      );
-      if (!kel) {
-        console.warn("Data tidak ditemukan di cache:", targetBersih);
+      if (!kodeKeluargaTarget) {
+        console.warn("Kode keluarga / Nomor KK target tidak valid.");
         return;
       }
 
-      // Tampilkan SEMUA modal detail (mengatasi ID duplikat)
-      document.querySelectorAll('[id="modalDetailCariEdit"]').forEach(m => m.classList.remove('hidden'));
-      document.querySelectorAll('[id="subDetailKeluargaCariEdit"]').forEach(el => {
-        el.innerText = `KK: ${kel.nomor_kk} | Nama KK: ${kel.nama_kk}`;
+      const targetBersih = String(kodeKeluargaTarget).trim();
+
+      // 1. Cari data keluarga di cache lokal Cari & Edit
+      let kel = (dataCariEditCache || []).find(k => 
+        String(k.kode_keluarga || '').trim() === targetBersih || 
+        String(k.nomor_kk || '').trim() === targetBersih
+      );
+
+      // Jika tidak ditemukan di cache lokal, coba ambil langsung dari database
+      if (!kel && supabaseClient) {
+        try {
+          const { data: kelDb, error: errKelDb } = await supabaseClient
+            .from('keluarga')
+            .select('*')
+            .or(`kode_keluarga.eq.${targetBersih},nomor_kk.eq.${targetBersih}`)
+            .maybeSingle();
+
+          if (!errKelDb && kelDb) {
+            kel = kelDb;
+          }
+        } catch (e) {
+          console.warn("Pencarian fallback keluarga gagal:", e);
+        }
+      }
+
+      if (!kel) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Data Tidak Ditemukan',
+          text: `Data keluarga dengan kode/KK "${targetBersih}" tidak ditemukan di sistem.`,
+          confirmButtonColor: '#0284c7'
+        });
+        return;
+      }
+
+      // 2. Tampilkan semua elemen modal detail (mengatasi ID duplikat di HTML)
+      document.querySelectorAll('[id="modalDetailCariEdit"]').forEach(modal => {
+        modal.classList.remove('hidden');
       });
 
-      // Ambil data anggota langsung terurut dari database
-      const { data: dataAnggotaTerurut, error } = await supabaseClient
-        .from('anggota_keluarga')
-        .select('*')
-        .or(`kode_keluarga.eq."${kel.kode_keluarga}",nomor_kk.eq."${kel.nomor_kk}"`)
-        .order('nomor_anggota_keluarga', { ascending: true });
+      // Tampilkan sub-header ringkasan KK
+      const teksSubDetail = `No. KK: ${kel.nomor_kk || '-'} | Nama KK: ${(kel.nama_kk || 'TANPA NAMA').toUpperCase()}`;
+      document.querySelectorAll('[id="subDetailKeluargaCariEdit"]').forEach(el => {
+        el.innerText = teksSubDetail;
+      });
 
-      const listAng = (!error && dataAnggotaTerurut && dataAnggotaTerurut.length > 0)
-        ? dataAnggotaTerurut
-        : (kel.anggota_keluarga || []);
+      // Pasang kode keluarga aktif ke label penampung
+      const kodeKelAktif = kel.kode_keluarga || targetBersih;
+      document.querySelectorAll('[id="ce_det_kode_keluarga"]').forEach(el => {
+        el.innerText = kodeKelAktif;
+      });
 
+      // 3. Tampilkan status memuat data anggota pada tabel rincian
+      document.querySelectorAll('[id="tbodyDetailAnggotaCariEdit"]').forEach(tb => {
+        tb.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500 font-semibold animate-pulse">Memuat rincian data anggota keluarga...</td></tr>`;
+      });
+
+      // 4. Ambil data rincian anggota keluarga dari database secara terurut
+      let listAng = [];
+      try {
+        let queryAnggota = supabaseClient
+          .from('anggota_keluarga')
+          .select('*')
+          .order('nomor_anggota_keluarga', { ascending: true });
+
+        if (kel.kode_keluarga && kel.nomor_kk) {
+          queryAnggota = queryAnggota.or(`kode_keluarga.eq.${kel.kode_keluarga},nomor_kk.eq.${kel.nomor_kk}`);
+        } else if (kel.kode_keluarga) {
+          queryAnggota = queryAnggota.eq('kode_keluarga', kel.kode_keluarga);
+        } else {
+          queryAnggota = queryAnggota.eq('nomor_kk', kel.nomor_kk);
+        }
+
+        const { data: dataAngDb, error: errAngDb } = await queryAnggota;
+
+        if (!errAngDb && Array.isArray(dataAngDb) && dataAngDb.length > 0) {
+          listAng = dataAngDb;
+        } else if (Array.isArray(kel.anggota_keluarga) && kel.anggota_keluarga.length > 0) {
+          listAng = kel.anggota_keluarga;
+        }
+      } catch (err) {
+        console.warn("Gagal menarik anggota dari database, menggunakan cache:", err);
+        listAng = Array.isArray(kel.anggota_keluarga) ? kel.anggota_keluarga : [];
+      }
+
+      // Perbarui relasi anggota keluarga di objek cache lokal
+      kel.anggota_keluarga = listAng;
+
+      // 5. Hitung Metrik Agregat Ringkasan Keluarga
+      // a. Jumlah Anak
       const anakKBMasihHidup = (parseInt(kel.kb_01_masih_laki, 10) || 0) + (parseInt(kel.kb_01_masih_perempuan, 10) || 0);
       const anakDiKK = listAng.filter(a => String(a.hubungan_dengan_kk) === '3').length;
       const totalAnak = (kel.kb_01_melahirkan !== null && kel.kb_01_melahirkan !== undefined && kel.kb_01_melahirkan !== '') 
-                        ? anakKBMasihHidup 
-                        : anakDiKK;
+        ? anakKBMasihHidup 
+        : anakDiKK;
 
-      const setValAll = (id, val) => {
-        document.querySelectorAll(`[id="${id}"]`).forEach(el => el.value = val);
-      };
-
-      setValAll('ce_det_jml_anak', totalAnak);      
-      let jmlBaduta = 0, jmlBalita = 0, jmlWus = 0;
+      // b. Baduta, Balita, dan WUS
+      let jmlBaduta = 0;
+      let jmlBalita = 0;
+      let jmlWus = 0;
 
       listAng.forEach(a => {
         if (!a.tanggal_lahir) return;
         const usiaTh = hitungUsiaTahun(a.tanggal_lahir);
         const jk = String(a.jenis_kelamin || '');
+
         if (usiaTh < 2) jmlBaduta++;
         if (usiaTh < 5) jmlBalita++;
         if (jk === '2' && usiaTh >= 15 && usiaTh <= 49) jmlWus++;
       });
-      
-      setValAll('ce_det_jml_baduta', jmlBaduta);
-      setValAll('ce_det_jml_balita', jmlBalita);
-      setValAll('ce_det_jml_wus', jmlWus);
-      document.querySelectorAll('[id="ce_det_kode_keluarga"]').forEach(el => el.innerText = kel.kode_keluarga || targetBersih);
-      
-      const mutasiAktif = listAng.find(a => a.mutasi_anggota && a.mutasi_anggota !== '0');
-      setValAll('ce_det_mutasi_keluarga', mutasiAktif ? String(mutasiAktif.mutasi_anggota) : '');
-      
-      const kepala = listAng.find(a => String(a.hubungan_dengan_kk) === '1');
-      const jknKK = kepala ? (kepala.kesertaan_jkn || kepala.kepesertaan_jkn) : null;
-      setValAll('ce_det_kesertaan_jkn', String(kel.kesertaan_jkn || jknKK || ''));
-      
+
+      // c. Status Pasangan Usia Subur (PUS)
       const adaIstri = listAng.find(a => String(a.hubungan_dengan_kk) === '2');
       let isPUS = false;
       if (adaIstri && adaIstri.tanggal_lahir) {
@@ -5314,54 +5030,95 @@
         isPUS = true;
       }
 
+      // d. Status Kehamilan
+      const isHamil = (kel.kb_03_sedang_hamil === true || String(kel.kb_03_sedang_hamil) === '1');
+
+      // e. Kesertaan JKN Keluarga (diambil dari data keluarga atau Kepala Keluarga)
+      const kepalaKeluarga = listAng.find(a => String(a.hubungan_dengan_kk) === '1');
+      const jknKK = kepalaKeluarga ? (kepalaKeluarga.kesertaan_jkn || kepalaKeluarga.kepesertaan_jkn) : null;
+      const valJKN = String(kel.kesertaan_jkn || jknKK || '');
+
+      // f. Mutasi Anggota Aktif
+      const mutasiAktif = listAng.find(a => a.mutasi_anggota && String(a.mutasi_anggota) !== '0');
+      const valMutasi = mutasiAktif ? String(mutasiAktif.mutasi_anggota) : '';
+
+      // 6. Pasang Nilai ke Formulir Ringkasan (Menjangkau seluruh elemen kembar di DOM)
+      const setValAll = (id, val) => {
+        document.querySelectorAll(`[id="${id}"]`).forEach(el => {
+          el.value = (val !== null && val !== undefined) ? val : '';
+        });
+      };
+
+      setValAll('ce_det_jml_anak', totalAnak);
+      setValAll('ce_det_jml_baduta', jmlBaduta);
+      setValAll('ce_det_jml_balita', jmlBalita);
+      setValAll('ce_det_jml_wus', jmlWus);
+      setValAll('ce_det_mutasi_keluarga', valMutasi);
+      setValAll('ce_det_kesertaan_jkn', valJKN);
+
       document.querySelectorAll('[id="ce_det_rad_pus_ya"]').forEach(r => r.checked = isPUS);
       document.querySelectorAll('[id="ce_det_rad_pus_tidak"]').forEach(r => r.checked = !isPUS);
-      
-      const isHamil = (kel.kb_03_sedang_hamil === true || String(kel.kb_03_sedang_hamil) === '1');
       document.querySelectorAll('[id="ce_det_rad_hamil_ya"]').forEach(r => r.checked = isHamil);
       document.querySelectorAll('[id="ce_det_rad_hamil_tidak"]').forEach(r => r.checked = !isHamil);
-      
+
+      // 7. Render Baris Data Anggota ke Tabel Modal
+      if (listAng.length === 0) {
+        document.querySelectorAll('[id="tbodyDetailAnggotaCariEdit"]').forEach(tb => {
+          tb.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-semibold">Belum ada rincian anggota keluarga yang terdaftar.</td></tr>`;
+        });
+        return;
+      }
+
       let htmlAng = '';
-      listAng.forEach(a => {
+      listAng.forEach((a, idx) => {
         let labelHub = 'Lainnya';
-        if (String(a.hubungan_dengan_kk) === '1') labelHub = 'KK';
+        if (String(a.hubungan_dengan_kk) === '1') labelHub = 'Kepala Keluarga';
         else if (String(a.hubungan_dengan_kk) === '2') labelHub = 'Istri';
         else if (String(a.hubungan_dengan_kk) === '3') labelHub = 'Anak';
 
         const usia = a.tanggal_lahir ? hitungUsiaTahun(a.tanggal_lahir) : '-';
         const tgl = a.tanggal_lahir ? formatTglIndo(a.tanggal_lahir) : '-';
 
-        let textMutasi = '';
-        if (a.mutasi_anggota === '1') textMutasi = 'Pindah Keluar';
-        else if (a.mutasi_anggota === '2') textMutasi = 'Meninggal';
-        else if (a.mutasi_anggota === '3') textMutasi = 'Baru Lahir';
-        else if (a.mutasi_anggota === '4') textMutasi = 'Pindah Datang';
+        let textMutasi = 'Tetap';
+        if (String(a.mutasi_anggota) === '1') textMutasi = 'Pindah Keluar';
+        else if (String(a.mutasi_anggota) === '2') textMutasi = 'Meninggal Dunia';
+        else if (String(a.mutasi_anggota) === '3') textMutasi = 'Baru Lahir';
+        else if (String(a.mutasi_anggota) === '4') textMutasi = 'Pindah Datang';
+
+        // Bersihkan karakter petik pada parameter fungsi inline
+        const idAnggotaBersih = String(a.id || '').replace(/'/g, "\\'");
+        const namaAnggotaBersih = String(a.nama_lengkap || '').replace(/'/g, "\\'");
+        const kodeKelEscaped = String(kodeKelAktif).replace(/'/g, "\\'");
 
         htmlAng += `
-          <tr class="hover:bg-slate-50 border-b">
-            <td class="p-2 text-center">
+          <tr class="hover:bg-slate-50 transition border-b">
+            <td class="p-2.5 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button type="button" onclick="editIndividuAnggota('${a.id}')" 
-                        class="p-1.5 bg-[#439297] hover:bg-[#34787d] text-white rounded-md text-[10px] font-bold shadow-sm" title="Edit Anggota">
+                <button type="button" onclick="editIndividuAnggota('${idAnggotaBersih}')" 
+                        class="p-1.5 bg-[#439297] hover:bg-[#34787d] text-white rounded-lg text-[10px] font-bold shadow-sm transition active:scale-95" 
+                        title="Edit Data Individu">
                   ✏️
                 </button>
-                <button type="button" onclick="hapusIndividuAnggota('${a.id}', '${a.nama_lengkap}', '${kel.kode_keluarga || targetBersih}')" 
-                        class="p-1.5 bg-[#d9534f] hover:bg-[#c9302c] text-white rounded-md text-[10px] font-bold shadow-sm" title="Hapus Anggota">
+                <button type="button" onclick="hapusIndividuAnggota('${idAnggotaBersih}', '${namaAnggotaBersih}', '${kodeKelEscaped}')" 
+                        class="p-1.5 bg-[#d9534f] hover:bg-[#c9302c] text-white rounded-lg text-[10px] font-bold shadow-sm transition active:scale-95" 
+                        title="Hapus Dari Kartu Keluarga">
                   🗑️
                 </button>
               </div>
             </td>
-            <td class="p-2 font-bold text-slate-800 uppercase">${a.nama_lengkap}</td>
-            <td class="p-2 font-mono text-slate-600 font-semibold">${a.nik}</td>
-            <td class="p-2 text-center font-bold text-slate-700">${labelHub}</td>
-            <td class="p-2 text-center text-slate-600">${tgl}</td>
-            <td class="p-2 text-center font-bold text-slate-800">${usia}</td>
-            <td class="p-2 text-center text-slate-500 font-semibold">${textMutasi}</td>
+            <td class="p-2.5 font-bold text-slate-800 uppercase">${a.nama_lengkap || '-'}</td>
+            <td class="p-2.5 font-mono text-slate-600 font-semibold">${a.nik || '-'}</td>
+            <td class="p-2.5 text-center font-bold text-slate-700">${labelHub}</td>
+            <td class="p-2.5 text-center text-slate-600 font-medium">${tgl}</td>
+            <td class="p-2.5 text-center font-black text-slate-800">${usia}</td>
+            <td class="p-2.5 text-center text-slate-500 font-semibold">${textMutasi}</td>
           </tr>
         `;
       });
 
-      document.querySelectorAll('[id="tbodyDetailAnggotaCariEdit"]').forEach(tb => tb.innerHTML = htmlAng);
+      document.querySelectorAll('[id="tbodyDetailAnggotaCariEdit"]').forEach(tb => {
+        tb.innerHTML = htmlAng;
+      });
     }
 
     function tutupModalDetailCariEdit() {
@@ -5801,379 +5558,404 @@
     // EDIT FORMULIR KELUARGA LENGKAP DARI TABEL CARI & EDIT
     // ========================================================
     async function editFormulirKeluargaLengkap(kodeKelTarget) {
-      if (!kodeKelTarget) return;
-      const targetBersih = String(kodeKelTarget).trim();
+  if (!kodeKelTarget) {
+    console.warn("Kode keluarga / No KK sasaran tidak sah.");
+    return;
+  }
+  const targetBersih = String(kodeKelTarget).trim();
 
-      // 1. Tentukan mod pengeditan mengikut peranan pengguna
-      if (userAktif && userAktif.role === 'USER_DESA') {
-        modeEditKeluargaLuar = false; // KADER: Laluan penuh individu
-      } else {
-        modeEditKeluargaLuar = true;  // ADMIN: Mod lintas terus
-      }
+  // 1. Tentukan mod pengeditan mengikut peranan pengguna
+  if (userAktif && userAktif.role === 'USER_DESA') {
+    modeEditKeluargaLuar = false; // KADER: Memerlukan laluan penuh individu
+  } else {
+    modeEditKeluargaLuar = false; // ADMIN: Tetap sediakan form individu lengkap mengikut jumlah keluarga sebenar
+  }
 
-      Swal.fire({
-        title: 'Memuatkan Data Keluarga...',
-        html: 'Menyediakan borang isian lengkap...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
+  Swal.fire({
+    title: 'Memuatkan Data Keluarga...',
+    html: '<div class="text-xs text-slate-500">Menyediakan borang isian lengkap dari pangkalan data...</div>',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+
+  try {
+    // 2. Tarik data keluarga berserta semua anggota keluarga berkaitan dari Supabase
+    const { data: kel, error: errKel } = await supabaseClient
+      .from('keluarga')
+      .select(`*, anggota_keluarga (*)`)
+      .or(`kode_keluarga.eq.${targetBersih},nomor_kk.eq.${targetBersih}`)
+      .maybeSingle();
+
+    if (errKel || !kel) {
+      throw new Error('Data keluarga tidak ditemui di dalam pangkalan data.');
+    }
+
+    // 3. Tampilkan skrin borang mengikut peranan login
+    if (userAktif && userAktif.role === 'USER_DESA') {
+      tampilkanLayar('tampilan_formulir'); //
+    } else {
+      tampilkanLayar('tampilan_dashboard'); //
+      bukaHalamanAdmin('formulir'); //
+    }
+
+    // Aktifkan langkah 1: Identiti Wilayah[cite: 2]
+    pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
+
+    // 4. Normalisasi nilai kod wilayah[cite: 2]
+    const kdProv = String(kel.kode_prov || '52').padStart(2, '0');
+    const kdKab  = String(kel.kode_kab || '01').padStart(2, '0');
+    const kdKec  = String(kel.kode_kec || '').padStart(2, '0');
+    const kdDesa = String(kel.kode_desa || '').padStart(4, '0');
+    const kdDsn  = String(kel.kode_dusun || '').padStart(4, '0');
+
+    // Helper menetapkan nilai ke SEMUA elemen yang berkongsi ID sama[cite: 2]
+    const setValAll = (id, val) => {
+      document.querySelectorAll(`[id="${id}"]`).forEach(el => {
+        el.value = (val !== null && val !== undefined) ? val : '';
       });
+    };
 
-      try {
-        // Ambil data keluarga berserta semua anggota berkaitan
-        const { data: kel, error: errKel } = await supabaseClient
-          .from('keluarga')
-          .select(`*, anggota_keluarga (*)`)
-          .or(`kode_keluarga.eq."${targetBersih}",nomor_kk.eq."${targetBersih}"`)
-          .maybeSingle();
+    // Pastikan semua menu lungsur (dropdown) aktif dan label teks tersembunyi[cite: 2]
+    document.querySelectorAll('#provinsi, #kabupaten, #kecamatan, #desa, #dusun, #rt').forEach(el => {
+      el.classList.remove('hidden', 'bg-slate-100', 'cursor-not-allowed');
+      el.disabled = false;
+    });
+    document.querySelectorAll('#label_provinsi, #label_kabupaten, #label_kecamatan, #label_desa').forEach(el => {
+      el.classList.add('hidden');
+    });
 
-        if (errKel || !kel) {
-          throw new Error('Data keluarga tidak ditemui di dalam pangkalan data.');
-        }
+    // 5. Muatkan Data Hierarki Wilayah (Provinsi -> Kabupaten -> Kecamatan -> Desa)[cite: 2]
+    // a. Provinsi[cite: 2]
+    document.querySelectorAll('[id="provinsi"]').forEach(el => {
+      el.innerHTML = '<option value="">-- PILIH PROVINSI --</option>';
+      Object.keys(dataProvinsi || {}).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(k => {
+        el.add(new Option(`${k} - ${dataProvinsi[k].toUpperCase()}`, k));
+      });
+      el.value = kdProv;
+    });
 
-        // Tampilkan skrin borang mengikut peranan
-        if (userAktif && userAktif.role === 'USER_DESA') {
-          tampilkanLayar('tampilan_formulir');
-        } else {
-          tampilkanLayar('tampilan_dashboard');
-          bukaHalamanAdmin('formulir');
-        }
+    // b. Kabupaten[cite: 2]
+    document.querySelectorAll('[id="kabupaten"]').forEach(el => {
+      el.innerHTML = '<option value="">-- PILIH KABUPATEN --</option>';
+      const listKab = (dataKabupaten && dataKabupaten[kdProv]) ? dataKabupaten[kdProv] : {};
+      Object.keys(listKab).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(k => {
+        el.add(new Option(`${k} - ${listKab[k].toUpperCase()}`, k));
+      });
+      el.value = kdKab;
+    });
 
-        // Aktifkan langkah 1: Identiti Wilayah
-        pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
+    // c. Kecamatan[cite: 2]
+    document.querySelectorAll('[id="kecamatan"]').forEach(el => {
+      el.innerHTML = '<option value="">-- PILIH KECAMATAN --</option>';
+      const listKec = (dataKecamatan && dataKecamatan[kdKab]) ? dataKecamatan[kdKab] : {};
+      Object.keys(listKec).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(k => {
+        el.add(new Option(`${k} - ${listKec[k].toUpperCase()}`, k));
+      });
+      el.value = kdKec;
+    });
 
-        // Normalisasi kod wilayah
-        const kdProv = String(kel.kode_prov || '52').padStart(2, '0');
-        const kdKab  = String(kel.kode_kab || '01').padStart(2, '0');
-        const kdKec  = String(kel.kode_kec || '').padStart(2, '0');
-        const kdDesa = String(kel.kode_desa || '').padStart(4, '0');
-        const kdDsn  = String(kel.kode_dusun || '').padStart(4, '0');
+    // d. Desa[cite: 2]
+    const desaKey = kdKab + "_" + kdKec;
+    document.querySelectorAll('[id="desa"]').forEach(el => {
+      el.innerHTML = '<option value="">-- PILIH DESA --</option>';
+      const listDesa = (dataDesa && dataDesa[desaKey]) ? dataDesa[desaKey] : {};
+      Object.keys(listDesa).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(k => {
+        el.add(new Option(`${k} - ${listDesa[k].toUpperCase()}`, k));
+      });
+      el.value = kdDesa;
+    });
 
-        // Fungsi bantuan untuk mengisi SEMUA elemen dengan ID yang sama
-        const setValAll = (id, val) => {
-          document.querySelectorAll(`[id="${id}"]`).forEach(el => {
-            el.value = val !== null && val !== undefined ? val : '';
-          });
-        };
+    // e. Dusun (Ditapis terus dari rawWilayahList dan dibuka kuncinya)[cite: 2]
+    const dsnSaring = (rawWilayahList || []).filter(w => 
+      String(w.kode_kab).padStart(2, '0') === kdKab &&
+      String(w.kode_kec).padStart(2, '0') === kdKec &&
+      String(w.kode_desa).padStart(4, '0') === kdDesa
+    );
 
-        // Pastikan semua menu lungsur (dropdown) aktif dan label teks tersembunyi
-        document.querySelectorAll('#provinsi, #kabupaten, #kecamatan, #desa, #dusun, #rt').forEach(el => {
-          el.classList.remove('hidden', 'bg-slate-100', 'cursor-not-allowed');
-          el.disabled = false;
-        });
-        document.querySelectorAll('#label_provinsi, #label_kabupaten, #label_kecamatan, #label_desa').forEach(el => {
-          el.classList.add('hidden');
-        });
+    document.querySelectorAll('[id="dusun"]').forEach(el => {
+      el.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
+      dsnSaring.forEach(w => {
+        const cKd = String(w.kode_dusun).padStart(4, '0');
+        const opt = new Option(`${cKd} - ${w.dusun.toUpperCase()}`, cKd);
+        opt.setAttribute('data-rt', w.jumlah_rt || 1);
+        el.add(opt);
+      });
+      el.value = kdDsn;
+      el.disabled = false; // Mengatasi masalah dusun terkunci / disabled
+      el.classList.remove('bg-slate-100', 'cursor-not-allowed');
+    });
 
-        // 2. Isi data Wilayah secara bertingkat pada semua borang
-        // a. Provinsi
-        document.querySelectorAll('[id="provinsi"]').forEach(el => {
-          el.innerHTML = '<option value="">-- PILIH PROVINSI --</option>';
-          Object.keys(dataProvinsi || {}).sort().forEach(k => {
-            el.add(new Option(`${k} - ${dataProvinsi[k].toUpperCase()}`, k));
-          });
-          el.value = kdProv;
-        });
+    // f. RT (Dibina mengikut jumlah RT Dusun sasaran dan dibuka kuncinya)[cite: 2]
+    const dusunObj = dsnSaring.find(w => String(w.kode_dusun).padStart(4, '0') === kdDsn);
+    const jmlRtMax = Math.max(dusunObj ? (dusunObj.jumlah_rt || 1) : 10, parseInt(kel.rt || 1, 10));
+    const valRtBersih = String(parseInt(kel.rt || 1, 10)).padStart(3, '0');
 
-        // b. Kabupaten
-        document.querySelectorAll('[id="kabupaten"]').forEach(el => {
-          el.innerHTML = '<option value="">-- PILIH KABUPATEN --</option>';
-          const listKab = (dataKabupaten && dataKabupaten[kdProv]) ? dataKabupaten[kdProv] : {};
-          Object.keys(listKab).sort().forEach(k => {
-            el.add(new Option(`${k} - ${listKab[k].toUpperCase()}`, k));
-          });
-          el.value = kdKab;
-        });
+    document.querySelectorAll('[id="rt"]').forEach(el => {
+      el.innerHTML = '<option value="">-- PILIH RT --</option>';
+      for (let r = 1; r <= jmlRtMax; r++) {
+        const strR = String(r).padStart(3, '0');
+        el.add(new Option(`RT ${strR} - ${strR}`, strR));
+      }
+      el.value = valRtBersih;
+      el.disabled = false; // Mengatasi masalah RT terkunci / disabled
+      el.classList.remove('bg-slate-100', 'cursor-not-allowed');
+    });
 
-        // c. Kecamatan
-        document.querySelectorAll('[id="kecamatan"]').forEach(el => {
-          el.innerHTML = '<option value="">-- PILIH KECAMATAN --</option>';
-          const listKec = (dataKecamatan && dataKecamatan[kdKab]) ? dataKecamatan[kdKab] : {};
-          Object.keys(listKec).sort().forEach(k => {
-            el.add(new Option(`${k} - ${listKec[k].toUpperCase()}`, k));
-          });
-          el.value = kdKec;
-        });
+    if (typeof sinkronkanLabelWilayah === 'function') {
+      sinkronkanLabelWilayah();
+    }
 
-        // d. Desa
-        const desaKey = kdKab + "_" + kdKec;
-        document.querySelectorAll('[id="desa"]').forEach(el => {
-          el.innerHTML = '<option value="">-- PILIH DESA --</option>';
-          const listDesa = (dataDesa && dataDesa[desaKey]) ? dataDesa[desaKey] : {};
-          Object.keys(listDesa).sort().forEach(k => {
-            el.add(new Option(`${k} - ${listDesa[k].toUpperCase()}`, k));
-          });
-          el.value = kdDesa;
-        });
+    // 6. Tetapkan nilai input borang wilayah dan medan tersembunyi[cite: 2]
+    setValAll('kode_prov', kdProv);
+    setValAll('kode_kab', kdKab);
+    setValAll('kode_kec', kdKec);
+    setValAll('kode_desa', kdDesa);
+    setValAll('kode_dusun', kdDsn);
+    setValAll('nomor_kk', kel.nomor_kk || '');
+    setValAll('kode_rumah', kel.kode_rumah || '001');
+    setValAll('no_urut_keluarga', kel.no_urut_keluarga || '001');
+    setValAll('no_hp', kel.no_hp || '');
+    setValAll('alamat_detail', kel.alamat_detail || '');
 
-        // e. Dusun (Cari terus daripada rawWilayahList untuk ketepatan menyeluruh)
-        const dsnSaring = (rawWilayahList || []).filter(w => 
-          String(w.kode_kab).padStart(2, '0') === kdKab &&
-          String(w.kode_kec).padStart(2, '0') === kdKec &&
-          String(w.kode_desa).padStart(4, '0') === kdDesa
-        );
+    document.querySelectorAll('[id="status_keluarga"]').forEach(sel => {
+      sel.value = String(kel.status_keluarga || '1');
+      sel.disabled = false;
+      sel.classList.remove('bg-slate-100', 'cursor-not-allowed');
+    });
 
-        document.querySelectorAll('[id="dusun"]').forEach(el => {
-          el.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
-          dsnSaring.forEach(w => {
-            const cKd = String(w.kode_dusun).padStart(4, '0');
-            const opt = new Option(`${cKd} - ${w.dusun.toUpperCase()}`, cKd);
-            opt.setAttribute('data-rt', w.jumlah_rt || 1);
-            el.add(opt);
-          });
-          el.value = kdDsn;
-        });
+    if (typeof evaluasiStatusKeluarga === 'function') {
+      evaluasiStatusKeluarga();
+    }
 
-        // f. RT
-        const dusunTerpilih = dsnSaring.find(w => String(w.kode_dusun).padStart(4, '0') === kdDsn);
-        const jmlRtMax = Math.max(dusunTerpilih ? (dusunTerpilih.jumlah_rt || 1) : 10, parseInt(kel.rt || 1, 10));
-        const valRtBersih = String(parseInt(kel.rt || 1, 10)).padStart(3, '0');
+    // 7. Muatkan dan bina Halaman Anggota Individu mengikut senarai sebenar[cite: 2]
+    const rawAnggota = Array.isArray(kel.anggota_keluarga) ? kel.anggota_keluarga : [];
+    rawAnggota.sort((a, b) => (parseInt(a.nomor_anggota_keluarga, 10) || 0) - (parseInt(b.nomor_anggota_keluarga, 10) || 0));
 
-        document.querySelectorAll('[id="rt"]').forEach(el => {
-          el.innerHTML = '<option value="">-- PILIH RT --</option>';
-          for (let r = 1; r <= jmlRtMax; r++) {
-            const strR = String(r).padStart(3, '0');
-            el.add(new Option(`RT ${strR} - ${strR}`, strR));
+    // Kosongkan bekas kontena anggota lama[cite: 2]
+    document.querySelectorAll('[id="area_anggota_keluarga"]').forEach(c => c.innerHTML = '');
+    totalHalamanAnggota = 0;
+
+    daftarUrutanAnomali = [];
+    indexAnomaliAktif = 0;
+
+    const jmlAng = Math.max(rawAnggota.length, 1);
+    setValAll('jumlah_anggota_input', jmlAng);
+
+    for (let i = 1; i <= jmlAng; i++) {
+      tambahHalamanAnggotaBaru();
+      const dAng = rawAnggota[i - 1];
+      if (dAng) {
+        document.querySelectorAll(`[id="hal_anggota_${i}"]`).forEach(hAng => {
+          const setInp = (name, val) => {
+            const el = hAng.querySelector(`[name="${name}"]`);
+            if (el) el.value = (val !== null && val !== undefined) ? val : '';
+          };
+
+          setInp('nama_lengkap', dAng.nama_lengkap);
+          setInp('nik', dAng.nik);
+          setInp('jenis_kelamin', String(dAng.jenis_kelamin || '1'));
+          setInp('tanggal_lahir', dAng.tanggal_lahir);
+          setInp('display_usia', dAng.tanggal_lahir ? hitungUsiaTahun(dAng.tanggal_lahir) : '');
+
+          const selKawin = hAng.querySelector('[name="status_perkawinan"]');
+          if (selKawin) {
+            selKawin.value = String(dAng.status_perkawinan || '1');
+            if (typeof evaluasiUsiaKawin === 'function') evaluasiUsiaKawin(selKawin, i);
           }
-          el.value = valRtBersih;
-        });
-
-        sinkronkanLabelWilayah();
-
-        // Tetapkan nilai input teks dan medan tersembunyi
-        setValAll('kode_prov', kdProv);
-        setValAll('kode_kab', kdKab);
-        setValAll('kode_kec', kdKec);
-        setValAll('kode_desa', kdDesa);
-        setValAll('kode_dusun', kdDsn);
-        setValAll('nomor_kk', kel.nomor_kk || '');
-        setValAll('kode_rumah', kel.kode_rumah || '001');
-        setValAll('no_urut_keluarga', kel.no_urut_keluarga || '001');
-        setValAll('no_hp', kel.no_hp || '');
-        setValAll('alamat_detail', kel.alamat_detail || '');
-
-        document.querySelectorAll('[id="status_keluarga"]').forEach(sel => {
-          sel.value = String(kel.status_keluarga || '1');
-          sel.disabled = false;
-          sel.classList.remove('bg-slate-100', 'cursor-not-allowed');
-        });
-
-        evaluasiStatusKeluarga();
-
-        // 3. Susun data semua Anggota Keluarga
-        const rawAnggota = kel.anggota_keluarga || [];
-        rawAnggota.sort((a, b) => (parseInt(a.nomor_anggota_keluarga, 10) || 0) - (parseInt(b.nomor_anggota_keluarga, 10) || 0));
-
-        // Bersihkan semua bekas kontena anggota
-        document.querySelectorAll('[id="area_anggota_keluarga"]').forEach(c => c.innerHTML = '');
-        totalHalamanAnggota = 0;
-
-        daftarUrutanAnomali = [];
-        indexAnomaliAktif = 0;
-
-        const jmlAng = Math.max(rawAnggota.length, 1);
-        setValAll('jumlah_anggota_input', jmlAng);
-
-        for (let i = 1; i <= jmlAng; i++) {
-          tambahHalamanAnggotaBaru();
-          const dAng = rawAnggota[i - 1];
-          if (dAng) {
-            document.querySelectorAll(`[id="hal_anggota_${i}"]`).forEach(hAng => {
-              const setInp = (name, val) => {
-                const el = hAng.querySelector(`[name="${name}"]`);
-                if (el) el.value = val !== null && val !== undefined ? val : '';
-              };
-
-              setInp('nama_lengkap', dAng.nama_lengkap);
-              setInp('nik', dAng.nik);
-              setInp('jenis_kelamin', String(dAng.jenis_kelamin || '1'));
-              setInp('tanggal_lahir', dAng.tanggal_lahir);
-              setInp('display_usia', dAng.tanggal_lahir ? hitungUsiaTahun(dAng.tanggal_lahir) : '');
-
-              const selKawin = hAng.querySelector('[name="status_perkawinan"]');
-              if (selKawin) {
-                selKawin.value = String(dAng.status_perkawinan || '1');
-                evaluasiUsiaKawin(selKawin, i);
-              }
-              if (dAng.usia_kawin_pertama) {
-                setInp('usia_kawin_pertama', dAng.usia_kawin_pertama);
-              }
-
-              setInp('memiliki_akta_lahir', String(dAng.memiliki_akta_lahir || '1'));
-              setInp('hubungan_dengan_kk', String(dAng.hubungan_dengan_kk || (i === 1 ? '1' : '3')));
-              setInp('agama', String(dAng.agama || '1'));
-              setInp('jenis_pekerjaan', String(dAng.jenis_pekerjaan || '1'));
-              setInp('pendidikan', String(dAng.pendidikan || '1'));
-              setInp('kepesertaan_jkn', String(dAng.kesertaan_jkn || dAng.kepesertaan_jkn || '1'));
-              setInp('gangguan_fungsional', String(dAng.gangguan_fungsional || '5'));
-              setInp('kemampuan_mengurus_diri', String(dAng.kemampuan_mengurus_diri || '4'));
-              setInp('bekerja_luar_negeri', String(dAng.bekerja_luar_negeri || '4'));
-              setInp('mutasi_anggota', String(dAng.mutasi_anggota || '0'));
-
-              evaluasiAturanOtomatisAnggota(i);
-            });
+          if (dAng.usia_kawin_pertama) {
+            setInp('usia_kawin_pertama', dAng.usia_kawin_pertama);
           }
-        }
 
-        totalHalamanAnggota = document.querySelectorAll('.item-anggota-page').length;
-        perbaruiLabelTotalAnggota();
+          setInp('memiliki_akta_lahir', String(dAng.memiliki_akta_lahir || '1'));
+          setInp('hubungan_dengan_kk', String(dAng.hubungan_dengan_kk || (i === 1 ? '1' : '3')));
+          setInp('agama', String(dAng.agama || '1'));
+          setInp('jenis_pekerjaan', String(dAng.jenis_pekerjaan || '1'));
+          setInp('pendidikan', String(dAng.pendidikan || '1'));
+          setInp('kepesertaan_jkn', String(dAng.kesertaan_jkn || dAng.kepesertaan_jkn || '1'));
+          setInp('gangguan_fungsional', String(dAng.gangguan_fungsional || '5'));
+          setInp('kemampuan_mengurus_diri', String(dAng.kemampuan_mengurus_diri || '4'));
+          setInp('bekerja_luar_negeri', String(dAng.bekerja_luar_negeri || '4'));
+          setInp('mutasi_anggota', String(dAng.mutasi_anggota || '0'));
 
-        perbaruiSemuaOpsiIbuKandung();
-        rawAnggota.forEach((ang, idx) => {
-          if (ang.kode_ibu_kandung) {
-            document.querySelectorAll(`[id="hal_anggota_${idx + 1}"]`).forEach(hal => {
-              const selIbu = hal.querySelector('[name="kode_ibu_kandung"]');
-              if (selIbu) selIbu.value = String(ang.kode_ibu_kandung);
-            });
+          if (typeof evaluasiAturanOtomatisAnggota === 'function') {
+            evaluasiAturanOtomatisAnggota(i);
           }
         });
-
-        // 4. Muatkan Data Blok KB
-        const toKodeBool = (val) => {
-          if (val === true || val === '1' || val === 1) return '1';
-          if (val === false || val === '2' || val === 2) return '2';
-          return val ? String(val) : '';
-        };
-
-        dataNilaiKB.kb_01_melahirkan = kel.kb_01_melahirkan ?? '';
-        dataNilaiKB.kb_01_hidup_laki = kel.kb_01_hidup_laki ?? '';
-        dataNilaiKB.kb_01_hidup_perempuan = kel.kb_01_hidup_perempuan ?? '';
-        dataNilaiKB.kb_01_masih_laki = kel.kb_01_masih_laki ?? '';
-        dataNilaiKB.kb_01_masih_perempuan = kel.kb_01_masih_perempuan ?? '';
-        dataNilaiKB.kb_02_anak_ideal = kel.kb_02_anak_ideal ?? '';
-        dataNilaiKB.kb_03_sedang_hamil = toKodeBool(kel.kb_03_sedang_hamil);
-        dataNilaiKB.kb_03_usia_kehamilan = kel.kb_03_usia_kehamilan ?? '';
-        dataNilaiKB.kb_03_status_ingin_hamil = kel.kb_03_status_ingin_hamil ? String(kel.kb_03_status_ingin_hamil) : '';
-        dataNilaiKB.kb_03_keinginan_anak_lagi = kel.kb_03_keinginan_anak_lagi ? String(kel.kb_03_keinginan_anak_lagi) : '';
-        dataNilaiKB.kb_04_sedang_kb = toKodeBool(kel.kb_04_sedang_kb);
-        dataNilaiKB.kb_04_mulai_bulan = kel.kb_04_mulai_bulan || '';
-        dataNilaiKB.kb_04_mulai_tahun = kel.kb_04_mulai_tahun || '';
-        dataNilaiKB.kb_05_pernah_kb = toKodeBool(kel.kb_05_pernah_kb || kel.kb_05_pernah_kb_12_bulan);
-        dataNilaiKB.kb_05_mulai_bulan = kel.kb_05_mulai_bulan || '';
-        dataNilaiKB.kb_05_mulai_tahun = kel.kb_05_mulai_tahun || '';
-        dataNilaiKB.kb_05_berhenti_bulan = kel.kb_05_berhenti_bulan || '';
-        dataNilaiKB.kb_05_berhenti_tahun = kel.kb_05_berhenti_tahun || '';
-        dataNilaiKB.kb_06_alasan_tidak_kb = kel.kb_06_alasan_tidak_kb ? String(kel.kb_06_alasan_tidak_kb) : '';
-        dataNilaiKB.kb_07_jenis_kb = kel.kb_07_jenis_kb ? String(kel.kb_07_jenis_kb) : '';
-        dataNilaiKB.kb_08_sumber_pelayanan = kel.kb_08_sumber_pelayanan ? String(kel.kb_08_sumber_pelayanan) : '';
-        dataNilaiKB.kb_09_info_jenis = toKodeBool(kel.kb_09_info_jenis);
-        dataNilaiKB.kb_09_info_efek_samping = toKodeBool(kel.kb_09_info_efek_samping);
-        dataNilaiKB.kb_09_info_tindakan = toKodeBool(kel.kb_09_info_tindakan);
-
-        // 5. Muatkan Data Blok PK (Menyokong kunci panjang dan pendek)
-        const parseArrayPK = (val) => {
-          if (!val) return [];
-          if (Array.isArray(val)) return val;
-          return String(val).split(',').map(s => s.trim()).filter(Boolean);
-        };
-
-        const getValPK = (kunciPanjang, kunciPendek) => {
-          const v = kel[kunciPanjang] !== undefined && kel[kunciPanjang] !== null ? kel[kunciPanjang] : kel[kunciPendek];
-          return v !== undefined && v !== null ? String(v) : '';
-        };
-
-        nilaiJawabanPK = {
-          pk_01_ibadah: getValPK('pk_01_ibadah', 'pk_01'),
-          pk_02_toleransi_agama: getValPK('pk_02_toleransi_agama', 'pk_02'),
-          pk_03_1_tanpa_sapa: getValPK('pk_03_1_tanpa_sapa', 'pk_03_1'),
-          pk_03_1: getValPK('pk_03_1_tanpa_sapa', 'pk_03_1'),
-          pk_03_2_pisah_ranjang: getValPK('pk_03_2_pisah_ranjang', 'pk_03_2'),
-          pk_03_2: getValPK('pk_03_2_pisah_ranjang', 'pk_03_2'),
-          pk_03_3_pergi_rumah: getValPK('pk_03_3_pergi_rumah', 'pk_03_3'),
-          pk_03_3: getValPK('pk_03_3_pergi_rumah', 'pk_03_3'),
-          pk_03_4_kdrt: getValPK('pk_03_4_kdrt', 'pk_03_4'),
-          pk_03_4: getValPK('pk_03_4_kdrt', 'pk_03_4'),
-          pk_03_5_kekerasan_anak: getValPK('pk_03_5_kekerasan_anak', 'pk_03_5'),
-          pk_03_5: getValPK('pk_03_5_kekerasan_anak', 'pk_03_5'),
-          pk_04_anggota_sakit: getValPK('pk_04_anggota_sakit', 'pk_04'),
-          pk_05_rekreasi: getValPK('pk_05_rekreasi', 'pk_05'),
-          pk_06_kegiatan_sosial: getValPK('pk_06_kegiatan_sosial', 'pk_06'),
-          pk_07_bantuan_orang_lain: getValPK('pk_07_bantuan_orang_lain', 'pk_07'),
-          pk_08_akses_sarana_publik: getValPK('pk_08_akses_sarana_publik', 'pk_08'),
-          pk_09_aman_nyaman: getValPK('pk_09_aman_nyaman', 'pk_09'),
-
-          pk_10_makan_dua_kali: getValPK('pk_10_makan_dua_kali', 'pk_10'),
-          pk_10: getValPK('pk_10_makan_dua_kali', 'pk_10'),
-          pk_10_1_jenis_makanan: parseArrayPK(kel.pk_10_1_jenis_makanan || kel.pk_10_1),
-          pk_10_1: parseArrayPK(kel.pk_10_1_jenis_makanan || kel.pk_10_1),
-
-          pk_11_akses_internet: getValPK('pk_11_akses_internet', 'pk_11'),
-          pk_12_internet_anak: getValPK('pk_12_internet_anak', 'pk_12'),
-          pk_13_sumber_penghasilan: getValPK('pk_13_sumber_penghasilan', 'pk_13'),
-
-          pk_14_memiliki_aset: getValPK('pk_14_memiliki_aset', 'pk_14'),
-          pk_14: getValPK('pk_14_memiliki_aset', 'pk_14'),
-          pk_14_1_jenis_aset: parseArrayPK(kel.pk_14_1_jenis_aset || kel.pk_14_1),
-          pk_14_1: parseArrayPK(kel.pk_14_1_jenis_aset || kel.pk_14_1),
-
-          pk_15_interaksi_harian: getValPK('pk_15_interaksi_harian', 'pk_15'),
-          pk_15: getValPK('pk_15_interaksi_harian', 'pk_15'),
-          pk_15_1_jenis_interaksi: parseArrayPK(kel.pk_15_1_jenis_interaksi || kel.pk_15_1),
-          pk_15_1: parseArrayPK(kel.pk_15_1_jenis_interaksi || kel.pk_15_1),
-
-          pk_16_1_ayah_menemani_anak: getValPK('pk_16_1_ayah_menemani_anak', 'pk_16_1'),
-          pk_16_1: getValPK('pk_16_1_ayah_menemani_anak', 'pk_16_1'),
-          pk_16_2_ayah_komunikasi: getValPK('pk_16_2_ayah_komunikasi', 'pk_16_2'),
-          pk_16_2: getValPK('pk_16_2_ayah_komunikasi', 'pk_16_2'),
-          pk_16_3_ayah_hak_dasar: getValPK('pk_16_3_ayah_hak_dasar', 'pk_16_3'),
-          pk_16_3: getValPK('pk_16_3_ayah_hak_dasar', 'pk_16_3'),
-          pk_16_4_ayah_pekerjaan_rumah: getValPK('pk_16_4_ayah_pekerjaan_rumah', 'pk_16_4'),
-          pk_16_4: getValPK('pk_16_4_ayah_pekerjaan_rumah', 'pk_16_4'),
-
-          pk_17_1_jenis_atap: getValPK('pk_17_1_jenis_atap', 'pk_17_1'),
-          pk_17_1: getValPK('pk_17_1_jenis_atap', 'pk_17_1'),
-          pk_17_2_kondisi_atap: getValPK('pk_17_2_kondisi_atap', 'pk_17_2'),
-          pk_17_2: getValPK('pk_17_2_kondisi_atap', 'pk_17_2'),
-          pk_18_1_jenis_dinding: getValPK('pk_18_1_jenis_dinding', 'pk_18_1'),
-          pk_18_1: getValPK('pk_18_1_jenis_dinding', 'pk_18_1'),
-          pk_18_2_kondisi_dinding: getValPK('pk_18_2_kondisi_dinding', 'pk_18_2'),
-          pk_18_2: getValPK('pk_18_2_kondisi_dinding', 'pk_18_2'),
-          pk_19_1_jenis_lantai: getValPK('pk_19_1_jenis_lantai', 'pk_19_1'),
-          pk_19_1: getValPK('pk_19_1_jenis_lantai', 'pk_19_1'),
-          pk_19_2_kondisi_lantai: getValPK('pk_19_2_kondisi_lantai', 'pk_19_2'),
-          pk_19_2: getValPK('pk_19_2_kondisi_lantai', 'pk_19_2'),
-
-          pk_20_1_sumber_penerangan: getValPK('pk_20_1_sumber_penerangan', 'pk_20_1'),
-          pk_20_1: getValPK('pk_20_1_sumber_penerangan', 'pk_20_1'),
-          pk_20_2_daya_listrik: getValPK('pk_20_2_daya_listrik', 'pk_20_2'),
-          pk_20_2: getValPK('pk_20_2_daya_listrik', 'pk_20_2'),
-          pk_21_1_sumber_air_minum: getValPK('pk_21_1_sumber_air_minum', 'pk_21_1'),
-          pk_21_1: getValPK('pk_21_1_sumber_air_minum', 'pk_21_1'),
-          pk_21_2_jarak_tinja: getValPK('pk_21_2_jarak_tinja', 'pk_21_2'),
-          pk_21_2: getValPK('pk_21_2_jarak_tinja', 'pk_21_2'),
-
-          pk_22_fasilitas_jamban: getValPK('pk_22_fasilitas_jamban', 'pk_22'),
-          pk_22: getValPK('pk_22_fasilitas_jamban', 'pk_22'),
-          pk_23_luas_rumah: getValPK('pk_23_luas_rumah', 'pk_23'),
-          pk_23: getValPK('pk_23_luas_rumah', 'pk_23'),
-          pk_24_jumlah_menetap: getValPK('pk_24_jumlah_menetap', 'pk_24'),
-          pk_24: getValPK('pk_24_jumlah_menetap', 'pk_24'),
-          pk_25_bahan_bakar_masak: getValPK('pk_25_bahan_bakar_masak', 'pk_25'),
-          pk_25: getValPK('pk_25_bahan_bakar_masak', 'pk_25'),
-          pk_26_kepemilikan_rumah: getValPK('pk_26_kepemilikan_rumah', 'pk_26'),
-          pk_26: getValPK('pk_26_kepemilikan_rumah', 'pk_26'),
-
-          pk_27_pesan_informasi: parseArrayPK(kel.pk_27_pesan_informasi || kel.pk_27),
-          pk_27: parseArrayPK(kel.pk_27_pesan_informasi || kel.pk_27),
-          pk_28_sumber_informasi: parseArrayPK(kel.pk_28_sumber_informasi || kel.pk_28),
-          pk_28: parseArrayPK(kel.pk_28_sumber_informasi || kel.pk_28),
-          pk_29_persetujuan_keluarga: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29),
-          pk_29: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29)
-        };
-
-        // Mulakan paparan soalan blok KB dan PK
-        indexStepKB = 0;
-        riwayatStepKB = [];
-        indexStepPK = 0;
-        riwayatStepPK = [];
-        tampilkanStepKB();
-        tampilkanStepPK();
-
-        Swal.close();
-      } catch (err) {
-        console.error(err);
-        Swal.fire('Gagal Membuka Borang', err.message || 'Ralat sistem berlaku semasa memuatkan data.', 'error');
       }
     }
+
+    totalHalamanAnggota = document.querySelectorAll('.item-anggota-page').length;
+    if (typeof perbaruiLabelTotalAnggota === 'function') {
+      perbaruiLabelTotalAnggota();
+    }
+
+    if (typeof perbaruiSemuaOpsiIbuKandung === 'function') {
+      perbaruiSemuaOpsiIbuKandung();
+    }
+
+    rawAnggota.forEach((ang, idx) => {
+      if (ang.kode_ibu_kandung) {
+        document.querySelectorAll(`[id="hal_anggota_${idx + 1}"]`).forEach(hal => {
+          const selIbu = hal.querySelector('[name="kode_ibu_kandung"]');
+          if (selIbu) selIbu.value = String(ang.kode_ibu_kandung);
+        });
+      }
+    });
+
+    // 8. Muatkan Data Blok KB[cite: 2]
+    const toKodeBool = (val) => {
+      if (val === true || val === '1' || val === 1) return '1';
+      if (val === false || val === '2' || val === 2) return '2';
+      return val ? String(val) : '';
+    };
+
+    dataNilaiKB.kb_01_melahirkan = kel.kb_01_melahirkan ?? '';
+    dataNilaiKB.kb_01_hidup_laki = kel.kb_01_hidup_laki ?? '';
+    dataNilaiKB.kb_01_hidup_perempuan = kel.kb_01_hidup_perempuan ?? '';
+    dataNilaiKB.kb_01_masih_laki = kel.kb_01_masih_laki ?? '';
+    dataNilaiKB.kb_01_masih_perempuan = kel.kb_01_masih_perempuan ?? '';
+    dataNilaiKB.kb_02_anak_ideal = kel.kb_02_anak_ideal ?? '';
+    dataNilaiKB.kb_03_sedang_hamil = toKodeBool(kel.kb_03_sedang_hamil);
+    dataNilaiKB.kb_03_usia_kehamilan = kel.kb_03_usia_kehamilan ?? '';
+    dataNilaiKB.kb_03_status_ingin_hamil = kel.kb_03_status_ingin_hamil ? String(kel.kb_03_status_ingin_hamil) : '';
+    dataNilaiKB.kb_03_keinginan_anak_lagi = kel.kb_03_keinginan_anak_lagi ? String(kel.kb_03_keinginan_anak_lagi) : '';
+    dataNilaiKB.kb_04_sedang_kb = toKodeBool(kel.kb_04_sedang_kb);
+    dataNilaiKB.kb_04_mulai_bulan = kel.kb_04_mulai_bulan || '';
+    dataNilaiKB.kb_04_mulai_tahun = kel.kb_04_mulai_tahun || '';
+    dataNilaiKB.kb_05_pernah_kb = toKodeBool(kel.kb_05_pernah_kb || kel.kb_05_pernah_kb_12_bulan);
+    dataNilaiKB.kb_05_mulai_bulan = kel.kb_05_mulai_bulan || '';
+    dataNilaiKB.kb_05_mulai_tahun = kel.kb_05_mulai_tahun || '';
+    dataNilaiKB.kb_05_berhenti_bulan = kel.kb_05_berhenti_bulan || '';
+    dataNilaiKB.kb_05_berhenti_tahun = kel.kb_05_berhenti_tahun || '';
+    dataNilaiKB.kb_06_alasan_tidak_kb = kel.kb_06_alasan_tidak_kb ? String(kel.kb_06_alasan_tidak_kb) : '';
+    dataNilaiKB.kb_07_jenis_kb = kel.kb_07_jenis_kb ? String(kel.kb_07_jenis_kb) : '';
+    dataNilaiKB.kb_08_sumber_pelayanan = kel.kb_08_sumber_pelayanan ? String(kel.kb_08_sumber_pelayanan) : '';
+    dataNilaiKB.kb_09_info_jenis = toKodeBool(kel.kb_09_info_jenis);
+    dataNilaiKB.kb_09_info_efek_samping = toKodeBool(kel.kb_09_info_efek_samping);
+    dataNilaiKB.kb_09_info_tindakan = toKodeBool(kel.kb_09_info_tindakan);
+
+    // 9. Muatkan Data Blok PK (Pembangunan Keluarga)[cite: 2]
+    const parseArrayPK = (val) => {
+      if (!val) return [];
+      if (Array.isArray(val)) return val;
+      return String(val).split(',').map(s => s.trim()).filter(Boolean);
+    };
+
+    const getValPK = (kunciPanjang, kunciPendek) => {
+      const v = (kel[kunciPanjang] !== undefined && kel[kunciPanjang] !== null) ? kel[kunciPanjang] : kel[kunciPendek];
+      return (v !== undefined && v !== null) ? String(v) : '';
+    };
+
+    nilaiJawabanPK = {
+      pk_01_ibadah: getValPK('pk_01_ibadah', 'pk_01'),
+      pk_02_toleransi_agama: getValPK('pk_02_toleransi_agama', 'pk_02'),
+      pk_03_1_tanpa_sapa: getValPK('pk_03_1_tanpa_sapa', 'pk_03_1'),
+      pk_03_1: getValPK('pk_03_1_tanpa_sapa', 'pk_03_1'),
+      pk_03_2_pisah_ranjang: getValPK('pk_03_2_pisah_ranjang', 'pk_03_2'),
+      pk_03_2: getValPK('pk_03_2_pisah_ranjang', 'pk_03_2'),
+      pk_03_3_pergi_rumah: getValPK('pk_03_3_pergi_rumah', 'pk_03_3'),
+      pk_03_3: getValPK('pk_03_3_pergi_rumah', 'pk_03_3'),
+      pk_03_4_kdrt: getValPK('pk_03_4_kdrt', 'pk_03_4'),
+      pk_03_4: getValPK('pk_03_4_kdrt', 'pk_03_4'),
+      pk_03_5_kekerasan_anak: getValPK('pk_03_5_kekerasan_anak', 'pk_03_5'),
+      pk_03_5: getValPK('pk_03_5_kekerasan_anak', 'pk_03_5'),
+      pk_04_anggota_sakit: getValPK('pk_04_anggota_sakit', 'pk_04'),
+      pk_05_rekreasi: getValPK('pk_05_rekreasi', 'pk_05'),
+      pk_06_kegiatan_sosial: getValPK('pk_06_kegiatan_sosial', 'pk_06'),
+      pk_07_bantuan_orang_lain: getValPK('pk_07_bantuan_orang_lain', 'pk_07'),
+      pk_08_akses_sarana_publik: getValPK('pk_08_akses_sarana_publik', 'pk_08'),
+      pk_09_aman_nyaman: getValPK('pk_09_aman_nyaman', 'pk_09'),
+
+      pk_10_makan_dua_kali: getValPK('pk_10_makan_dua_kali', 'pk_10'),
+      pk_10: getValPK('pk_10_makan_dua_kali', 'pk_10'),
+      pk_10_1_jenis_makanan: parseArrayPK(kel.pk_10_1_jenis_makanan || kel.pk_10_1),
+      pk_10_1: parseArrayPK(kel.pk_10_1_jenis_makanan || kel.pk_10_1),
+
+      pk_11_akses_internet: getValPK('pk_11_akses_internet', 'pk_11'),
+      pk_12_internet_anak: getValPK('pk_12_internet_anak', 'pk_12'),
+      pk_13_sumber_penghasilan: getValPK('pk_13_sumber_penghasilan', 'pk_13'),
+
+      pk_14_memiliki_aset: getValPK('pk_14_memiliki_aset', 'pk_14'),
+      pk_14: getValPK('pk_14_memiliki_aset', 'pk_14'),
+      pk_14_1_jenis_aset: parseArrayPK(kel.pk_14_1_jenis_aset || kel.pk_14_1),
+      pk_14_1: parseArrayPK(kel.pk_14_1_jenis_aset || kel.pk_14_1),
+
+      pk_15_interaksi_harian: getValPK('pk_15_interaksi_harian', 'pk_15'),
+      pk_15: getValPK('pk_15_interaksi_harian', 'pk_15'),
+      pk_15_1_jenis_interaksi: parseArrayPK(kel.pk_15_1_jenis_interaksi || kel.pk_15_1),
+      pk_15_1: parseArrayPK(kel.pk_15_1_jenis_interaksi || kel.pk_15_1),
+
+      pk_16_1_ayah_menemani_anak: getValPK('pk_16_1_ayah_menemani_anak', 'pk_16_1'),
+      pk_16_1: getValPK('pk_16_1_ayah_menemani_anak', 'pk_16_1'),
+      pk_16_2_ayah_komunikasi: getValPK('pk_16_2_ayah_komunikasi', 'pk_16_2'),
+      pk_16_2: getValPK('pk_16_2_ayah_komunikasi', 'pk_16_2'),
+      pk_16_3_ayah_hak_dasar: getValPK('pk_16_3_ayah_hak_dasar', 'pk_16_3'),
+      pk_16_3: getValPK('pk_16_3_ayah_hak_dasar', 'pk_16_3'),
+      pk_16_4_ayah_pekerjaan_rumah: getValPK('pk_16_4_ayah_pekerjaan_rumah', 'pk_16_4'),
+      pk_16_4: getValPK('pk_16_4_ayah_pekerjaan_rumah', 'pk_16_4'),
+
+      pk_17_1_jenis_atap: getValPK('pk_17_1_jenis_atap', 'pk_17_1'),
+      pk_17_1: getValPK('pk_17_1_jenis_atap', 'pk_17_1'),
+      pk_17_2_kondisi_atap: getValPK('pk_17_2_kondisi_atap', 'pk_17_2'),
+      pk_17_2: getValPK('pk_17_2_kondisi_atap', 'pk_17_2'),
+      pk_18_1_jenis_dinding: getValPK('pk_18_1_jenis_dinding', 'pk_18_1'),
+      pk_18_1: getValPK('pk_18_1_jenis_dinding', 'pk_18_1'),
+      pk_18_2_kondisi_dinding: getValPK('pk_18_2_kondisi_dinding', 'pk_18_2'),
+      pk_18_2: getValPK('pk_18_2_kondisi_dinding', 'pk_18_2'),
+      pk_19_1_jenis_lantai: getValPK('pk_19_1_jenis_lantai', 'pk_19_1'),
+      pk_19_1: getValPK('pk_19_1_jenis_lantai', 'pk_19_1'),
+      pk_19_2_kondisi_lantai: getValPK('pk_19_2_kondisi_lantai', 'pk_19_2'),
+      pk_19_2: getValPK('pk_19_2_kondisi_lantai', 'pk_19_2'),
+
+      pk_20_1_sumber_penerangan: getValPK('pk_20_1_sumber_penerangan', 'pk_20_1'),
+      pk_20_1: getValPK('pk_20_1_sumber_penerangan', 'pk_20_1'),
+      pk_20_2_daya_listrik: getValPK('pk_20_2_daya_listrik', 'pk_20_2'),
+      pk_20_2: getValPK('pk_20_2_daya_listrik', 'pk_20_2'),
+      pk_21_1_sumber_air_minum: getValPK('pk_21_1_sumber_air_minum', 'pk_21_1'),
+      pk_21_1: getValPK('pk_21_1_sumber_air_minum', 'pk_21_1'),
+      pk_21_2_jarak_tinja: getValPK('pk_21_2_jarak_tinja', 'pk_21_2'),
+      pk_21_2: getValPK('pk_21_2_jarak_tinja', 'pk_21_2'),
+
+      pk_22_fasilitas_jamban: getValPK('pk_22_fasilitas_jamban', 'pk_22'),
+      pk_22: getValPK('pk_22_fasilitas_jamban', 'pk_22'),
+      pk_23_luas_rumah: getValPK('pk_23_luas_rumah', 'pk_23'),
+      pk_23: getValPK('pk_23_luas_rumah', 'pk_23'),
+      pk_24_jumlah_menetap: getValPK('pk_24_jumlah_menetap', 'pk_24'),
+      pk_24: getValPK('pk_24_jumlah_menetap', 'pk_24'),
+      pk_25_bahan_bakar_masak: getValPK('pk_25_bahan_bakar_masak', 'pk_25'),
+      pk_25: getValPK('pk_25_bahan_bakar_masak', 'pk_25'),
+      pk_26_kepemilikan_rumah: getValPK('pk_26_kepemilikan_rumah', 'pk_26'),
+      pk_26: getValPK('pk_26_kepemilikan_rumah', 'pk_26'),
+
+      pk_27_pesan_informasi: parseArrayPK(kel.pk_27_pesan_informasi || kel.pk_27),
+      pk_27: parseArrayPK(kel.pk_27_pesan_informasi || kel.pk_27),
+      pk_28_sumber_informasi: parseArrayPK(kel.pk_28_sumber_informasi || kel.pk_28),
+      pk_28: parseArrayPK(kel.pk_28_sumber_informasi || kel.pk_28),
+      pk_29_persetujuan_keluarga: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29),
+      pk_29: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29)
+    };
+
+    // 10. Mulakan semula penunjuk langkah KB dan PK[cite: 2]
+    indexStepKB = 0;
+    riwayatStepKB = [];
+    indexStepPK = 0;
+    riwayatStepPK = [];
+
+    if (typeof tampilkanStepKB === 'function') tampilkanStepKB();
+    if (typeof tampilkanStepPK === 'function') tampilkanStepPK();
+
+    Swal.close();
+
+  } catch (err) {
+    console.error("Gagal membuka borang keluarga lengkap:", err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Gagal Membuka Borang',
+      text: err.message || 'Ralat berlaku semasa menyediakan borang pengeditan data.',
+      confirmButtonColor: '#e11d48'
+    });
+  }
+}
     
     function terjemahkanWilayahKeNama(k) {
       const kdProv = String(k.kode_prov || '52').padStart(2, '0');
@@ -9927,22 +9709,42 @@
 
     function updateFormDusun() {
       let rawKab = '', rawKec = '', rawDesa = '';
-      document.querySelectorAll('[id="kabupaten"]').forEach(el => { if (el.value) rawKab = el.value; });
-      document.querySelectorAll('[id="kecamatan"]').forEach(el => { if (el.value) rawKec = el.value; });
-      document.querySelectorAll('[id="desa"]').forEach(el => { if (el.value) rawDesa = el.value; });
+      const kontainer = (userAktif && userAktif.role === 'USER_DESA') 
+        ? document.querySelector('#tampilan_formulir')
+        : document.querySelector('#sub_view_formulir');
+
+      if (kontainer) {
+        rawKab = kontainer.querySelector('[id="kabupaten"]')?.value || kontainer.querySelector('[id="kode_kab"]')?.value || '';
+        rawKec = kontainer.querySelector('[id="kecamatan"]')?.value || kontainer.querySelector('[id="kode_kec"]')?.value || '';
+        rawDesa = kontainer.querySelector('[id="desa"]')?.value || kontainer.querySelector('[id="kode_desa"]')?.value || '';
+      }
 
       const kdKab = rawKab ? String(rawKab).padStart(2, '0') : '';
       const kdKec = rawKec ? String(rawKec).padStart(2, '0') : '';
       const kdDesa = rawDesa ? String(rawDesa).padStart(4, '0') : '';
-      
+
       document.querySelectorAll('[id="kode_desa"]').forEach(el => el.value = kdDesa);
       document.querySelectorAll('[id="kode_dusun"]').forEach(el => el.value = '');
 
-      const dsnSaring = (rawWilayahList || []).filter(w => 
+      // Ambil data dusun dari master wilayah
+      let dsnSaring = (rawWilayahList || []).filter(w => 
         String(w.kode_kab).padStart(2, '0') === kdKab &&
         String(w.kode_kec).padStart(2, '0') === kdKec &&
         String(w.kode_desa).padStart(4, '0') === kdDesa
       );
+
+      // Jika login sebagai Kader Pendata, filter dusun berdasarkan hak akses
+      if (userAktif && userAktif.role === 'USER_DESA' && userAktif.allowed_wilayah_rt) {
+        try {
+          const allowed = JSON.parse(userAktif.allowed_wilayah_rt);
+          if (Array.isArray(allowed) && allowed.length > 0) {
+            const allowedDusunCodes = allowed.map(a => String(a.kode_dusun).padStart(4, '0'));
+            dsnSaring = dsnSaring.filter(w => allowedDusunCodes.includes(String(w.kode_dusun).padStart(4, '0')));
+          }
+        } catch(e) {
+          console.warn("Gagal parse allowed_wilayah_rt:", e);
+        }
+      }
 
       document.querySelectorAll('[id="dusun"]').forEach(elDusun => {
         elDusun.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
@@ -9966,18 +9768,35 @@
     }
 
     function updateFormRT() {
+      const kontainer = (userAktif && userAktif.role === 'USER_DESA') 
+        ? document.querySelector('#tampilan_formulir')
+        : document.querySelector('#sub_view_formulir');
+
       let kdDusun = '';
       let jmlRtMax = 1;
 
-      document.querySelectorAll('[id="dusun"]').forEach(el => {
-        if (el.value) {
-          kdDusun = el.value;
-          const opt = el.selectedOptions[0];
+      if (kontainer) {
+        const selDusun = kontainer.querySelector('[id="dusun"]');
+        if (selDusun && selDusun.value) {
+          kdDusun = selDusun.value;
+          const opt = selDusun.selectedOptions[0];
           if (opt) jmlRtMax = parseInt(opt.getAttribute('data-rt'), 10) || 1;
         }
-      });
+      }
 
       document.querySelectorAll('[id="kode_dusun"]').forEach(el => el.value = kdDusun);
+
+      // Cek jika ada penugasan RT khusus untuk kader
+      let allowedRTList = null;
+      if (userAktif && userAktif.role === 'USER_DESA' && userAktif.allowed_wilayah_rt && kdDusun) {
+        try {
+          const allowed = JSON.parse(userAktif.allowed_wilayah_rt);
+          const match = allowed.find(a => String(a.kode_dusun).padStart(4, '0') === String(kdDusun).padStart(4, '0'));
+          if (match && Array.isArray(match.rt)) {
+            allowedRTList = match.rt.map(r => String(r).padStart(3, '0'));
+          }
+        } catch(e) {}
+      }
 
       document.querySelectorAll('[id="rt"]').forEach(elRt => {
         elRt.innerHTML = '<option value="">-- PILIH RT --</option>';
@@ -9988,6 +9807,7 @@
 
         for (let i = 1; i <= jmlRtMax; i++) {
           const strRt = String(i).padStart(3, '0');
+          if (allowedRTList && !allowedRTList.includes(strRt)) continue;
           elRt.add(new Option(`RT ${strRt} - ${strRt}`, strRt));
         }
 
@@ -10044,15 +9864,24 @@
     }
 
     async function prosesAksiWilayah() {
-      const kontainerFormAktif = (userAktif && userAktif.role === 'USER_DESA') 
-      ? document.querySelector('#tampilan_formulir')
-      : document.querySelector('#sub_view_formulir');
+      // 1. Tentukan kontainer form yang sedang aktif berdasarkan peran pengguna
+      const isKader = userAktif && userAktif.role === 'USER_DESA';
+      const kontainerFormAktif = isKader
+        ? document.querySelector('#tampilan_kader_app.aktif') || document.querySelector('#tampilan_formulir.aktif') || document.querySelector('#tampilan_formulir')
+        : document.querySelector('#sub_view_formulir:not(.hidden)') || document.querySelector('#sub_view_formulir');
 
+      if (!kontainerFormAktif) {
+        console.error("Kontainer formulir aktif tidak ditemukan!");
+        return;
+      }
+
+      // Helper mengambil nilai input langsung dari kontainer yang aktif
       const getInp = (id) => {
         const el = kontainerFormAktif.querySelector(`[id="${id}"]`);
         return el ? el.value.trim() : '';
       };
 
+      // 2. Ambil nilai seluruh elemen I. IDENTITAS WILAYAH
       const status = getInp('status_keluarga') || '1';
       const noKK = getInp('nomor_kk');
       const kdProv = getInp('kode_prov') || getInp('provinsi');
@@ -10061,157 +9890,242 @@
       const kdDesa = getInp('kode_desa') || getInp('desa');
       const kdDusun = getInp('kode_dusun') || getInp('dusun');
       const rt = getInp('rt');
-      const kodeRumah = (getInp('kode_rumah') || '001').padStart(3, '0');
-      const noUrutKel = (getInp('no_urut_keluarga') || '001').padStart(3, '0');
+      const rawKodeRumah = getInp('kode_rumah');
+      const rawNoUrut = getInp('no_urut_keluarga');
       const alamat = getInp('alamat_detail').toUpperCase();
       const noHp = getInp('no_hp');
 
-      // Sinkronkan ke seluruh form terduplikasi agar data tidak timpang
+      // Format 3 digit angka dengan padding 0 di depan
+      const kodeRumah = rawKodeRumah ? rawKodeRumah.padStart(3, '0') : '';
+      const noUrutKel = rawNoUrut ? rawNoUrut.padStart(3, '0') : '';
+
+      // 3. Validasi umum identitas wilayah
+      if (!noKK) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Nomor KK Kosong',
+          text: 'Nomor Kartu Keluarga (16 digit) wajib diisi!',
+          confirmButtonColor: '#0284c7'
+        });
+        return;
+      }
+
+      if (noKK.length !== 16 || isNaN(noKK)) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Format No. KK Salah',
+          text: 'Nomor Kartu Keluarga harus terdiri dari 16 digit angka!',
+          confirmButtonColor: '#0284c7'
+        });
+        return;
+      }
+
+      if (!kdProv || !kdKab || !kdKec || !kdDesa || !kdDusun || !rt) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Wilayah Belum Lengkap',
+          text: 'Mohon pastikan Provinsi, Kabupaten, Kecamatan, Desa, Dusun, dan RT sudah dipilih!',
+          confirmButtonColor: '#0284c7'
+        });
+        return;
+      }
+
+      // 4. Sinkronkan nilai ke semua input kembar di DOM agar konsisten
       document.querySelectorAll('[id="kode_prov"]').forEach(el => el.value = kdProv);
       document.querySelectorAll('[id="kode_kab"]').forEach(el => el.value = kdKab);
       document.querySelectorAll('[id="kode_kec"]').forEach(el => el.value = kdKec);
       document.querySelectorAll('[id="kode_desa"]').forEach(el => el.value = kdDesa);
       document.querySelectorAll('[id="kode_dusun"]').forEach(el => el.value = kdDusun);
       document.querySelectorAll('[id="rt"]').forEach(el => el.value = rt);
-      document.querySelectorAll('[id="kode_rumah"]').forEach(el => el.value = kodeRumah);
-      document.querySelectorAll('[id="no_urut_keluarga"]').forEach(el => el.value = noUrutKel);
-      
-      if (!noKK || !kdDusun || !rt || !kodeRumah || !noUrutKel || !alamat || !noHp) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Data Belum Lengkap',
-          text: 'Mohon lengkapi seluruh isian Identitas Wilayah, Kode Rumah, No. Urut Keluarga, dan No. HP terlebih dahulu!',
-          confirmButtonColor: '#059669'
-        });
-        return;
-      }
+      document.querySelectorAll('[id="nomor_kk"]').forEach(el => el.value = noKK);
 
-      if (noHp.length < 10 || noHp.length > 13) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Format No. HP Tidak Sesuai',
-          text: `Nomor Handphone/WhatsApp harus terdiri dari 10 sampai 13 digit angka (saat ini ${noHp.length} digit)!`,
-          confirmButtonColor: '#0284c7'
-        });
-        return;
-      }
+      // 5. Percabangan berdasarkan Status Keluarga
+      // STATUS 1 (Keluarga Ada) ATAU 6 (Keluarga Baru) -> Memerlukan isian rumah, HP, dan data anggota
+      if (status === '1' || status === '6') {
+        if (!rawKodeRumah || !rawNoUrut || !alamat || !noHp) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Data Belum Lengkap',
+            text: 'Mohon lengkapi No. Rumah, No. Urut KK, No. HP/WhatsApp, dan Alamat Detail!',
+            confirmButtonColor: '#0284c7'
+          });
+          return;
+        }
 
-      document.getElementById('kode_rumah').value = kodeRumah;
-      document.getElementById('no_urut_keluarga').value = noUrutKel;
+        if (noHp.length < 10 || noHp.length > 13) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Nomor HP Tidak Sesuai',
+            text: `Nomor Handphone/WhatsApp harus antara 10 s.d. 13 digit angka (saat ini ${noHp.length} digit)!`,
+            confirmButtonColor: '#0284c7'
+          });
+          return;
+        }
 
-      if (status === '1' || status === '6') {        
-        if (modeEditKeluargaLuar) {
-          pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');          
+        // Terapkan nilai padding ke semua input di form
+        document.querySelectorAll('[id="kode_rumah"]').forEach(el => el.value = kodeRumah);
+        document.querySelectorAll('[id="no_urut_keluarga"]').forEach(el => el.value = noUrutKel);
+        document.querySelectorAll('[id="alamat_detail"]').forEach(el => el.value = alamat);
+        document.querySelectorAll('[id="no_hp"]').forEach(el => el.value = noHp);
+
+        const rawJml = getInp('jumlah_anggota_input');
+        const jmlAnggota = parseInt(rawJml, 10) || 0;
+
+        if (jmlAnggota < 1) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Jumlah Anggota Keluarga',
+            text: 'Jumlah anggota keluarga minimal diisi 1 orang!',
+            confirmButtonColor: '#0284c7'
+          });
+          return;
+        }
+
+        // Jika sedang dalam mode edit cepat data luar oleh admin, langsung lompat ke form KB
+        if (typeof modeEditKeluargaLuar !== 'undefined' && modeEditKeluargaLuar) {
+          pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
           indexStepKB = 0;
           riwayatStepKB = [];
           tampilkanStepKB();
           return;
         }
-        
-        const jmlAnggota = parseInt(document.getElementById('jumlah_anggota_input').value, 10) || 0;
-        if (jmlAnggota < 1) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Jumlah Anggota',
-            text: 'Jumlah anggota keluarga minimal 1 orang!',
-            confirmButtonColor: '#059669'
-          });
-          return;
-        }
 
-        const sisaHalaman = document.querySelectorAll('.item-anggota-page');
-        const jumlahSaatIni = sisaHalaman.length;
+        // Hitung halaman kartu anggota yang sudah ada di area form
+        const containerAnggota = document.getElementById('area_anggota_keluarga');
+        const kartuSaatIni = containerAnggota ? containerAnggota.querySelectorAll('.item-anggota-page') : [];
+        const jumlahSaatIni = kartuSaatIni.length;
 
-        if (jumlahSaatIni === 0) {          
-          const container = document.getElementById('area_anggota_keluarga');
-          container.innerHTML = '';
+        if (jumlahSaatIni === 0) {
+          // Jika form masih kosong, buat dari awal
+          document.querySelectorAll('[id="area_anggota_keluarga"]').forEach(c => c.innerHTML = '');
           totalHalamanAnggota = 0;
           for (let i = 1; i <= jmlAnggota; i++) {
             tambahHalamanAnggotaBaru();
           }
-        } else if (jmlAnggota > jumlahSaatIni) {          
+        } else if (jmlAnggota > jumlahSaatIni) {
+          // Jika jumlah ditambah, tambahkan sisa kartu baru tanpa menghapus isian yang sudah ada
           const selisih = jmlAnggota - jumlahSaatIni;
           for (let i = 0; i < selisih; i++) {
             tambahHalamanAnggotaBaru();
           }
+        } else if (jmlAnggota < jumlahSaatIni) {
+          // Jika jumlah dikurangi, potong kartu yang berlebih dari urutan paling belakang
+          for (let i = jumlahSaatIni; i > jmlAnggota; i--) {
+            const elHapus = document.getElementById(`hal_anggota_${i}`);
+            if (elHapus) elHapus.remove();
+          }
+          totalHalamanAnggota = jmlAnggota;
+          perbaruiLabelTotalAnggota();
+        }
+
+        // Perbarui opsi dropdown Ibu Kandung di seluruh formulir anggota
+        if (typeof perbaruiSemuaOpsiIbuKandung === 'function') {
           perbaruiSemuaOpsiIbuKandung();
         }
 
+        // Arahkan langsung ke form Anggota Keluarga #1 (Kepala Keluarga)
         bukaHalamanAnggota(1);
+
       } else {
-        const textStatus = document.getElementById('status_keluarga').selectedOptions[0].text;
-        
-        Swal.fire({
+        // STATUS 2, 3, 4, 5 (Pindah, Meninggal, Tidak Ditemukan, Bercerai)
+        const selStatus = kontainerFormAktif.querySelector('[id="status_keluarga"]');
+        const textStatus = selStatus ? selStatus.options[selStatus.selectedIndex].text : 'Non-Aktif';
+
+        const konfirmasi = await Swal.fire({
           title: 'Selesaikan Pendataan?',
-          html: `Status keluarga ini adalah: <b>${textStatus}</b>.<br>Pendataan akan langsung disimpan ke sistem tanpa pengisian anggota keluarga.`,
+          html: `Status keluarga ini adalah: <b>${textStatus}</b>.<br>Data keluarga ini akan langsung disimpan ke sistem tanpa pengisian rincian individu anggota keluarga.`,
           icon: 'question',
           showCancelButton: true,
-          confirmButtonColor: '#e11d48',
+          confirmButtonColor: '#059669',
           cancelButtonColor: '#64748b',
           confirmButtonText: 'Ya, Simpan & Selesaikan',
-          cancelButtonText: 'Batal'
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            try {
-              const payloadKKNonAktif = {
-                nomor_kk: noKK,
-                kode_prov: kdProv,
-                kode_kab: kdKab,
-                kode_kec: kdKec,
-                kode_desa: kdDesa,
-                kode_dusun: kdDusun,
-                rt: rt,
-                kode_rumah: kodeRumah,
-                no_urut_keluarga: noUrutKel,
-                alamat_detail: alamat,
-                no_hp: noHp,
-                status_keluarga: status,
-                diperbarui_pada: new Date()
-              };
-
-              // CEK STATUS KONEKSI INTERNET
-              if (!navigator.onLine) {
-                await simpanKeAntreanOffline(payloadKKNonAktif, []);
-                Swal.fire({
-                  icon: 'info',
-                  title: 'Disimpan Offline (Lokal)',
-                  text: `Data KK (${textStatus}) disimpan di memori perangkat dan akan disinkronkan saat online kembali.`,
-                  confirmButtonColor: '#0284c7'
-                }).then(() => {
-                  document.getElementById('pendataanForm').reset();
-                  evaluasiStatusKeluarga();
-                  kembaliKeDashboard();
-                  perbaruiIndikatorStatusKoneksi();
-                });
-                return;
-              }
-
-              // JIKA ONLINE: SIMPAN LANGSUNG KE SUPABASE
-              const { error: errUpsertKK } = await supabaseClient
-                .from('keluarga')
-                .upsert([payloadKKNonAktif], { onConflict: 'nomor_kk' });
-
-              if (errUpsertKK) throw errUpsertKK;
-
-              Swal.fire({
-                icon: 'success',
-                title: 'PENDATAAN SELESAI',
-                text: `Data KK dengan status "${textStatus}" berhasil disimpan ke sistem!`,
-                confirmButtonColor: '#059669'
-              }).then(() => {
-                document.getElementById('pendataanForm').reset();
-                evaluasiStatusKeluarga();
-                kembaliKeDashboard();
-              });
-
-            } catch (err) {
-              console.error(err);
-              Swal.fire('Gagal Menyimpan', err.message || 'Terjadi kesalahan sistem.', 'error');
-            }
-          }
+          cancelButtonText: 'Periksa Kembali',
+          reverseButtons: true
         });
+
+        if (!konfirmasi.isConfirmed) return;
+
+        Swal.fire({
+          title: 'Menyimpan Data...',
+          html: '<div class="text-xs text-slate-500">Mencatat status keluarga ke sistem...</div>',
+          allowOutsideClick: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        const kodeKeluarga = `${kdProv}${kdKab}${kdKec}${kdDesa}${kdDusun} ${rt}${kodeRumah || '001'}${noUrutKel || '001'}`;
+
+        const payloadKKNonAktif = {
+          kode_keluarga: kodeKeluarga,
+          nomor_kk: noKK,
+          nama_kk: getInp('nama_kk') || 'KELUARGA ' + textStatus.toUpperCase(),
+          nik_kk: getInp('nik_kk') || '9999999999999999',
+          kode_prov: kdProv,
+          kode_kab: kdKab,
+          kode_kec: kdKec,
+          kode_desa: kdDesa,
+          kode_dusun: kdDusun,
+          rt: rt,
+          kode_rumah: kodeRumah || '001',
+          no_urut_keluarga: noUrutKel || '001',
+          alamat_detail: alamat || '-',
+          no_hp: noHp || '-',
+          status_keluarga: status,
+          diperbarui_pada: new Date()
+        };
+
+        try {
+          // 1. Cek koneksi untuk mode offline
+          if (!navigator.onLine) {
+            if (typeof simpanKeAntreanOffline === 'function') {
+              await simpanKeAntreanOffline(payloadKKNonAktif, []);
+            }
+            Swal.fire({
+              icon: 'info',
+              title: 'Disimpan Offline (Lokal)',
+              text: `Data keluarga (${textStatus}) disimpan di memori perangkat dan akan disinkronkan saat koneksi online.`,
+              confirmButtonColor: '#0284c7'
+            }).then(() => {
+              document.getElementById('pendataanForm')?.reset();
+              evaluasiStatusKeluarga();
+              kembaliKeDashboard();
+              if (typeof perbaruiIndikatorStatusKoneksi === 'function') perbaruiIndikatorStatusKoneksi();
+            });
+            return;
+          }
+
+          // 2. Simpan online ke Supabase
+          const { error: errUpsert } = await supabaseClient
+            .from('keluarga')
+            .upsert([payloadKKNonAktif], { onConflict: 'nomor_kk' });
+
+          if (errUpsert) throw errUpsert;
+
+          // Hapus data anggota sebelumnya jika ada
+          await supabaseClient
+            .from('anggota_keluarga')
+            .delete()
+            .eq('nomor_kk', noKK);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Pendataan Selesai!',
+            text: `Data keluarga dengan status "${textStatus}" berhasil disimpan ke database.`,
+            confirmButtonColor: '#059669'
+          }).then(() => {
+            document.getElementById('pendataanForm')?.reset();
+            evaluasiStatusKeluarga();
+            kembaliKeDashboard();
+          });
+
+        } catch (err) {
+          console.error("Gagal simpan status non-aktif:", err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Gagal Menyimpan',
+            text: err.message || 'Terjadi kesalahan sistem saat menyimpan data.',
+            confirmButtonColor: '#e11d48'
+          });
+        }
       }
     }
 
@@ -15032,5 +14946,140 @@
       evaluasiStatusKeluarga();      
     });
   </script>
+  
+  <div id="modalDetailCariEdit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+  <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto text-xs">
+    
+    <div class="flex justify-between items-center border-b pb-3">
+      <div>
+        <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase flex items-center gap-2">
+          <span>👨‍👩‍👧‍👦 Detail Anggota Keluarga</span>
+        </h3>
+        <p id="subDetailKeluargaCariEdit" class="text-[11px] text-slate-500 font-semibold"></p>
+      </div>
+      <button type="button" onclick="tutupModalDetailCariEdit()" class="text-slate-400 hover:text-slate-700 font-bold text-2xl px-2">&times;</button>
+    </div>
+
+    <div class="flex justify-end pt-1">
+      <button type="button" onclick="bukaModalTambahAnggotaDariAdmin()" 
+              class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
+        <span>➕ Tambah Anggota Baru</span>
+      </button>
+    </div>
+
+    <!-- Tabel Anggota Keluarga -->
+    <div class="overflow-x-auto border rounded-xl">
+      <table class="w-full text-left border-collapse text-[11px]">
+        <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b">
+          <tr>
+            <th class="p-2.5 text-center w-20">Aksi</th>
+            <th class="p-2.5">Nama</th>
+            <th class="p-2.5 font-mono">NIK</th>
+            <th class="p-2.5 text-center">Hub. Dgn KK</th>
+            <th class="p-2.5 text-center">Tanggal Lahir</th>
+            <th class="p-2.5 text-center">Usia</th>
+            <th class="p-2.5 text-center">Mutasi</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyDetailAnggotaCariEdit" class="divide-y divide-slate-100">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Informasi Ringkasan Keluarga Sesuai Format Rekap -->
+    <div class="pt-4 space-y-3.5 text-xs text-slate-700">
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Anak</label>
+        <div class="sm:col-span-9">
+          <input type="text" id="ce_det_jml_anak" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Baduta</label>
+        <div class="sm:col-span-9">
+          <input type="text" id="ce_det_jml_baduta" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Balita</label>
+        <div class="sm:col-span-9">
+          <input type="text" id="ce_det_jml_balita" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Jumlah WUS</label>
+        <div class="sm:col-span-9">
+          <input type="text" id="ce_det_jml_wus" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Kode Keluarga</label>
+        <div class="sm:col-span-9 font-mono font-bold text-slate-800 italic" id="ce_det_kode_keluarga">
+          -
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Mutasi Keluarga</label>
+        <div class="sm:col-span-9">
+          <select id="ce_det_mutasi_keluarga" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 outline-none">
+            <option value="">Select...</option>
+            <option value="1">1. Anggota Pindah Keluar</option>
+            <option value="2">2. Meninggal Dunia</option>
+            <option value="3">3. Anggota Baru Lahir</option>
+            <option value="4">4. Anggota Baru Pindah Datang</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Kesertaan JKN</label>
+        <div class="sm:col-span-9">
+          <select id="ce_det_kesertaan_jkn" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold outline-none cursor-not-allowed">
+            <option value="">Select...</option>
+            <option value="1">1. PBI</option>
+            <option value="2">2. Bukan PBI</option>
+            <option value="3">3. Swasta</option>
+            <option value="4">4. Tidak Memiliki</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Status PUS</label>
+        <div class="sm:col-span-9 flex items-center gap-6">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_ya" disabled class="accent-slate-500" />
+            <span>Ya</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_tidak" disabled class="accent-slate-500" />
+            <span>Tidak</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+        <label class="sm:col-span-3 font-medium text-slate-600">Status Hamil</label>
+        <div class="sm:col-span-9 flex items-center gap-6">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_ya" disabled class="accent-slate-500" />
+            <span>Ya</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_tidak" disabled class="accent-slate-500" />
+            <span>Tidak</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
