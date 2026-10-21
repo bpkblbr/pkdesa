@@ -9302,11 +9302,10 @@
           }
 
           // 3. Susun Payload Batch Tabel "keluarga" & "anggota_keluarga"
-          const payloadKeluargaBatch = [];
+          const mapKeluargaBatch = new Map();
           const payloadAnggotaBatch = [];
 
-          rawKeluarga.forEach((k, idx) => {
-            // Ambil nomor KK dan Kode Keluarga secara fleksibel (mengantisipasi variasi nama kolom)
+          rawKeluarga.forEach((k) => {
             const noKK = String(k.NOMOR_KK || k.nomor_kk || k['NO KK'] || k['NO. KK'] || '').trim();
             let kodeKel = String(k.KODE_KELUARGA || k.kode_keluarga || k['KODE KELUARGA'] || '').trim();
 
@@ -9319,14 +9318,13 @@
             const kdRmh  = String(k.KODE_RUMAH || k.kode_rumah || '001').padStart(3, '0');
             const noUrut = String(k.NO_URUT_KELUARGA || k.no_urut_keluarga || '001').padStart(3, '0');
 
-            // Jika kode keluarga kosong di Excel, buat otomatis dari hierarki wilayah
             if (!kodeKel) {
               kodeKel = `${kdProv}${kdKab}${kdKec}${kdDesa}${kdDsn} ${rt}${kdRmh}${noUrut}`;
             }
 
             if (!noKK && !kodeKel) return;
 
-            // Validasi hak akses wilayah login
+            // Validasi Otoritas Wilayah
             if (userAktif && userAktif.role === 'ADMIN_KABUPATEN') {
               if (kdKab !== String(userAktif.kode_kab).padStart(2, '0')) return;
             }
@@ -9337,11 +9335,11 @@
               if (kdDesa !== String(userAktif.kode_desa).padStart(4, '0')) return;
             }
 
-            // Ambil anggota keluarga (cocokkan via kode_keluarga ATAU nomor_kk sebagai fallback)
             const listAng = mapAnggotaPerKeluarga.get(kodeKel) || mapAnggotaPerKeluarga.get(noKK) || [];
             const kk = listAng.find(a => String(a.hub) === '1');
 
-            payloadKeluargaBatch.push({
+            // Simpan ke Map dengan key kodeKel (mencegah bentrok ganda di Postgres)
+            mapKeluargaBatch.set(kodeKel, {
               kode_keluarga: kodeKel,
               nomor_kk: noKK || '9999999999999999',
               nama_kk: kk ? String(kk.nama).toUpperCase() : String(k.NAMA_KK || k.nama_kk || '').toUpperCase(),
@@ -9434,7 +9432,7 @@
               diperbarui_pada: new Date()
             });
 
-            // Masukkan seluruh anggota keluarga yang cocok
+            // Anggota keluarga
             listAng.forEach((a, iAng) => {
               payloadAnggotaBatch.push({
                 kode_keluarga: kodeKel,
@@ -9460,6 +9458,8 @@
               });
             });
           });
+          
+          const payloadKeluargaBatch = Array.from(mapKeluargaBatch.values());
 
           console.log("Jumlah Raw Keluarga Excel:", rawKeluarga.length);
           console.log("Jumlah Payload Keluarga Siap Simpan:", payloadKeluargaBatch.length);
@@ -14095,30 +14095,33 @@
           mutasi_anggota: item.mutasi_anggota
         }));
 
-        // 7. Pengiriman ke Supabase
-        const { error: errKel } = await supabaseClient
-          .from('keluarga')
-          .upsert([payloadKeluarga], { onConflict: 'kode_keluarga' });
+        // 4. Eksekusi Upsert yang dijamin unik pada kode_keluarga
+          const { error: errKel } = await supabaseClient
+            .from('keluarga')
+            .upsert(payloadKeluargaBatch, { onConflict: 'kode_keluarga' });
 
-        if (errKel) throw errKel;
+          if (errKel) throw errKel;
 
-        if (payloadAnggota.length > 0) {
-          await supabaseClient.from('anggota_keluarga').delete().eq('kode_keluarga', kodeKeluarga);
-          const { error: errAng } = await supabaseClient.from('anggota_keluarga').insert(payloadAnggota);
+          // Hapus rincian anggota lama berdasarkan list kode_keluarga unik
+          const listKodeKeluarga = payloadKeluargaBatch.map(k => k.kode_keluarga);
+          await supabaseClient
+            .from('anggota_keluarga')
+            .delete()
+            .in('kode_keluarga', listKodeKeluarga);
+
+          // Masukkan anggota keluarga yang baru
+          const { error: errAng } = await supabaseClient
+            .from('anggota_keluarga')
+            .insert(payloadAnggotaBatch);
+
           if (errAng) throw errAng;
-        }
 
-        // Tampilkan Notifikasi Sukses
-        Swal.fire({
-          icon: 'success',
-          title: 'Berhasil Disimpan!',
-          html: `Data keluarga <b>${namaKK}</b><br><span class="font-mono text-xs text-slate-500">Kode: ${kodeKeluarga}</span><br>berhasil tersimpan ke database.`,
-          confirmButtonColor: '#059669'
-        }).then(() => {
-          const form = document.getElementById('pendataanForm');
-          if (form) form.reset();
-          kembaliKeDashboard();
-        });
+          Swal.fire({
+            icon: 'success',
+            title: 'Berhasil Upload!',
+            text: `Sebanyak ${payloadKeluargaBatch.length} keluarga dan ${payloadAnggotaBatch.length} anggota berhasil diimpor ke database!`,
+            confirmButtonColor: '#059669'
+          });
 
       } catch (err) {
         console.error("Gagal simpan final:", err);
