@@ -6656,7 +6656,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <div>
                 <label class="block font-bold text-slate-700 uppercase mb-1">Kepesertaan JKN *</label>
-                <select id="ed_kepesertaan_jkn" ...>
+                <select id="ed_kepesertaan_jkn" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
                   <option value="1" ${String(targetAnggota.kesertaan_jkn) === '1' ? 'selected' : ''}>PBI</option>
                   <option value="2" ${String(targetAnggota.kesertaan_jkn) === '2' ? 'selected' : ''}>Bukan PBI</option>
                   <option value="3" ${String(targetAnggota.kesertaan_jkn) === '3' ? 'selected' : ''}>Swasta</option>
@@ -9925,7 +9925,6 @@
     }
 
     function updateFormDusun() {
-      // Ambil nilai wilayah dari salah satu dropdown yang terisi
       let rawKab = '', rawKec = '', rawDesa = '';
       document.querySelectorAll('[id="kabupaten"]').forEach(el => { if (el.value) rawKab = el.value; });
       document.querySelectorAll('[id="kecamatan"]').forEach(el => { if (el.value) rawKec = el.value; });
