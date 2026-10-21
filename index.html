@@ -14553,47 +14553,75 @@
       if (!userAktif || !userAktif.kode_desa) return;
 
       try {
-        let query = supabaseClient
-          .from('keluarga')
-          .select(`*, anggota_keluarga (*)`)
-          .eq('kode_desa', String(userAktif.kode_desa).padStart(4, '0'))
-          .order('kode_keluarga', { ascending: true });
+        // Normalisasi kode desa (ambil 4 digit terakhir jika berupa kode panjang)
+        const strDesaUser = String(userAktif.kode_desa).trim();
+        const cleanKdDesa = strDesaUser.length > 4 ? strDesaUser.slice(-4) : strDesaUser.padStart(4, '0');
 
-        const { data, error } = await query;
-        if (error) throw error;
+        // 1. Ambil seluruh data keluarga di desa ini secara bertahap (Loop Chunking agar menembus limit 1.000)
+        let dataMentah = [];
+        let fromIdx = 0;
+        const step = 1000;
+        let adaDataLagi = true;
 
-        let dataMentah = data || [];
+        while (adaDataLagi) {
+          let query = supabaseClient
+            .from('keluarga')
+            .select(`*, anggota_keluarga (*)`)
+            .or(`kode_desa.eq.${cleanKdDesa},kode_desa.eq.${strDesaUser}`)
+            .order('kode_keluarga', { ascending: true })
+            .range(fromIdx, fromIdx + step - 1);
 
-        // Filter ketat: Hanya ambil keluarga yang RT-nya termasuk dalam penugasan kader
+          const { data: batch, error } = await query;
+          if (error) throw error;
+
+          if (batch && batch.length > 0) {
+            dataMentah = dataMentah.concat(batch);
+            fromIdx += step;
+            if (batch.length < step) {
+              adaDataLagi = false;
+            }
+          } else {
+            adaDataLagi = false;
+          }
+        }
+
+        // 2. Filter fleksibel berdasarkan penugasan RT & Dusun Kader
         if (userAktif.allowed_wilayah_rt) {
           try {
             const allowed = JSON.parse(userAktif.allowed_wilayah_rt);
-            const setDsnRt = new Set();
-            allowed.forEach(w => {
-              const dsn = String(w.kode_dusun).padStart(4, '0');
-              (w.rt || []).forEach(r => setDsnRt.add(`${dsn}_${String(r).padStart(3, '0')}`));
-            });
+            if (Array.isArray(allowed) && allowed.length > 0) {
+              const setDsnRt = new Set();
+              
+              allowed.forEach(w => {
+                // Simpan dalam format integer/angka bersih untuk menghindari bentrok padding nol
+                const dsnInt = parseInt(w.kode_dusun, 10);
+                (w.rt || []).forEach(r => {
+                  const rtInt = parseInt(r, 10);
+                  setDsnRt.add(`${dsnInt}_${rtInt}`);
+                });
+              });
 
-            dataMentah = dataMentah.filter(k => {
-              const key = `${String(k.kode_dusun).padStart(4, '0')}_${String(k.rt).padStart(3, '0')}`;
-              return setDsnRt.has(key);
-            });
+              dataMentah = dataMentah.filter(k => {
+                const kDsnInt = parseInt(k.kode_dusun, 10);
+                const kRtInt = parseInt(k.rt, 10);
+                return setDsnRt.has(`${kDsnInt}_${kRtInt}`);
+              });
+            }
           } catch(e) {
             console.warn("Gagal filter RT penugasan kader:", e);
           }
         }
 
         dataKeluargaKaderCache = dataMentah;
-        document.getElementById('kaderTotalKkBadge').innerText = `${dataKeluargaKaderCache.length} KK`;
+        const badgeTotal = document.getElementById('kaderTotalKkBadge');
+        if (badgeTotal) badgeTotal.innerText = `${dataKeluargaKaderCache.length} KK`;
 
         renderDaftarKeluargaKader(dataKeluargaKaderCache);
-        hitungMetrikRingkasanKader();
+        await hitungMetrikRingkasanKader();
 
       } catch (err) {
         console.error("Gagal memuat data kader:", err);
       }
-
-      await hitungMetrikRingkasanKader();
     }
 
     // 4. Render Daftar Keluarga (Data.jpg) dengan Tombol Edit & Hapus
