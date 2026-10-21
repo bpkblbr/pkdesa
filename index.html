@@ -5031,14 +5031,18 @@
 
     async function muatDataCariEditKeluarga() {
       const kdDesa = document.getElementById('cari_edit_desa')?.value;
+      const kdKec = document.getElementById('cari_edit_kec')?.value;
+      const kdKab = document.getElementById('cari_edit_kab')?.value;
+      const kdDusun = document.getElementById('cari_edit_dusun')?.value;
+      const noRt = document.getElementById('cari_edit_rt')?.value;
       const inputNik = document.getElementById('cari_edit_cari_nik')?.value.trim();
       const inputNama = document.getElementById('cari_edit_cari_nama')?.value.trim();
 
-      if (!kdDesa && !inputNik && !inputNama) {
+      if (!kdDesa && !kdKec && !inputNik && !inputNama) {
         Swal.fire({
           icon: 'warning',
-          title: 'Pilih Desa atau Masukkan NIK',
-          text: 'Untuk mempercepat pencarian data, silakan pilih Kecamatan dan Desa/Kelurahan atau masukkan NIK!',
+          title: 'Pilih Wilayah atau Masukkan NIK',
+          text: 'Silakan pilih minimal Kecamatan/Desa atau masukkan NIK/Nama KK!',
           confirmButtonColor: '#0284c7'
         });
         return;
@@ -5048,59 +5052,62 @@
       tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-500 font-semibold animate-pulse">Mengambil data keluarga di database...</td></tr>`;
 
       try {
-        const kdKab = document.getElementById('cari_edit_kab')?.value;
-        const kdKec = document.getElementById('cari_edit_kec')?.value;
-        const kdDusun = document.getElementById('cari_edit_dusun')?.value;
-        const noRt = document.getElementById('cari_edit_rt')?.value;
+        // Query tabel keluarga tanpa join relasi anggota_keluarga di awal untuk mencegah gagal schema cache
+        let query = supabaseClient.from('keluarga').select('*').order('kode_keluarga', { ascending: true }).range(0, 99999);
 
-        // Tarik data dengan range besar agar tidak terpotong 1000 limit bawaan
-        let query = supabaseClient.from('keluarga').select(`
-          kode_keluarga,
-          nomor_kk,
-          nama_kk,
-          nik_kk,
-          kode_prov,
-          kode_kab,
-          kode_kec,
-          kode_desa,
-          kode_dusun,
-          rt,
-          kode_rumah,
-          no_urut_keluarga,
-          status_keluarga,
-          kb_04_sedang_kb,
-          kb_03_sedang_hamil,
-          anggota_keluarga (*)
-        `).order('kode_keluarga', { ascending: true }).range(0, 99999);
+        // Filter sederhana yang presisi
+        if (kdDesa) query = query.ilike('kode_desa', `%${parseInt(kdDesa, 10)}%`);
+        else if (kdKec) query = query.ilike('kode_kec', `%${parseInt(kdKec, 10)}%`);
+        else if (kdKab) query = query.ilike('kode_kab', `%${parseInt(kdKab, 10)}%`);
 
-        // Filter desa fleksibel (mencocokkan baik "2001" maupun "02001")
-        if (kdDesa) {
-          const cleanDesa = String(parseInt(kdDesa, 10));
-          query = query.or(`kode_desa.eq.${kdDesa},kode_desa.eq.${cleanDesa}`);
-        }
-        if (kdKec) {
-          const cleanKec = String(parseInt(kdKec, 10));
-          query = query.or(`kode_kec.eq.${kdKec},kode_kec.eq.${cleanKec}`);
-        }
-        if (kdDusun) {
-          const cleanDusun = String(parseInt(kdDusun, 10));
-          query = query.or(`kode_dusun.eq.${kdDusun},kode_dusun.eq.${cleanDusun}`);
-        }
-        if (noRt) {
-          const cleanRt = String(parseInt(noRt, 10));
-          query = query.or(`rt.eq.${noRt},rt.eq.${cleanRt}`);
-        }
+        if (kdDusun) query = query.ilike('kode_dusun', `%${parseInt(kdDusun, 10)}%`);
+        if (noRt) query = query.ilike('rt', `%${parseInt(noRt, 10)}%`);
+
         if (inputNik) {
-          query = query.or(`nik_kk.eq.${inputNik},nomor_kk.eq.${inputNik}`);
+          query = query.or(`nik_kk.ilike.%${inputNik}%,nomor_kk.ilike.%${inputNik}%`);
+        }
+        if (inputNama) {
+          query = query.ilike('nama_kk', `%${inputNama}%`);
         }
 
-        const { data, error } = await query;
-        if (error) throw error;
+        const { data: dataKeluarga, error: errKel } = await query;
+        if (errKel) throw errKel;
 
-        dataCariEditCache = data || [];
+        if (!dataKeluarga || dataKeluarga.length === 0) {
+          dataCariEditCache = [];
+          renderTabelCariEditKeluarga();
+          return;
+        }
+
+        // Ambil rincian anggota keluarga berdasarkan kumpulan kode_keluarga yang didapat
+        const listKode = dataKeluarga.map(k => k.kode_keluarga).filter(Boolean);
+        const listNoKK = dataKeluarga.map(k => k.nomor_kk).filter(Boolean);
+
+        let listAnggota = [];
+        if (listKode.length > 0) {
+          const { data: dataAng } = await supabaseClient
+            .from('anggota_keluarga')
+            .select('*')
+            .or(`kode_keluarga.in.(${listKode.map(k => `"${k}"`).join(',')}),nomor_kk.in.(${listNoKK.map(n => `"${n}"`).join(',')})`);
+          listAnggota = dataAng || [];
+        }
+
+        // Petakan anggota ke masing-masing keluarga
+        dataCariEditCache = dataKeluarga.map(k => {
+          const anggota = listAnggota.filter(a => 
+            (a.kode_keluarga && a.kode_keluarga === k.kode_keluarga) || 
+            (a.nomor_kk && a.nomor_kk === k.nomor_kk)
+          );
+          return {
+            ...k,
+            anggota_keluarga: anggota
+          };
+        });
+
         renderTabelCariEditKeluarga();
 
       } catch (err) {
+        console.error("Gagal cari data:", err);
         tbody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-rose-500 font-bold">Gagal memuat: ${err.message}</td></tr>`;
       }
     }
@@ -5834,40 +5841,43 @@
         const kdDesa = String(kel.kode_desa || '').padStart(4, '0');
         const kdDsn  = String(kel.kode_dusun || '').padStart(4, '0');
 
-        const elProv = document.getElementById('provinsi');
-        if (elProv) { elProv.value = kdProv; updateFormKabupaten(); }
-        const elKab = document.getElementById('kabupaten');
-        if (elKab) { elKab.value = kdKab; updateFormKecamatan(); }
-        const elKec = document.getElementById('kecamatan');
-        if (elKec) { elKec.value = kdKec; updateFormDesa(); }
-        const elDesa = document.getElementById('desa');
-        if (elDesa) { elDesa.value = kdDesa; updateFormDusun(); }
-        const elDusun = document.getElementById('dusun');
-        if (elDusun) { elDusun.value = kdDsn; updateFormRT(); }
-        const elRt = document.getElementById('rt');
-        if (elRt) { elRt.value = String(kel.rt || '001').padStart(3, '0'); }
+        const setValAll = (id, val) => {
+          document.querySelectorAll(`[id="${id}"]`).forEach(el => {
+            el.value = val;
+          });
+        };
+
+        // 2. Isi Data Wilayah pada SEMUA form (Admin & Pendata)
+        document.querySelectorAll('[id="provinsi"]').forEach(el => { el.value = kdProv; });
+        updateFormKabupaten();
+        document.querySelectorAll('[id="kabupaten"]').forEach(el => { el.value = kdKab; });
+        updateFormKecamatan();
+        document.querySelectorAll('[id="kecamatan"]').forEach(el => { el.value = kdKec; });
+        updateFormDesa();
+        document.querySelectorAll('[id="desa"]').forEach(el => { el.value = kdDesa; });
+        updateFormDusun();
+        document.querySelectorAll('[id="dusun"]').forEach(el => { el.value = kdDsn; });
+        updateFormRT();
+        document.querySelectorAll('[id="rt"]').forEach(el => { el.value = String(kel.rt || '001').padStart(3, '0'); });
 
         sinkronkanLabelWilayah();
 
-        document.getElementById('kode_prov').value = kdProv;
-        document.getElementById('kode_kab').value = kdKab;
-        document.getElementById('kode_kec').value = kdKec;
-        document.getElementById('kode_desa').value = kdDesa;
-        document.getElementById('kode_dusun').value = kdDsn;
+        setValAll('kode_prov', kdProv);
+        setValAll('kode_kab', kdKab);
+        setValAll('kode_kec', kdKec);
+        setValAll('kode_desa', kdDesa);
+        setValAll('kode_dusun', kdDsn);
+        setValAll('nomor_kk', kel.nomor_kk || '');
+        setValAll('kode_rumah', kel.kode_rumah || '001');
+        setValAll('no_urut_keluarga', kel.no_urut_keluarga || '001');
+        setValAll('no_hp', kel.no_hp || '');
+        setValAll('alamat_detail', kel.alamat_detail || '');
 
-        document.getElementById('nomor_kk').value = kel.nomor_kk || '';
-
-        const selStatus = document.getElementById('status_keluarga');
-        if (selStatus) {
-          selStatus.value = String(kel.status_keluarga || '1');
-          selStatus.disabled = false;
-          selStatus.classList.remove('bg-slate-100', 'cursor-not-allowed');
-        }
-
-        document.getElementById('kode_rumah').value = kel.kode_rumah || '001';
-        document.getElementById('no_urut_keluarga').value = kel.no_urut_keluarga || '001';
-        document.getElementById('no_hp').value = kel.no_hp || '';
-        document.getElementById('alamat_detail').value = kel.alamat_detail || '';
+        document.querySelectorAll('[id="status_keluarga"]').forEach(sel => {
+          sel.value = String(kel.status_keluarga || '1');
+          sel.disabled = false;
+          sel.classList.remove('bg-slate-100', 'cursor-not-allowed');
+        });
 
         evaluasiStatusKeluarga();
 
@@ -5875,23 +5885,22 @@
         const rawAnggota = kel.anggota_keluarga || [];
         rawAnggota.sort((a, b) => (parseInt(a.nomor_anggota_keluarga, 10) || 0) - (parseInt(b.nomor_anggota_keluarga, 10) || 0));
 
-        const containerAnggota = document.getElementById('area_anggota_keluarga');
-        containerAnggota.innerHTML = '';
-        totalHalamanAnggota = 0; // Reset ke 0
+        // Bersihkan SEMUA kontainer anggota
+        document.querySelectorAll('[id="area_anggota_keluarga"]').forEach(c => c.innerHTML = '');
+        totalHalamanAnggota = 0;
 
-        // Reset antrean anomali agar tidak mencegat saat navigasi edit biasa
         daftarUrutanAnomali = [];
         indexAnomaliAktif = 0;
 
         const jmlAng = Math.max(rawAnggota.length, 1);
-        document.getElementById('jumlah_anggota_input').value = jmlAng;
+        setValAll('jumlah_anggota_input', jmlAng);
 
         for (let i = 1; i <= jmlAng; i++) {
-          tambahHalamanAnggotaBaru(); // Di dalam fungsi ini totalHalamanAnggota bertambah otomatis
+          tambahHalamanAnggotaBaru();
           const dAng = rawAnggota[i - 1];
           if (dAng) {
-            const hAng = document.getElementById(`hal_anggota_${i}`);
-            if (hAng) {
+            // Targetkan semua halaman anggota ke-i baik di form admin maupun pendata
+            document.querySelectorAll(`[id="hal_anggota_${i}"]`).forEach(hAng => {
               hAng.querySelector('[name="nama_lengkap"]').value = dAng.nama_lengkap || '';
               hAng.querySelector('[name="nik"]').value = dAng.nik || '';
               hAng.querySelector('[name="jenis_kelamin"]').value = String(dAng.jenis_kelamin || '1');
@@ -5899,26 +5908,27 @@
               hAng.querySelector('[name="display_usia"]').value = dAng.tanggal_lahir ? hitungUsiaTahun(dAng.tanggal_lahir) : '';
               
               const selKawin = hAng.querySelector('[name="status_perkawinan"]');
-              selKawin.value = String(dAng.status_perkawinan || '1');
-              evaluasiUsiaKawin(selKawin, i);
-              if (dAng.usia_kawin_pertama) {
+              if (selKawin) {
+                selKawin.value = String(dAng.status_perkawinan || '1');
+                evaluasiUsiaKawin(selKawin, i);
+              }
+              if (dAng.usia_kawin_pertama && hAng.querySelector('[name="usia_kawin_pertama"]')) {
                 hAng.querySelector('[name="usia_kawin_pertama"]').value = dAng.usia_kawin_pertama;
               }
 
-              hAng.querySelector('[name="memiliki_akta_lahir"]').value = String(dAng.memiliki_akta_lahir || '1');
-              hAng.querySelector('[name="hubungan_dengan_kk"]').value = String(dAng.hubungan_dengan_kk || (i === 1 ? '1' : '3'));
-              hAng.querySelector('[name="agama"]').value = String(dAng.agama || '1');
-              hAng.querySelector('[name="jenis_pekerjaan"]').value = String(dAng.jenis_pekerjaan || '1');
-              hAng.querySelector('[name="pendidikan"]').value = String(dAng.pendidikan || '1');
-              hAng.querySelector('[name="kepesertaan_jkn"]').value = String(dAng.kesertaan_jkn || dAng.kepesertaan_jkn || '1');
-              hAng.querySelector('[name="gangguan_fungsional"]').value = String(dAng.gangguan_fungsional || '5');
-              hAng.querySelector('[name="kemampuan_mengurus_diri"]').value = String(dAng.kemampuan_mengurus_diri || '4');
-              hAng.querySelector('[name="bekerja_luar_negeri"]').value = String(dAng.bekerja_luar_negeri || '4');
-              hAng.querySelector('[name="mutasi_anggota"]').value = String(dAng.mutasi_anggota || '0');
+              if (hAng.querySelector('[name="memiliki_akta_lahir"]')) hAng.querySelector('[name="memiliki_akta_lahir"]').value = String(dAng.memiliki_akta_lahir || '1');
+              if (hAng.querySelector('[name="hubungan_dengan_kk"]')) hAng.querySelector('[name="hubungan_dengan_kk"]').value = String(dAng.hubungan_dengan_kk || (i === 1 ? '1' : '3'));
+              if (hAng.querySelector('[name="agama"]')) hAng.querySelector('[name="agama"]').value = String(dAng.agama || '1');
+              if (hAng.querySelector('[name="jenis_pekerjaan"]')) hAng.querySelector('[name="jenis_pekerjaan"]').value = String(dAng.jenis_pekerjaan || '1');
+              if (hAng.querySelector('[name="pendidikan"]')) hAng.querySelector('[name="pendidikan"]').value = String(dAng.pendidikan || '1');
+              if (hAng.querySelector('[name="kepesertaan_jkn"]')) hAng.querySelector('[name="kepesertaan_jkn"]').value = String(dAng.kesertaan_jkn || dAng.kepesertaan_jkn || '1');
+              if (hAng.querySelector('[name="gangguan_fungsional"]')) hAng.querySelector('[name="gangguan_fungsional"]').value = String(dAng.gangguan_fungsional || '5');
+              if (hAng.querySelector('[name="kemampuan_mengurus_diri"]')) hAng.querySelector('[name="kemampuan_mengurus_diri"]').value = String(dAng.kemampuan_mengurus_diri || '4');
+              if (hAng.querySelector('[name="bekerja_luar_negeri"]')) hAng.querySelector('[name="bekerja_luar_negeri"]').value = String(dAng.bekerja_luar_negeri || '4');
+              if (hAng.querySelector('[name="mutasi_anggota"]')) hAng.querySelector('[name="mutasi_anggota"]').value = String(dAng.mutasi_anggota || '0');
 
-              // Jalankan aturan otomatis untuk mengunci kolom sesuai data yang dimuat
               evaluasiAturanOtomatisAnggota(i);
-            }
+            });
           }
         }
 
@@ -10447,7 +10457,9 @@
         </div>
       `;
 
-      container.appendChild(hal);
+      document.querySelectorAll('[id="area_anggota_keluarga"]').forEach(c => {
+        c.appendChild(hal.cloneNode(true));
+      });
       perbaruiLabelTotalAnggota();
 
       const selectPerkawinan = hal.querySelector('[name="status_perkawinan"]');
