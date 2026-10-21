@@ -9157,6 +9157,48 @@
       XLSX.writeFile(wb, `Error_NIK_Istri_Ganda_${new Date().toISOString().split('T')[0]}.xlsx`);
     }
 
+    // Helper mengubah format tanggal Indonesia/Excel ke format standar PostgreSQL (YYYY-MM-DD)
+    function normalisasiTanggalDb(val) {
+      if (!val) return null;
+      val = String(val).trim();
+
+      // 1. Jika serial number dari Excel (misal: 30488)
+      if (!isNaN(val) && Number(val) > 1000) {
+        const tglExcel = new Date((Number(val) - 25569) * 86400 * 1000);
+        if (!isNaN(tglExcel.getTime())) {
+          return tglExcel.toISOString().split('T')[0];
+        }
+      }
+
+      // 2. Jika format DD-MM-YYYY atau DD/MM/YYYY
+      const polaIndo = /^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/;
+      const matchIndo = val.match(polaIndo);
+      if (matchIndo) {
+        const hari = matchIndo[1].padStart(2, '0');
+        const bulan = matchIndo[2].padStart(2, '0');
+        const tahun = matchIndo[3];
+        return `${tahun}-${bulan}-${hari}`;
+      }
+
+      // 3. Jika sudah format YYYY-MM-DD atau YYYY/MM/DD
+      const polaIso = /^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/;
+      const matchIso = val.match(polaIso);
+      if (matchIso) {
+        const tahun = matchIso[1];
+        const bulan = matchIso[2].padStart(2, '0');
+        const hari = matchIso[3].padStart(2, '0');
+        return `${tahun}-${bulan}-${hari}`;
+      }
+
+      // 4. Fallback dengan Date constructor
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        return d.toISOString().split('T')[0];
+      }
+
+      return null;
+    }
+
     // ========================================================
     // UPLOAD EXCEL KELUARGA & ANGGOTA DENGAN PROTEKSI NIK GANDA
     // ========================================================
@@ -9441,7 +9483,7 @@
                 nama_lengkap: a.nama,
                 nik: a.nik,
                 jenis_kelamin: String(a.JENIS_KELAMIN || a.jenis_kelamin || '1'),
-                tanggal_lahir: a.TANGGAL_LAHIR || a.tanggal_lahir,
+                tanggal_lahir: normalisasiTanggalDb(a.TANGGAL_LAHIR || a.tanggal_lahir || a['TGL LAHIR'] || a['TANGGAL LAHIR']),
                 status_perkawinan: String(a.STATUS_PERKAWINAN || a.status_perkawinan || '1'),
                 usia_kawin_pertama: parseInt(a.USIA_KAWIN_PERTAMA || a.usia_kawin_pertama, 10) || null,
                 memiliki_akta_lahir: String(a.MEMILIKI_AKTA_LAHIR || a.memiliki_akta_lahir || '1'),
@@ -13376,7 +13418,7 @@
                 nama_lengkap: String(a.NAMA_LENGKAP || a.nama_lengkap).toUpperCase().trim(),
                 nik: String(a.NIK || a.nik).trim(),
                 jenis_kelamin: String(a.JENIS_KELAMIN || a.jenis_kelamin || '1'),
-                tanggal_lahir: a.TANGGAL_LAHIR || a.tanggal_lahir,
+                tanggal_lahir: normalisasiTanggalDb(a.TANGGAL_LAHIR || a.tanggal_lahir || a['TGL LAHIR'] || a['TANGGAL LAHIR']),
                 status_perkawinan: String(a.STATUS_PERKAWINAN || a.status_perkawinan || '1'),
                 usia_kawin_pertama: parseInt(a.USIA_KAWIN_PERTAMA || a.usia_kawin_pertama, 10) || null,
                 memiliki_akta_lahir: String(a.MEMILIKI_AKTA_LAHIR || '1'),
