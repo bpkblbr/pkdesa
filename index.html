@@ -3660,119 +3660,59 @@
       if (!supabaseClient) return;
 
       try {
-        let query = supabaseClient.from('keluarga').select(`
-          nomor_kk,
-          status_keluarga,
-          kode_prov,
-          kode_kab,
-          kode_kec,
-          kode_desa,
-          kb_04_sedang_kb,
-          anggota_keluarga (
-            hubungan_dengan_kk,
-            status_perkawinan,
-            tanggal_lahir,
-            jenis_kelamin
-          )
-        `);
+        // Tentukan parameter wilayah berdasarkan role akun yang sedang login
+        let pProv = null;
+        let pKab = null;
+        let pKec = null;
+        let pDesa = null;
 
         if (userAktif) {
-          if (userAktif.role === 'ADMIN_PROVINSI' && userAktif.kode_prov) {
-            query = query.eq('kode_prov', userAktif.kode_prov);
-          } else if (userAktif.role === 'ADMIN_KABUPATEN' && userAktif.kode_kab) {
-            query = query.eq('kode_kab', userAktif.kode_kab);
-          } else if (userAktif.role === 'ADMIN_KECAMATAN' && userAktif.kode_kec) {
-            query = query.eq('kode_kec', userAktif.kode_kec);
-          } else if ((userAktif.role === 'ADMIN_DESA' || userAktif.role === 'USER_DESA') && userAktif.kode_desa) {
-            query = query.eq('kode_desa', userAktif.kode_desa);
+          if (userAktif.role === 'ADMIN_PROVINSI') {
+            pProv = userAktif.kode_prov || null;
+          } else if (userAktif.role === 'ADMIN_KABUPATEN') {
+            pProv = userAktif.kode_prov || null;
+            pKab = userAktif.kode_kab || null;
+          } else if (userAktif.role === 'ADMIN_KECAMATAN') {
+            pProv = userAktif.kode_prov || null;
+            pKab = userAktif.kode_kab || null;
+            pKec = userAktif.kode_kec || null;
+          } else if (userAktif.role === 'ADMIN_DESA' || userAktif.role === 'USER_DESA') {
+            pProv = userAktif.kode_prov || null;
+            pKab = userAktif.kode_kab || null;
+            pKec = userAktif.kode_kec || null;
+            pDesa = userAktif.kode_desa || null;
           }
         }
 
-        const { data, error } = await query;
-        if (error) throw error;
-
-        let totalKK = 0;
-        let totalJiwa = 0;
-        let totalPUS = 0;
-        let totalBaduta = 0; // 0 - 23 bulan (< 2 tahun)
-        let totalBalita = 0; // 24 - 59 bulan (2 s.d < 5 tahun)
-        let totalRemaja = 0; // 10 - 24 tahun, belum kawin
-        let totalLansia = 0; // >= 60 tahun
-        let totalPA = 0;     // Peserta KB aktif
-
-        (data || []).forEach(k => {
-          totalKK++;
-
-          const listAng = k.anggota_keluarga || [];
-          const istri = listAng.find(a => String(a.hubungan_dengan_kk) === '2');
-          let isPUS = false;
-
-          // 1. Evaluasi PUS
-          if (istri && istri.tanggal_lahir) {
-            const usiaIstri = hitungUsiaTahun(istri.tanggal_lahir);
-            const kawin = ['2', '3'].includes(String(istri.status_perkawinan || ''));
-            isPUS = kawin && (usiaIstri >= 10 && usiaIstri <= 49);
-          } else if (k.kb_04_sedang_kb) {
-            isPUS = true;
-          }
-          if (isPUS) totalPUS++;
-
-          // 2. Evaluasi Peserta KB Aktif
-          if (k.kb_04_sedang_kb === true || String(k.kb_04_sedang_kb) === '1') {
-            totalPA++;
-          }
-
-          // 3. Evaluasi Anggota Individu
-          listAng.forEach(a => {
-            totalJiwa++;
-            if (!a.tanggal_lahir) return;
-
-            const tglLahir = new Date(a.tanggal_lahir);
-            const sekarang = new Date();
-            
-            // Hitung selisih dalam bulan secara persis untuk Baduta & Balita
-            const selisihBulan = (sekarang.getFullYear() - tglLahir.getFullYear()) * 12 + (sekarang.getMonth() - tglLahir.getMonth());
-            const usiaTh = hitungUsiaTahun(a.tanggal_lahir);
-            const statusKawin = String(a.status_perkawinan || '1');
-
-            // Baduta: 0 s.d 23 bulan
-            if (selisihBulan >= 0 && selisihBulan <= 23) {
-              totalBaduta++;
-            }
-            // Balita: 24 s.d 59 bulan
-            else if (selisihBulan >= 24 && selisihBulan <= 59) {
-              totalBalita++;
-            }
-
-            // Remaja: Usia 10 - 24 tahun dan belum kawin (status 1)
-            if (usiaTh >= 10 && usiaTh <= 24 && statusKawin === '1') {
-              totalRemaja++;
-            }
-
-            // Lansia: Usia >= 60 tahun
-            if (usiaTh >= 60) {
-              totalLansia++;
-            }
-          });
+        // Panggil fungsi agregasi di sisi database PostgreSQL
+        const { data, error } = await supabaseClient.rpc('hitung_ringkasan_eksekutif', {
+          p_kode_prov: pProv,
+          p_kode_kab: pKab,
+          p_kode_kec: pKec,
+          p_kode_desa: pDesa
         });
 
-        // Terapkan hasil ke elemen HTML kartu metrik
-        const setVal = (id, val) => {
-          const el = document.getElementById(id);
-          if (el) el.innerText = val.toLocaleString('id-ID');
-        };
+        if (error) throw error;
 
-        setVal('tile_total_kk', totalKK);
-        setVal('tile_total_jiwa', totalJiwa);
-        setVal('tile_total_pus', totalPUS);
-        setVal('tile_total_baduta', totalBaduta);
-        setVal('tile_total_balita', totalBalita);
-        setVal('tile_total_remaja', totalRemaja);
-        setVal('tile_total_lansia', totalLansia);
-        setVal('tile_total_pa', totalPA);
+        // Pasang hasil kalkulasi server langsung ke elemen HTML masing-masing kartu
+        if (data) {
+          const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = (val || 0).toLocaleString('id-ID');
+          };
+
+          setVal('tile_total_kk', data.total_kk);
+          setVal('tile_total_jiwa', data.total_jiwa);
+          setVal('tile_total_pus', data.total_pus);
+          setVal('tile_total_baduta', data.total_baduta);
+          setVal('tile_total_balita', data.total_balita);
+          setVal('tile_total_remaja', data.total_remaja);
+          setVal('tile_total_lansia', data.total_lansia);
+          setVal('tile_total_pa', data.total_pa);
+        }
 
       } catch (err) {
-        console.warn("Gagal menghitung 8 metrik ringkasan eksekutif:", err);
+        console.warn("Gagal memuat ringkasan eksekutif via RPC:", err);
       }
     }
 
