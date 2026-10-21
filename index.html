@@ -5349,9 +5349,19 @@
         : 1;
 
       // Cari nomor dan nama istri untuk opsi Kode Ibu Kandung
+      const kk = (listAng || []).find(a => String(a.hubungan_dengan_kk) === '1');
       const istri = (listAng || []).find(a => String(a.hubungan_dengan_kk) === '2');
-      const nomorIstri = istri ? String(istri.nomor_anggota_keluarga || 2).padStart(2, '0') : null;
-      const namaIstri = istri ? (istri.nama_lengkap || 'ISTRI').toUpperCase() : '';
+      
+      let nomorIbu = null;
+      let namaIbu = '';
+
+      if (kk && String(kk.jenis_kelamin) === '2') {
+        nomorIbu = '01';
+        namaIbu = (kk.nama_lengkap || 'KEPALA KELUARGA').toUpperCase();
+      } else if (istri) {
+        nomorIbu = String(istri.nomor_anggota_keluarga || 2).padStart(2, '0');
+        namaIbu = (istri.nama_lengkap || 'ISTRI').toUpperCase();
+      }
 
       Swal.fire({
         title: `
@@ -5449,7 +5459,7 @@
                 <label class="block font-bold text-slate-700 uppercase mb-1">Kode Ibu Kandung</label>
                 <select id="tb_kode_ibu" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
                   <option value="00">00 - LAINNYA</option>
-                  ${nomorIstri ? `<option value="${nomorIstri}" selected>${nomorIstri} -${namaIstri}</option>` : ''}
+                  ${nomorIbu ? `<option value="${nomorIbu}" selected>${nomorIbu} - ${namaIbu}</option>` : ''}
                 </select>
               </div>
               <div>
@@ -6362,9 +6372,19 @@
       }
 
       const listAnggotaKK = targetKK.anggota_keluarga || [];
+      const kk = listAnggotaKK.find(a => String(a.hubungan_dengan_kk) === '1');
       const istri = listAnggotaKK.find(a => String(a.hubungan_dengan_kk) === '2');
-      const nomorIstri = istri ? String(istri.nomor_anggota_keluarga || 2).padStart(2, '0') : null;
-      const namaIstri = istri ? (istri.nama_lengkap || 'ISTRI').toUpperCase() : '';
+
+      let nomorIbu = null;
+      let namaIbu = '';
+
+      if (kk && String(kk.jenis_kelamin) === '2') {
+        nomorIbu = '01';
+        namaIbu = (kk.nama_lengkap || 'KEPALA KELUARGA').toUpperCase();
+      } else if (istri) {
+        nomorIbu = String(istri.nomor_anggota_keluarga || 2).padStart(2, '0');
+        namaIbu = (istri.nama_lengkap || 'ISTRI').toUpperCase();
+      }
 
       Swal.fire({
         title: `
@@ -6461,7 +6481,7 @@
                 <label class="block font-bold text-slate-700 uppercase mb-1">Kode Ibu Kandung</label>
                 <select id="ed_kode_ibu" class="w-full p-2.5 border rounded-xl bg-white font-semibold text-slate-800 outline-none">
                   <option value="00">00 - LAINNYA</option>
-                  ${nomorIstri ? `<option value="${nomorIstri}" ${String(targetAnggota.kode_ibu_kandung) === nomorIstri ? 'selected' : ''}>${nomorIstri} -${namaIstri}</option>` : ''}
+                  ${nomorIbu ? `<option value="${nomorIbu}" ${String(targetAnggota.kode_ibu_kandung) === nomorIbu ? 'selected' : ''}>${nomorIbu} - ${namaIbu}</option>` : ''}
                 </select>
               </div>
               <div>
@@ -10064,7 +10084,7 @@
         <!-- (3) JENIS KELAMIN -->
         <div>
           <label class="block text-slate-700 font-medium mb-1">Jenis Kelamin *</label>
-          <select name="jenis_kelamin" onchange="sinkronisasiPasanganKK(${no})" required
+          <select name="jenis_kelamin" onchange="sinkronisasiPasanganKK(${no}); perbaruiSemuaOpsiIbuKandung();" required ...>
                   ${isJkLocked ? 'disabled' : ''}
                   class="w-full px-2.5 py-2.5 ${isJkLocked ? 'bg-slate-100 cursor-not-allowed' : 'bg-white'} border border-slate-300 rounded-lg outline-none font-medium text-slate-800 text-xs sm:text-sm focus:border-blue-500">
             <option value="" ${defaultJk === "" ? 'selected' : ''}>-- PILIH JENIS KELAMIN --</option>
@@ -10426,34 +10446,48 @@
     function perbaruiSemuaOpsiIbuKandung() {
       const listHal = document.querySelectorAll('.item-anggota-page');
       
-      // 1. Cari apakah ada anggota yang berperan sebagai ISTRI (Kode Hubungan = '2')
-      let nomorIstri = null;
-      let namaIstri = '';
+      let nomorIbuTersedia = null;
+      let namaIbuTersedia = '';
 
-      listHal.forEach((hal, idx) => {
-        const noUrut = idx + 1;
-        const hubungan = (noUrut === 1) ? '1' : (hal.querySelector('[name="hubungan_dengan_kk"]')?.value || '');
-        if (hubungan === '2') {
-          nomorIstri = String(noUrut).padStart(2, '0');
-          namaIstri = hal.querySelector('[name="nama_lengkap"]')?.value.trim().toUpperCase() || 'ISTRI';
+      // 1. Cek apakah Anggota #1 (Kepala Keluarga) adalah Perempuan
+      const hal1 = document.getElementById('hal_anggota_1');
+      if (hal1) {
+        const jkKK = hal1.querySelector('[name="jenis_kelamin"]')?.value;
+        const namaKK = hal1.querySelector('[name="nama_lengkap"]')?.value.trim().toUpperCase() || 'KEPALA KELUARGA';
+        if (jkKK === '2') {
+          nomorIbuTersedia = '01';
+          namaIbuTersedia = namaKK;
         }
-      });
+      }
 
-      // 2. Terapkan aturan lock dan pembaruan format dropdown
+      // 2. Jika KK bukan perempuan, cari apakah ada anggota yang berperan sebagai ISTRI (Kode Hubungan = '2')
+      if (!nomorIbuTersedia) {
+        listHal.forEach((hal, idx) => {
+          const noUrut = idx + 1;
+          const hubungan = (noUrut === 1) ? '1' : (hal.querySelector('[name="hubungan_dengan_kk"]')?.value || '');
+          if (hubungan === '2') {
+            nomorIbuTersedia = String(noUrut).padStart(2, '0');
+            namaIbuTersedia = hal.querySelector('[name="nama_lengkap"]')?.value.trim().toUpperCase() || 'ISTRI';
+          }
+        });
+      }
+
+      // 3. Terapkan aturan lock dan opsi dropdown pada setiap anggota
       listHal.forEach((hal, idx) => {
         const noUrut = idx + 1;
         const hubungan = (noUrut === 1) ? '1' : (hal.querySelector('[name="hubungan_dengan_kk"]')?.value || '');
         const selectIbu = hal.querySelector('[name="kode_ibu_kandung"]');
         if (!selectIbu) return;
 
-        // JIKA KEPALA KELUARGA (1) ATAU ISTRI (2): KUNCI & DEFAULT KE 00 - LAINNYA
-        if (hubungan === '1' || hubungan === '2') {
+        // Jika anggota tersebut adalah figur ibu itu sendiri (KK Perempuan atau Istri), kunci ke 00 - LAINNYA
+        const isFigurIbu = (String(noUrut).padStart(2, '0') === nomorIbuTersedia) || (hubungan === '1' && !nomorIbuTersedia);
+
+        if (isFigurIbu || hubungan === '2') {
           selectIbu.innerHTML = `<option value="00" selected>00 - LAINNYA</option>`;
           selectIbu.disabled = true;
           selectIbu.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
           selectIbu.classList.remove('bg-white');
         } else {
-          // UNTUK ANAK ATAU ANGGOTA LAINNYA: BUKA LOCK
           selectIbu.disabled = false;
           selectIbu.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
           selectIbu.classList.add('bg-white');
@@ -10464,17 +10498,16 @@
           // Opsi 1: 00 - LAINNYA
           selectIbu.add(new Option("00 - LAINNYA", "00"));
 
-          // Opsi 2: KODE - NAMA ISTRI (misal: 02 - SIROJUDIN ROBBANI)
-          if (nomorIstri) {
-            const labelIstri = `${nomorIstri} - ${namaIstri}`;
-            selectIbu.add(new Option(labelIstri, nomorIstri));
+          // Opsi 2: KODE - NAMA IBU (Bisa '01 - NAMA KK' atau '02 - NAMA ISTRI')
+          if (nomorIbuTersedia) {
+            const labelIbu = `${nomorIbuTersedia} - ${namaIbuTersedia}`;
+            selectIbu.add(new Option(labelIbu, nomorIbuTersedia));
           }
 
-          // Pertahankan pilihan sebelumnya jika masih ada, atau default ke istri jika baru
-          if (nilaiSebelumnya && (nilaiSebelumnya === "00" || nilaiSebelumnya === nomorIstri)) {
+          if (nilaiSebelumnya && (nilaiSebelumnya === "00" || nilaiSebelumnya === nomorIbuTersedia)) {
             selectIbu.value = nilaiSebelumnya;
-          } else if (nomorIstri) {
-            selectIbu.value = nomorIstri;
+          } else if (nomorIbuTersedia) {
+            selectIbu.value = nomorIbuTersedia;
           } else {
             selectIbu.value = "00";
           }
