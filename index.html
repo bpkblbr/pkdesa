@@ -9159,23 +9159,23 @@
             return;
           }
 
-          // 1. Tarik seluruh data NIK Istri dari database untuk pembanding
+          // 1. Tarik seluruh data NIK Istri dari database untuk pembanding (tanpa join relasi)
           const { data: dbIstriList, error: errDb } = await supabaseClient
             .from('anggota_keluarga')
-            .select('nomor_kk, nik, nama_lengkap, keluarga:nomor_kk(kode_prov, kode_kab, kode_kec, kode_desa, kode_dusun, rt)')
+            .select('kode_keluarga, nomor_kk, nik, nama_lengkap')
             .eq('hubungan_dengan_kk', '2');
 
           if (errDb) throw errDb;
 
-          // Buat Map untuk NIK Istri yang sudah ada di database
+          // Buat Map untuk NIK Istri yang sudah ada di database (acuan kode_keluarga)
           const mapIstriDb = new Map();
           (dbIstriList || []).forEach(r => {
             const nikClean = String(r.nik || '').trim();
             if (nikClean && nikClean !== DUMMY_NIK_ISTRI) {
               mapIstriDb.set(nikClean, {
                 nama: r.nama_lengkap,
-                noKK: r.nomor_kk,
-                wilayah: r.keluarga || {}
+                kodeKel: r.kode_keluarga,
+                noKK: r.nomor_kk
               });
             }
           });
@@ -9183,51 +9183,51 @@
           // 2. Evaluasi NIK Istri di dalam file Excel
           const seenIstriExcel = new Map();
           const pelanggaranIstriGanda = [];
-          const infoKembarBedaStatus = [];
 
-          // Kelompokkan anggota per No. KK
-          const mapAnggotaPerKK = new Map();
+          // Kelompokkan anggota per KODE_KELUARGA
+          const mapAnggotaPerKeluarga = new Map();
           rawAnggota.forEach((ang, idx) => {
+            const kodeKel = String(ang.KODE_KELUARGA || ang.kode_keluarga || '').trim();
             const noKK = String(ang.NOMOR_KK || ang.nomor_kk || '').trim();
-            if (!noKK) return;
+            if (!kodeKel) return;
 
             const hub = String(ang.HUBUNGAN_DENGAN_KK || ang.hubungan_dengan_kk || '3').trim();
             const nik = String(ang.NIK || ang.nik || '').trim();
             const nama = String(ang.NAMA_LENGKAP || ang.nama_lengkap || '').toUpperCase().trim();
 
-            if (!mapAnggotaPerKK.has(noKK)) {
-              mapAnggotaPerKK.set(noKK, []);
+            if (!mapAnggotaPerKeluarga.has(kodeKel)) {
+              mapAnggotaPerKeluarga.set(kodeKel, []);
             }
-            mapAnggotaPerKK.get(noKK).push({ ...ang, noKK, hub, nik, nama });
+            mapAnggotaPerKeluarga.get(kodeKel).push({ ...ang, kodeKel, noKK, hub, nik, nama });
 
             // Jika peran adalah Istri (2)
             if (hub === '2' && nik && nik !== DUMMY_NIK_ISTRI) {
-              // Cek bentrok di database
+              // Cek bentrok di database berdasarkan kode_keluarga
               if (mapIstriDb.has(nik)) {
                 const ownerDb = mapIstriDb.get(nik);
-                if (ownerDb.noKK !== noKK) {
+                if (ownerDb.kodeKel !== kodeKel) {
                   pelanggaranIstriGanda.push({
                     baris: idx + 2,
                     nik: nik,
                     namaIstri: nama,
-                    noKK: noKK,
-                    bentrokDengan: `${ownerDb.nama} (KK: ${ownerDb.noKK}) di DB`
+                    kodeKel: kodeKel,
+                    bentrokDengan: `${ownerDb.nama} (Kode: ${ownerDb.kodeKel}) di DB`
                   });
                 }
               }
 
-              // Cek bentrok di internal file Excel
+              // Cek bentrok di internal file Excel berdasarkan kode_keluarga
               if (seenIstriExcel.has(nik)) {
                 const ownerEx = seenIstriExcel.get(nik);
                 pelanggaranIstriGanda.push({
                   baris: idx + 2,
                   nik: nik,
                   namaIstri: nama,
-                  noKK: noKK,
-                  bentrokDengan: `${ownerEx.nama} (KK: ${ownerEx.noKK}) di Sheet Excel baris ${ownerEx.baris}`
+                  kodeKel: kodeKel,
+                  bentrokDengan: `${ownerEx.nama} (Kode: ${ownerEx.kodeKel}) di Baris ${ownerEx.baris}`
                 });
               } else {
-                seenIstriExcel.set(nik, { nama, noKK, baris: idx + 2 });
+                seenIstriExcel.set(nik, { nama, kodeKel: kodeKel, baris: idx + 2 });
               }
             }
           });
@@ -9385,11 +9385,11 @@
           });
 
           // 4. Kirim Data ke Supabase
-          const { error: errKel } = await supabaseClient.from('keluarga').upsert(payloadKeluargaBatch, { onConflict: 'nomor_kk' });
+          const { error: errKel } = await supabaseClient.from('keluarga').upsert(payloadKeluargaBatch, { onConflict: 'kode_keluarga' });
           if (errKel) throw errKel;
 
-          const listKK = payloadKeluargaBatch.map(k => k.nomor_kk);
-          await supabaseClient.from('anggota_keluarga').delete().in('nomor_kk', listKK);
+          const listKodeKeluarga = payloadKeluargaBatch.map(k => k.kode_keluarga);
+          await supabaseClient.from('anggota_keluarga').delete().in('kode_keluarga', listKodeKeluarga);
           const { error: errAng } = await supabaseClient.from('anggota_keluarga').insert(payloadAnggotaBatch);
           if (errAng) throw errAng;
 
