@@ -1994,6 +1994,7 @@
     let daftarUrutanAnomali = [];
     let indexAnomaliAktif = 0;
     let totalHalamanAnggota = 0;
+    let dataNilaiPK = {};
 
     // Inisialisasi IndexedDB Lokal
     function bukaDatabaseOffline() {
@@ -2154,22 +2155,22 @@
       await sinkronkanDataOffline();
     }
 
-    function bukaFormulirPendataan() {      
+    function bukaFormulirPendataan() {
       modeEditKeluargaLuar = false;      
       
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
       const targetSub = document.getElementById('sub_view_formulir');
       if (targetSub) targetSub.classList.remove('hidden');
-      
+
       const form = document.getElementById('pendataanForm');
       if (form) form.reset();
-      
+
       const kontainerAnggota = document.getElementById('area_anggota_keluarga');
       if (kontainerAnggota) kontainerAnggota.innerHTML = '';
       totalHalamanAnggota = 0;
-      
+
       pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
-      inisialisasiWilayahSesuaiRole();      
+      inisialisasiWilayahSesuaiRole();
       
       const selStatus = document.getElementById('status_keluarga');
       if (selStatus) {
@@ -2177,10 +2178,10 @@
         selStatus.disabled = false;
         selStatus.classList.remove('bg-slate-100', 'cursor-not-allowed');
       }
-      
+
+      // Reset state KB & PK yang benar
       for (let k in dataNilaiKB) dataNilaiKB[k] = '';
-      for (let k in dataNilaiPK) dataNilaiPK[k] = '';
-      nilaiJawabanPK = {};
+      nilaiJawabanPK = {}; // <-- Menggunakan nilaiJawabanPK (bukan dataNilaiPK)
       indexStepKB = 0;
       riwayatStepKB = [];
       indexStepPK = 0;
@@ -4723,7 +4724,9 @@
           tampilkanLayar('tampilan_formulir');
         } else {
           tampilkanLayar('tampilan_dashboard');
-          bukaHalamanAdmin('formulir');
+          document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+          const targetSub = document.getElementById('sub_view_formulir');
+          if (targetSub) targetSub.classList.remove('hidden');
         }
 
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
