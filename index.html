@@ -4028,11 +4028,13 @@
       const targetBersih = String(kodeKeluargaTarget).trim();
       const normalisasi = (str) => String(str || '').replace(/\s+/g, ' ').trim();
 
+      // 1. Cari data KK target dari cache
       let kel = (dataCariEditCache || []).find(k => 
         normalisasi(k.kode_keluarga) === normalisasi(targetBersih) || 
         String(k.nomor_kk || '').trim() === targetBersih
       );
 
+      // Fallback jika tidak ada di cache
       if (!kel && supabaseClient) {
         try {
           const { data: kelDb, error: errKelDb } = await supabaseClient
@@ -4052,11 +4054,11 @@
         return;
       }
 
+      // Buka modal
       document.querySelectorAll('[id="modalDetailCariEdit"]').forEach(modal => {
         modal.classList.remove('hidden');
       });
 
-      // Terjemahkan kode wilayah menjadi nama nyata untuk sub-detail modal
       const infoWil = terjemahkanWilayahKeNama(kel);
       const teksSubDetail = `No. KK: ${kel.nomor_kk || '-'} | KK: ${(kel.nama_kk || 'TANPA NAMA').toUpperCase()} | Dusun: ${infoWil.dusun} (RT ${infoWil.rt})`;
       
@@ -4073,6 +4075,7 @@
         tb.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500 font-semibold animate-pulse">Memuat rincian data anggota keluarga...</td></tr>`;
       });
 
+      // 2. AMBIL ANGGOTA HANYA MILIK KK TERPILIH (FILTER KETAT)
       let listAng = [];
       try {
         let queryAnggota = supabaseClient
@@ -4080,24 +4083,36 @@
           .select('*')
           .order('nomor_anggota_keluarga', { ascending: true });
 
-        const filterOr = [];
-        if (kel.kode_keluarga) filterOr.push(`kode_keluarga.eq."${kel.kode_keluarga}"`);
-        if (kel.nomor_kk) filterOr.push(`nomor_kk.eq."${kel.nomor_kk}"`);
+        // Pastikan nomor_kk atau kode_keluarga benar-benar memiliki nilai sebelum difilter
+        const cleanNoKK = String(kel.nomor_kk || '').trim();
+        const cleanKodeKel = normalisasi(kel.kode_keluarga);
 
-        const { data: dataAngDb, error: errAngDb } = await queryAnggota.or(filterOr.join(','));
+        if (cleanNoKK && cleanNoKK !== '-' && cleanNoKK !== '9999999999999999') {
+          // Prioritas 1: Filter mutlak berdasarkan Nomor KK unik keluarga
+          queryAnggota = queryAnggota.eq('nomor_kk', cleanNoKK);
+        } else if (cleanKodeKel) {
+          // Prioritas 2: Filter mutlak berdasarkan Kode Keluarga
+          queryAnggota = queryAnggota.eq('kode_keluarga', cleanKodeKel);
+        } else {
+          // Jika tidak ada pengenal keluarga sama sekali, gagalkan agar tidak menarik semua data
+          throw new Error("Nomor KK atau Kode Keluarga tidak valid.");
+        }
 
-        if (!errAngDb && Array.isArray(dataAngDb) && dataAngDb.length > 0) {
+        const { data: dataAngDb, error: errAngDb } = await queryAnggota;
+
+        if (!errAngDb && Array.isArray(dataAngDb)) {
           listAng = dataAngDb;
-        } else if (Array.isArray(kel.anggota_keluarga) && kel.anggota_keluarga.length > 0) {
+        } else if (Array.isArray(kel.anggota_keluarga)) {
           listAng = kel.anggota_keluarga;
         }
       } catch (err) {
+        console.warn("Gagal mengambil anggota dari database:", err);
         listAng = Array.isArray(kel.anggota_keluarga) ? kel.anggota_keluarga : [];
       }
 
       kel.anggota_keluarga = listAng;
 
-      // Hitung metrik ringkasan
+      // 3. Hitung ringkasan indikator
       const anakKBMasihHidup = (parseInt(kel.kb_01_masih_laki, 10) || 0) + (parseInt(kel.kb_01_masih_perempuan, 10) || 0);
       const anakDiKK = listAng.filter(a => String(a.hubungan_dengan_kk) === '3').length;
       const totalAnak = (kel.kb_01_melahirkan !== null && kel.kb_01_melahirkan !== undefined && kel.kb_01_melahirkan !== '') 
@@ -4150,9 +4165,10 @@
       document.querySelectorAll('[id="ce_det_rad_hamil_ya"]').forEach(r => r.checked = isHamil);
       document.querySelectorAll('[id="ce_det_rad_hamil_tidak"]').forEach(r => r.checked = !isHamil);
 
+      // Render tabel anggota keluarga spesifik
       if (listAng.length === 0) {
         document.querySelectorAll('[id="tbodyDetailAnggotaCariEdit"]').forEach(tb => {
-          tb.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-semibold">Belum ada rincian anggota keluarga yang terdaftar.</td></tr>`;
+          tb.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400 font-semibold">Belum ada rincian anggota keluarga yang terdaftar untuk KK ini.</td></tr>`;
         });
         return;
       }
