@@ -1841,7 +1841,140 @@
       </nav>
 
     </div>
-  </div>  
+  </div>
+
+  <!-- MODAL DETAIL ANGGOTA KELUARGA CARI & EDIT -->
+  <div id="modalDetailCariEdit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto text-xs">
+      
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase flex items-center gap-2">
+            <span>👨‍👩‍👧‍👦 Detail Anggota Keluarga</span>
+          </h3>
+          <p id="subDetailKeluargaCariEdit" class="text-[11px] text-slate-500 font-semibold"></p>
+        </div>
+        <button type="button" onclick="tutupModalDetailCariEdit()" class="text-slate-400 hover:text-slate-700 font-bold text-2xl px-2">&times;</button>
+      </div>
+
+      <div class="flex justify-end pt-1">
+        <button type="button" onclick="bukaModalTambahAnggotaDariAdmin()" 
+                class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
+          <span>➕ Tambah Anggota Baru</span>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto border rounded-xl">
+        <table class="w-full text-left border-collapse text-[11px]">
+          <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b">
+            <tr>
+              <th class="p-2.5 text-center w-20">Aksi</th>
+              <th class="p-2.5">Nama</th>
+              <th class="p-2.5 font-mono">NIK</th>
+              <th class="p-2.5 text-center">Hub. Dgn KK</th>
+              <th class="p-2.5 text-center">Tanggal Lahir</th>
+              <th class="p-2.5 text-center">Usia</th>
+              <th class="p-2.5 text-center">Mutasi</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDetailAnggotaCariEdit" class="divide-y divide-slate-100">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pt-4 space-y-3.5 text-xs text-slate-700">
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Anak</label>
+          <div class="sm:col-span-9">
+            <input type="text" id="ce_det_jml_anak" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Baduta</label>
+          <div class="sm:col-span-9">
+            <input type="text" id="ce_det_jml_baduta" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Balita</label>
+          <div class="sm:col-span-9">
+            <input type="text" id="ce_det_jml_balita" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah WUS</label>
+          <div class="sm:col-span-9">
+            <input type="text" id="ce_det_jml_wus" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Kode Keluarga</label>
+          <div class="sm:col-span-9 font-mono font-bold text-slate-800 italic" id="ce_det_kode_keluarga">
+            -
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Mutasi Keluarga</label>
+          <div class="sm:col-span-9">
+            <select id="ce_det_mutasi_keluarga" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 outline-none">
+              <option value="">Select...</option>
+              <option value="1">1. Anggota Pindah Keluar</option>
+              <option value="2">2. Meninggal Dunia</option>
+              <option value="3">3. Anggota Baru Lahir</option>
+              <option value="4">4. Anggota Baru Pindah Datang</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Kesertaan JKN</label>
+          <div class="sm:col-span-9">
+            <select id="ce_det_kesertaan_jkn" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold outline-none cursor-not-allowed">
+              <option value="">Select...</option>
+              <option value="1">1. PBI</option>
+              <option value="2">2. Bukan PBI</option>
+              <option value="3">3. Swasta</option>
+              <option value="4">4. Tidak Memiliki</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Status PUS</label>
+          <div class="sm:col-span-9 flex items-center gap-6">
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_ya" disabled class="accent-slate-500" />
+              <span>Ya</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_tidak" disabled class="accent-slate-500" />
+              <span>Tidak</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
+          <label class="sm:col-span-3 font-medium text-slate-600">Status Hamil</label>
+          <div class="sm:col-span-9 flex items-center gap-6">
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_ya" disabled class="accent-slate-500" />
+              <span>Ya</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_tidak" disabled class="accent-slate-500" />
+              <span>Tidak</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <script>
     const SUPABASE_URL = "https://suyeimwyswhpzymbdwiw.supabase.co";
@@ -10623,6 +10756,241 @@
 
     const DUMMY_NIK_ISTRI = "9999999999999999";
 
+    function isNikIstriBebasValidasi(nik) {
+      const clean = String(nik || "").trim();
+      return !clean || clean === DUMMY_NIK_ISTRI || clean.length !== 16;
+    }
+    
+    async function validasiNikIstriSebelumSimpanManual(noKK, listAnggota) {      
+      const anggotaIstri = listAnggota.find(a => a.hubungan_dengan_kk === '2');
+      if (!anggotaIstri) return { lolos: true };
+
+      const nikIstri = String(anggotaIstri.nik || "").trim();
+      if (isNikIstriBebasValidasi(nikIstri)) return { lolos: true };
+      
+      const { data: cekIstriLain, error: errCek } = await supabaseClient
+        .from('anggota_keluarga')
+        .select('nomor_kk, nama_lengkap, hubungan_dengan_kk, keluarga:nomor_kk(kode_prov, kode_kab, kode_kec, kode_desa, kode_dusun, rt, alamat_detail)')
+        .eq('nik', nikIstri)
+        .eq('hubungan_dengan_kk', '2')
+        .neq('nomor_kk', noKK);
+
+      if (errCek) {
+        console.error("Gagal memeriksa NIK Istri:", errCek);
+      }
+
+      if (cekIstriLain && cekIstriLain.length > 0) {
+        const pemilikLain = cekIstriLain[0];
+        const wil = pemilikLain.keluarga || {};
+        return {
+          lolos: false,
+          alasan: `NIK Istri (${nikIstri}) sudah terdaftar pada Istri keluarga lain: ${pemilikLain.nama_lengkap} (No. KK: ${pemilikLain.nomor_kk}) di RT ${wil.rt || '-'}/Dusun ${wil.kode_dusun || '-'}.`
+        };
+      }
+      
+      const { data: cekKembarNonIstri } = await supabaseClient
+        .from('anggota_keluarga')
+        .select('nomor_kk, nama_lengkap, hubungan_dengan_kk, keluarga:nomor_kk(kode_prov, kode_kab, kode_kec, kode_desa, kode_dusun, rt)')
+        .eq('nik', nikIstri)
+        .neq('hubungan_dengan_kk', '2');
+
+      if (cekKembarNonIstri && cekKembarNonIstri.length > 0) {
+        return {
+          lolos: true,
+          peringatanKembar: cekKembarNonIstri
+        };
+      }
+
+      return { lolos: true };
+    }
+
+    // ========================================================
+    // FITUR AUDIT NIK ISTRI GANDA (LOGIKA DARI INDEX_KAB)
+    // ========================================================
+    async function auditNikIstriGandaKeluarga() {
+      if (!supabaseClient) {
+        Swal.fire('Koneksi Gagal', 'Client Supabase belum terhubung!', 'error');
+        return;
+      }
+
+      if (!userAktif || userAktif.role === 'USER_DESA') {
+        Swal.fire('Akses Ditolak', 'Fitur ini hanya dapat dijalankan oleh Admin!', 'warning');
+        return;
+      }
+
+      // 1. MUNCULKAN PERINGATAN KONFIRMASI (LANJUTKAN / BATAL)
+      const konfirmasi = await Swal.fire({
+        title: 'Konfirmasi Audit NIK Istri Ganda',
+        text: 'Proses ini akan memindai seluruh data individu istri di database untuk mendeteksi potensi duplikasi NIK. Lanjutkan?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#059669', // Hijau untuk Lanjutkan
+        cancelButtonColor: '#dc2626',  // Merah untuk Batal
+        confirmButtonText: 'Ya, Lanjutkan Audit',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+      });
+
+      // Jika admin memilih Batal, hentikan proses
+      if (!konfirmasi.isConfirmed) {
+        return;
+      }
+
+      // 2. PROSES AUDIT BERJALAN JIKA DIPILIH LANJUTKAN
+      Swal.fire({
+        title: 'Memeriksa Database...',
+        text: 'Mengambil dan menganalisis seluruh data individu istri...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        let allAnggota = [];
+        let fromIdx = 0;
+        const step = 1000;
+        let hasMore = true;
+
+        while (hasMore) {
+          const { data: chunk, error } = await supabaseClient
+            .from('anggota_keluarga')
+            .select('id, nomor_kk, nama_lengkap, nik, jenis_kelamin, hubungan_dengan_kk, status_perkawinan')
+            .eq('hubungan_dengan_kk', '2')
+            .order('id', { ascending: true })
+            .range(fromIdx, fromIdx + step - 1);
+
+          if (error) throw error;
+
+          if (chunk && chunk.length > 0) {
+            allAnggota = allAnggota.concat(chunk);
+            fromIdx += step;
+            if (chunk.length < step) hasMore = false;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        if (allAnggota.length === 0) {
+          Swal.fire('Data Bersih', 'Tidak ada data individu istri yang terdaftar.', 'info');
+          return;
+        }
+
+        const kkList = [...new Set(allAnggota.map(a => a.nomor_kk).filter(Boolean))];
+        let mapKeluarga = new Map();
+
+        for (let i = 0; i < kkList.length; i += 500) {
+          const sliceKk = kkList.slice(i, i + 500);
+          const { data: dataKk } = await supabaseClient
+            .from('keluarga')
+            .select('nomor_kk, nama_kk, nik_kk, kode_kec, kode_desa, kode_dusun, rt, alamat_detail, status_keluarga')
+            .in('nomor_kk', sliceKk);
+
+          if (dataKk) {
+            dataKk.forEach(k => mapKeluarga.set(String(k.nomor_kk).trim(), k));
+          }
+        }
+
+        const nikMap = new Map();
+        allAnggota.forEach(item => {
+          const nik = String(item.nik || '').trim();
+          if (!nik || nik === '9999999999999999' || nik.length !== 16) return;
+
+          if (!nikMap.has(nik)) {
+            nikMap.set(nik, []);
+          }
+
+          const infoKk = mapKeluarga.get(String(item.nomor_kk).trim()) || {};
+
+          nikMap.get(nik).push({
+            nomor_kk: item.nomor_kk || '-',
+            nik_istri: nik,
+            nama_istri: item.nama_lengkap || '-',
+            nama_suami: infoKk.nama_kk || '-',
+            nik_suami: infoKk.nik_kk || '-',
+            kode_kec: infoKk.kode_kec || '-',
+            kode_desa: infoKk.kode_desa || '-',
+            kode_dusun: infoKk.kode_dusun || '-',
+            rt: infoKk.rt || '-',
+            alamat: infoKk.alamat_detail || '-',
+            status_keluarga: infoKk.status_keluarga || '1',
+            keterangan_audit: 'NIK Istri Ganda pada Lebih dari 1 KK'
+          });
+        });
+
+        const listGanda = [];
+        nikMap.forEach((records) => {
+          if (records.length > 1) {
+            records.forEach(r => listGanda.push(r));
+          }
+        });
+
+        Swal.close();
+
+        if (listGanda.length === 0) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Database Bersih!',
+            text: 'Tidak ditemukan NIK Istri ganda di seluruh data keluarga.'
+          });
+          return;
+        }
+
+        const previewHtml = listGanda.slice(0, 6).map(d =>
+          `• <b>${d.nama_istri}</b> (NIK: <code>${d.nik_istri}</code>) - Suami: ${d.nama_suami} [KK: ${d.nomor_kk}, Desa: ${d.kode_desa}]`
+        ).join('<br>');
+
+        Swal.fire({
+          icon: 'warning',
+          title: `Ditemukan ${listGanda.length} Rekaman NIK Ganda!`,
+          html: `
+            <div style="text-align: left; font-size: 12px; color: #334155; line-height: 1.5;">
+              Ditemukan NIK Istri yang terdaftar pada lebih dari satu Kartu Keluarga:<br><br>
+              <div style="background:#fff1f2; padding:8px; border-radius:8px; border:1px solid #fecdd3; max-height:160px; overflow-y:auto; font-size:11px;">
+                ${previewHtml}
+                ${listGanda.length > 6 ? `<br><i>...dan ${listGanda.length - 6} rekaman lainnya.</i>` : ''}
+              </div>
+              <br>Unduh laporan Excel untuk meneliti dan memverifikasi data.
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: '📥 Unduh Laporan Excel',
+          cancelButtonText: 'Tutup',
+          confirmButtonColor: '#e11d48',
+          cancelButtonColor: '#64748b'
+        }).then((res) => {
+          if (res.isConfirmed) {
+            unduhLaporanAuditNikExcel(listGanda);
+          }
+        });
+
+      } catch (err) {
+        console.error("Audit Error:", err);
+        Swal.fire("Gagal", err.message || "Terjadi kesalahan saat memproses audit.", "error");
+      }
+    }
+
+    function unduhLaporanAuditNikExcel(dataList) {
+      const rows = dataList.map((d, idx) => ({
+        "NO": idx + 1,
+        "NOMOR KK": d.nomor_kk,
+        "NIK ISTRI": d.nik_istri,
+        "NAMA ISTRI": d.nama_istri,
+        "NAMA SUAMI (KK)": d.nama_suami,
+        "NIK SUAMI": d.nik_suami,
+        "KD KEC": d.kode_kec,
+        "KD DESA": d.kode_desa,
+        "KD DUSUN": d.kode_dusun,
+        "RT": d.rt,
+        "ALAMAT": d.alamat,
+        "STATUS KELUARGA": d.status_keluarga,
+        "STATUS AUDIT": d.keterangan_audit
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Audit_NIK_Istri");
+      XLSX.writeFile(wb, `Laporan_Audit_NIK_Istri_Ganda_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
     function periksaSeluruhAnomaliKeluarga(listAnggota) {
       const hasil = [];
       listAnggota.forEach((ang, idx) => {
@@ -11451,139 +11819,5 @@
       evaluasiStatusKeluarga();      
     });
   </script>
-  
-  <!-- MODAL DETAIL ANGGOTA KELUARGA CARI & EDIT -->
-  <div id="modalDetailCariEdit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-7 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto text-xs">
-      
-      <div class="flex justify-between items-center border-b pb-3">
-        <div>
-          <h3 class="text-sm sm:text-base font-black text-slate-800 uppercase flex items-center gap-2">
-            <span>👨‍👩‍👧‍👦 Detail Anggota Keluarga</span>
-          </h3>
-          <p id="subDetailKeluargaCariEdit" class="text-[11px] text-slate-500 font-semibold"></p>
-        </div>
-        <button type="button" onclick="tutupModalDetailCariEdit()" class="text-slate-400 hover:text-slate-700 font-bold text-2xl px-2">&times;</button>
-      </div>
-
-      <div class="flex justify-end pt-1">
-        <button type="button" onclick="bukaModalTambahAnggotaDariAdmin()" 
-                class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1.5">
-          <span>➕ Tambah Anggota Baru</span>
-        </button>
-      </div>
-
-      <div class="overflow-x-auto border rounded-xl">
-        <table class="w-full text-left border-collapse text-[11px]">
-          <thead class="bg-slate-100 text-slate-600 uppercase font-bold border-b">
-            <tr>
-              <th class="p-2.5 text-center w-20">Aksi</th>
-              <th class="p-2.5">Nama</th>
-              <th class="p-2.5 font-mono">NIK</th>
-              <th class="p-2.5 text-center">Hub. Dgn KK</th>
-              <th class="p-2.5 text-center">Tanggal Lahir</th>
-              <th class="p-2.5 text-center">Usia</th>
-              <th class="p-2.5 text-center">Mutasi</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyDetailAnggotaCariEdit" class="divide-y divide-slate-100">
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pt-4 space-y-3.5 text-xs text-slate-700">
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Anak</label>
-          <div class="sm:col-span-9">
-            <input type="text" id="ce_det_jml_anak" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Baduta</label>
-          <div class="sm:col-span-9">
-            <input type="text" id="ce_det_jml_baduta" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah Balita</label>
-          <div class="sm:col-span-9">
-            <input type="text" id="ce_det_jml_balita" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Jumlah WUS</label>
-          <div class="sm:col-span-9">
-            <input type="text" id="ce_det_jml_wus" readonly class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none" />
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Kode Keluarga</label>
-          <div class="sm:col-span-9 font-mono font-bold text-slate-800 italic" id="ce_det_kode_keluarga">
-            -
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Mutasi Keluarga</label>
-          <div class="sm:col-span-9">
-            <select id="ce_det_mutasi_keluarga" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 outline-none">
-              <option value="">Select...</option>
-              <option value="1">1. Anggota Pindah Keluar</option>
-              <option value="2">2. Meninggal Dunia</option>
-              <option value="3">3. Anggota Baru Lahir</option>
-              <option value="4">4. Anggota Baru Pindah Datang</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Kesertaan JKN</label>
-          <div class="sm:col-span-9">
-            <select id="ce_det_kesertaan_jkn" disabled class="w-full sm:w-1/2 p-2 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold outline-none cursor-not-allowed">
-              <option value="">Select...</option>
-              <option value="1">1. PBI</option>
-              <option value="2">2. Bukan PBI</option>
-              <option value="3">3. Swasta</option>
-              <option value="4">4. Tidak Memiliki</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Status PUS</label>
-          <div class="sm:col-span-9 flex items-center gap-6">
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_ya" disabled class="accent-slate-500" />
-              <span>Ya</span>
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="ce_det_rad_pus" id="ce_det_rad_pus_tidak" disabled class="accent-slate-500" />
-              <span>Tidak</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-2">
-          <label class="sm:col-span-3 font-medium text-slate-600">Status Hamil</label>
-          <div class="sm:col-span-9 flex items-center gap-6">
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_ya" disabled class="accent-slate-500" />
-              <span>Ya</span>
-            </label>
-            <label class="flex items-center gap-1.5 cursor-pointer">
-              <input type="radio" name="ce_det_rad_hamil" id="ce_det_rad_hamil_tidak" disabled class="accent-slate-500" />
-              <span>Tidak</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
 </body>
 </html>
