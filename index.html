@@ -1020,12 +1020,22 @@
              ======================================================== -->
         <div id="sub_view_formulir" class="sub-view-admin hidden space-y-5">
           <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-slate-200 form-uppercase">
-            <header class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white p-5">
-              <div class="space-y-1 text-center">
-                <h3 class="text-lg sm:text-xl font-black uppercase tracking-wide">FORM PENDATAAN KELUARGA</h3>
-                <span id="labelTotalTahap" class="text-xs text-emerald-200 font-bold uppercase tracking-wider block text-left">
+            <header class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white p-4 sm:p-5">
+              <div class="flex items-center justify-between mb-2">
+                <!-- Tombol Kembali ke Beranda / Dashboard Kader -->
+                <button type="button" onclick="kembaliKeDashboard()" 
+                        class="px-3 py-1.5 bg-white/20 hover:bg-white/30 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
+                  <span>←</span>
+                  <span>Kembali ke Beranda</span>
+                </button>
+
+                <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-200 font-bold uppercase tracking-wider">
                   I. IDENTITAS WILAYAH
                 </span>
+              </div>
+              
+              <div class="text-center pt-1">
+                <h3 class="text-base sm:text-xl font-black uppercase tracking-wide">FORM PENDATAAN KELUARGA</h3>
               </div>
             </header>
 
@@ -2190,8 +2200,8 @@
       const selStatus = document.getElementById('status_keluarga');
       if (selStatus) {
         selStatus.value = '6';
-        selStatus.disabled = false;
-        selStatus.classList.remove('bg-slate-100', 'cursor-not-allowed');
+        selStatus.disabled = true;
+        selStatus.classList.add('bg-slate-100', 'cursor-not-allowed');
       }
 
       for (let k in dataNilaiKB) dataNilaiKB[k] = '';
@@ -4916,7 +4926,7 @@
 
         document.querySelectorAll('[id="status_keluarga"]').forEach(sel => {
           sel.value = String(kel.status_keluarga || '1');
-          sel.disabled = false;
+          sel.disabled = false; // Buka kunci saat mengedit data
           sel.classList.remove('bg-slate-100', 'cursor-not-allowed');
         });
 
@@ -11424,7 +11434,7 @@
         const rt = (document.getElementById('rt')?.value || '001').trim();
         const kodeRumah = (document.getElementById('kode_rumah')?.value || '001').trim().padStart(3, '0');
         const noUrutKel = (document.getElementById('no_urut_keluarga')?.value || '001').trim().padStart(3, '0');
-        const statusKeluarga = document.getElementById('status_keluarga')?.value || '1';
+        const statusKeluarga = document.getElementById('status_keluarga')?.value || (modeEditKeluargaLuar ? '1' : '6');
         const alamat = (document.getElementById('alamat_detail')?.value || '').trim().toUpperCase();
         const noHp = (document.getElementById('no_hp')?.value || '').trim();
 
