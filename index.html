@@ -2154,33 +2154,69 @@
       await sinkronkanDataOffline();
     }
 
-    function bukaFormulirPendataan() {
+    function bukaFormulirPendataan() {      
       modeEditKeluargaLuar = false;      
       
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
       const targetSub = document.getElementById('sub_view_formulir');
       if (targetSub) targetSub.classList.remove('hidden');
-
+      
+      const form = document.getElementById('pendataanForm');
+      if (form) form.reset();
+      
+      const kontainerAnggota = document.getElementById('area_anggota_keluarga');
+      if (kontainerAnggota) kontainerAnggota.innerHTML = '';
+      totalHalamanAnggota = 0;
+      
       pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
-      inisialisasiWilayahSesuaiRole();
+      inisialisasiWilayahSesuaiRole();      
       
       const selStatus = document.getElementById('status_keluarga');
       if (selStatus) {
         selStatus.value = '6';
-        selStatus.disabled = true;
-        selStatus.classList.add('bg-slate-100', 'cursor-not-allowed');
+        selStatus.disabled = false;
+        selStatus.classList.remove('bg-slate-100', 'cursor-not-allowed');
       }
-
+      
+      for (let k in dataNilaiKB) dataNilaiKB[k] = '';
+      for (let k in dataNilaiPK) dataNilaiPK[k] = '';
+      nilaiJawabanPK = {};
       indexStepKB = 0;
       riwayatStepKB = [];
       indexStepPK = 0;
       riwayatStepPK = [];
-      tampilkanStepKB();
-      tampilkanStepPK();
+
       evaluasiStatusKeluarga();
     }
+
+    function resetHalamanCariEdit() {
+      dataCariEditCache = [];
+
+      const inpNama = document.getElementById('cari_edit_cari_nama');
+      const inpNik = document.getElementById('cari_edit_cari_nik');
+      const selCakupan = document.getElementById('cari_edit_cakupan_cetak');
+      const lblTotal = document.getElementById('labelTotalCariEdit');
+      const tbody = document.getElementById('tbodyCariEditKeluarga');
+
+      if (inpNama) inpNama.value = '';
+      if (inpNik) inpNik.value = '';
+      if (selCakupan) selCakupan.value = 'kk';
+      if (lblTotal) lblTotal.innerText = 'Total: 0 Keluarga';
+
+      if (tbody) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-8 text-center text-slate-400 font-semibold">
+              Silakan pilih <b>Kecamatan</b> dan <b>Desa/Kelurahan</b> terlebih dahulu, lalu klik tombol <b>Cari</b>.
+            </td>
+          </tr>
+        `;
+      }
+      
+      initFilterWilayahCariEdit();
+    }
 	
-	function isiDataUjiCobaOtomatis() {
+	  function isiDataUjiCobaOtomatis() {
       const unik = Math.floor(1000 + Math.random() * 9000);
       const noKKTest = `520108${Date.now().toString().slice(-6)}${unik.toString().slice(-4)}`;
 
@@ -2427,6 +2463,7 @@
 
     function bukaHalamanAdmin(namaModul) {      
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+      
       document.querySelectorAll('.nav-item').forEach(el => {
         el.className = "nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-xl border-l-4 border-transparent text-slate-600 hover:text-indigo-600 hover:bg-slate-50 transition";
       });
@@ -2460,13 +2497,36 @@
         if (breadcrumb) breadcrumb.innerText = metaHalaman[namaModul].bc;
       }
       
-      if (namaModul === 'rekapitulasi') initFilterWilayahRekap();
-      if (namaModul === 'cari_edit') initFilterWilayahCariEdit();
-      if (namaModul === 'bnba') initFilterWilayahBnbaLap();
-      if (namaModul === 'kelola_wilayah') bukaKelolaWilayah();
-      if (namaModul === 'kelola_user') gantiTabUser('form', true);
-      if (namaModul === 'formulir') bukaFormulirPendataan();
-      if (namaModul === 'beranda') muatMetrikRingkasanEksekutif();
+      // RESET SETIAP HALAMAN KE KONDISI AWAL SETIAP KALI DIKLIK:
+      if (namaModul === 'formulir') {
+        bukaFormulirPendataan(); // Otomatis reset form keluarga baru yang kosong
+      } else if (namaModul === 'cari_edit') {
+        resetHalamanCariEdit();  // Otomatis reset input nama/nik, tabel, dan filter wilayah
+      } else if (namaModul === 'rekapitulasi') {
+        initFilterWilayahRekap();
+      } else if (namaModul === 'bnba') {
+        initFilterWilayahBnbaLap();
+        const selKat = document.getElementById('bnba_lap_kategori');
+        if (selKat) {
+          selKat.value = '';
+          saatKategoriBnbaLapBerubah();
+        }
+        dataHasilBnbaLap = [];
+        const thead = document.getElementById('theadBnbaLap');
+        const tbody = document.getElementById('tbodyBnbaLap');
+        const lblTotal = document.getElementById('labelTotalBnbaLap');
+        if (thead) thead.innerHTML = '';
+        if (lblTotal) lblTotal.innerText = 'Ditemukan: 0 Data';
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="12" class="p-8 text-center text-slate-400 font-semibold">Silakan pilih indikator dan klik <b>Tampilkan</b>.</td></tr>`;
+        }
+      } else if (namaModul === 'kelola_wilayah') {
+        bukaKelolaWilayah();
+      } else if (namaModul === 'kelola_user') {
+        gantiTabUser('form', true);
+      } else if (namaModul === 'beranda') {
+        muatMetrikRingkasanEksekutif();
+      }
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -4633,7 +4693,11 @@
         return;
       }
       const targetBersih = String(kodeKelTarget).trim();
-      modeEditKeluargaLuar = false;
+      if (userAktif && userAktif.role === 'USER_DESA') {
+        modeEditKeluargaLuar = false;
+      } else {
+        modeEditKeluargaLuar = true;
+      }
 
       Swal.fire({
         title: 'Memuat Data Keluarga...',
