@@ -4024,7 +4024,7 @@
           const { data: kelDb, error: errKelDb } = await supabaseClient
             .from('keluarga')
             .select('*')
-            .or(`kode_keluarga.eq."${targetBersih}",nomor_kk.eq."${targetBersih}"`)
+            .or(`kode_keluarga.eq.${targetBersih},nomor_kk.eq.${targetBersih}`)
             .maybeSingle();
 
           if (!errKelDb && kelDb) kel = kelDb;
@@ -4613,7 +4613,7 @@
         const { data: kel, error: errKel } = await supabaseClient
           .from('keluarga')
           .select(`*, anggota_keluarga (*)`)
-          .or(`kode_keluarga.eq."${targetBersih}",nomor_kk.eq."${targetBersih}"`)
+          .or(`kode_keluarga.eq.${targetBersih},nomor_kk.eq.${targetBersih}`)
           .maybeSingle();
 
         if (errKel || !kel) {
@@ -7864,6 +7864,48 @@
       XLSX.writeFile(wb, "Template_Pendataan_Keluarga_Desa_Lengkap.xlsx");
     }
 
+    async function downloadExcelKeluargaTerisi() {
+      Swal.fire({
+        title: 'Menyiapkan Berkas...',
+        html: 'Mengambil data keluarga dari database...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        let queryKel = supabaseClient.from('keluarga').select('*');
+        if (userAktif.role === 'ADMIN_KABUPATEN') queryKel = queryKel.eq('kode_kab', userAktif.kode_kab);
+        if (userAktif.role === 'ADMIN_KECAMATAN') queryKel = queryKel.eq('kode_kec', userAktif.kode_kec);
+        if (userAktif.role === 'USER_DESA') queryKel = queryKel.eq('kode_desa', userAktif.kode_desa);
+
+        const { data: dataKel, error: errKel } = await queryKel;
+        if (errKel) throw errKel;
+
+        if (!dataKel || dataKel.length === 0) {
+          Swal.fire('Data Kosong', 'Tidak ada data keluarga untuk diunduh.', 'info');
+          return;
+        }
+
+        const listKK = dataKel.map(k => k.nomor_kk).filter(Boolean);
+        const { data: dataAng } = await supabaseClient
+          .from('anggota_keluarga')
+          .select('*')
+          .in('nomor_kk', listKK)
+          .order('nomor_anggota_keluarga', { ascending: true });
+
+        const wsKel = XLSX.utils.json_to_sheet(dataKel);
+        const wsAng = XLSX.utils.json_to_sheet(dataAng || []);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, wsKel, "KELUARGA");
+        XLSX.utils.book_append_sheet(wb, wsAng, "ANGGOTA_KELUARGA");
+
+        XLSX.writeFile(wb, `Data_Keluarga_Terisi_${new Date().toISOString().split('T')[0]}.xlsx`);
+        Swal.close();
+      } catch (err) {
+        Swal.fire('Gagal', err.message, 'error');
+      }
+    }
+
     function downloadLogNikIstriGandaExcel(dataList) {
       if (!dataList || dataList.length === 0) return;
 
@@ -11044,26 +11086,32 @@
       }
 
       const cekPK = [
-        { key: 'pk_01', label: 'Blok PK No. 01' }, { key: 'pk_02', label: 'Blok PK No. 02' },
-        { key: 'pk_10', label: 'Blok PK No. 10' }, { key: 'pk_14', label: 'Blok PK No. 14' },
-        { key: 'pk_15', label: 'Blok PK No. 15' }, { key: 'pk_17_1', label: 'Blok PK No. 17.1' },
-        { key: 'pk_18_1', label: 'Blok PK No. 18.1' }, { key: 'pk_19_1', label: 'Blok PK No. 19.1' },
-        { key: 'pk_20_1', label: 'Blok PK No. 20.1' }, { key: 'pk_21_1', label: 'Blok PK No. 21.1' },
-        { key: 'pk_22', label: 'Blok PK No. 22' }, { key: 'pk_23', label: 'Blok PK No. 23' },
-        { key: 'pk_24', label: 'Blok PK No. 24' }, { key: 'pk_25', label: 'Blok PK No. 25' },
-        { key: 'pk_26', label: 'Blok PK No. 26' }
+        { keys: ['pk_01_ibadah', 'pk_01'], label: 'Blok PK No. 01' },
+        { keys: ['pk_02_toleransi_agama', 'pk_02'], label: 'Blok PK No. 02' },
+        { keys: ['pk_10_makan_dua_kali', 'pk_10'], label: 'Blok PK No. 10' },
+        { keys: ['pk_14_memiliki_aset', 'pk_14'], label: 'Blok PK No. 14' },
+        { keys: ['pk_15_interaksi_harian', 'pk_15'], label: 'Blok PK No. 15' },
+        { keys: ['pk_17_1_jenis_atap', 'pk_17_1'], label: 'Blok PK No. 17.1' },
+        { keys: ['pk_18_1_jenis_dinding', 'pk_18_1'], label: 'Blok PK No. 18.1' },
+        { keys: ['pk_19_1_jenis_lantai', 'pk_19_1'], label: 'Blok PK No. 19.1' },
+        { keys: ['pk_20_1_sumber_penerangan', 'pk_20_1'], label: 'Blok PK No. 20.1' },
+        { keys: ['pk_21_1_sumber_air_minum', 'pk_21_1'], label: 'Blok PK No. 21.1' },
+        { keys: ['pk_22_fasilitas_jamban', 'pk_22'], label: 'Blok PK No. 22' },
+        { keys: ['pk_23_luas_rumah', 'pk_23'], label: 'Blok PK No. 23' },
+        { keys: ['pk_24_jumlah_menetap', 'pk_24'], label: 'Blok PK No. 24' },
+        { keys: ['pk_25_bahan_bakar_masak', 'pk_25'], label: 'Blok PK No. 25' },
+        { keys: ['pk_26_kepemilikan_rumah', 'pk_26'], label: 'Blok PK No. 26' }
       ];
 
       for (let c of cekPK) {
-        if (!nilaiJawabanPK[c.key]) {
-          return `${c.label} belum dijawab!`;
-        }
+        const terisi = c.keys.some(k => nilaiJawabanPK[k] !== undefined && nilaiJawabanPK[k] !== '' && nilaiJawabanPK[k] !== null);
+        if (!terisi) return `${c.label} belum dijawab!`;
       }
 
-      if (!Array.isArray(nilaiJawabanPK['pk_29']) || nilaiJawabanPK['pk_29'].length === 0) {
+      const list29 = nilaiJawabanPK['pk_29_persetujuan_keluarga'] || nilaiJawabanPK['pk_29'];
+      if (!Array.isArray(list29) || list29.length === 0) {
         return 'Blok PK No. 29 belum dipilih minimal satu!';
       }
-
       return null;
     }
 
@@ -11263,50 +11311,50 @@
           kb_09_info_efek_samping: dataNilaiKB.kb_09_info_efek_samping === '1',
           kb_09_info_tindakan: dataNilaiKB.kb_09_info_tindakan === '1',
 
-          pk_01_ibadah: payloadPK.pk_01 || null,
-          pk_02_toleransi_agama: payloadPK.pk_02 || null,
-          pk_03_1_tanpa_sapa: payloadPK.pk_03_1 || null,
-          pk_03_2_pisah_ranjang: payloadPK.pk_03_2 || null,
-          pk_03_3_pergi_rumah: payloadPK.pk_03_3 || null,
-          pk_03_4_kdrt: payloadPK.pk_03_4 || null,
-          pk_03_5_kekerasan_anak: payloadPK.pk_03_5 || null,
-          pk_04_anggota_sakit: payloadPK.pk_04 || null,
-          pk_05_rekreasi: payloadPK.pk_05 || null,
-          pk_06_kegiatan_sosial: payloadPK.pk_06 || null,
-          pk_07_bantuan_orang_lain: payloadPK.pk_07 || null,
-          pk_08_akses_sarana_publik: payloadPK.pk_08 || null,
-          pk_09_aman_nyaman: payloadPK.pk_09 || null,
-          pk_10_makan_dua_kali: payloadPK.pk_10 || null,
-          pk_10_1_jenis_makanan: payloadPK.pk_10_1 || null,
-          pk_11_akses_internet: payloadPK.pk_11 || null,
-          pk_12_internet_anak: payloadPK.pk_12 || null,
-          pk_13_sumber_penghasilan: payloadPK.pk_13 || null,
-          pk_14_memiliki_aset: payloadPK.pk_14 || null,
-          pk_14_1_jenis_aset: payloadPK.pk_14_1 || null,
-          pk_15_interaksi_harian: payloadPK.pk_15 || null,
-          pk_15_1_jenis_interaksi: payloadPK.pk_15_1 || null,
-          pk_16_1_ayah_menemani_anak: payloadPK.pk_16_1 || null,
-          pk_16_2_ayah_komunikasi: payloadPK.pk_16_2 || null,
-          pk_16_3_ayah_hak_dasar: payloadPK.pk_16_3 || null,
-          pk_16_4_ayah_pekerjaan_rumah: payloadPK.pk_16_4 || null,
-          pk_17_1_jenis_atap: payloadPK.pk_17_1 || null,
-          pk_17_2_kondisi_atap: payloadPK.pk_17_2 || null,
-          pk_18_1_jenis_dinding: payloadPK.pk_18_1 || null,
-          pk_18_2_kondisi_dinding: payloadPK.pk_18_2 || null,
-          pk_19_1_jenis_lantai: payloadPK.pk_19_1 || null,
-          pk_19_2_kondisi_lantai: payloadPK.pk_19_2 || null,
-          pk_20_1_sumber_penerangan: payloadPK.pk_20_1 || null,
-          pk_20_2_daya_listrik: payloadPK.pk_20_2 || null,
-          pk_21_1_sumber_air_minum: payloadPK.pk_21_1 || null,
-          pk_21_2_jarak_tinja: payloadPK.pk_21_2 || null,
-          pk_22_fasilitas_jamban: payloadPK.pk_22 || null,
-          pk_23_luas_rumah: keFloat(payloadPK.pk_23),
-          pk_24_jumlah_menetap: keInteger(payloadPK.pk_24),
-          pk_25_bahan_bakar_masak: payloadPK.pk_25 || null,
-          pk_26_kepemilikan_rumah: payloadPK.pk_26 || null,
-          pk_27_pesan_informasi: payloadPK.pk_27 || null,
-          pk_28_sumber_informasi: payloadPK.pk_28 || null,
-          pk_29_persetujuan_keluarga: payloadPK.pk_29 || null,
+          pk_01_ibadah: payloadPK.pk_01_ibadah || payloadPK.pk_01 || null,
+          pk_02_toleransi_agama: payloadPK.pk_02_toleransi_agama || payloadPK.pk_02 || null,
+          pk_03_1_tanpa_sapa: payloadPK.pk_03_1_tanpa_sapa || payloadPK.pk_03_1 || null,
+          pk_03_2_pisah_ranjang: payloadPK.pk_03_2_pisah_ranjang || payloadPK.pk_03_2 || null,
+          pk_03_3_pergi_rumah: payloadPK.pk_03_3_pergi_rumah || payloadPK.pk_03_3 || null,
+          pk_03_4_kdrt: payloadPK.pk_03_4_kdrt || payloadPK.pk_03_4 || null,
+          pk_03_5_kekerasan_anak: payloadPK.pk_03_5_kekerasan_anak || payloadPK.pk_03_5 || null,
+          pk_04_anggota_sakit: payloadPK.pk_04_anggota_sakit || payloadPK.pk_04 || null,
+          pk_05_rekreasi: payloadPK.pk_05_rekreasi || payloadPK.pk_05 || null,
+          pk_06_kegiatan_sosial: payloadPK.pk_06_kegiatan_sosial || payloadPK.pk_06 || null,
+          pk_07_bantuan_orang_lain: payloadPK.pk_07_bantuan_orang_lain || payloadPK.pk_07 || null,
+          pk_08_akses_sarana_publik: payloadPK.pk_08_akses_sarana_publik || payloadPK.pk_08 || null,
+          pk_09_aman_nyaman: payloadPK.pk_09_aman_nyaman || payloadPK.pk_09 || null,
+          pk_10_makan_dua_kali: payloadPK.pk_10_makan_dua_kali || payloadPK.pk_10 || null,
+          pk_10_1_jenis_makanan: payloadPK.pk_10_1_jenis_makanan || payloadPK.pk_10_1 || null,
+          pk_11_akses_internet: payloadPK.pk_11_akses_internet || payloadPK.pk_11 || null,
+          pk_12_internet_anak: payloadPK.pk_12_internet_anak || payloadPK.pk_12 || null,
+          pk_13_sumber_penghasilan: payloadPK.pk_13_sumber_penghasilan || payloadPK.pk_13 || null,
+          pk_14_memiliki_aset: payloadPK.pk_14_memiliki_aset || payloadPK.pk_14 || null,
+          pk_14_1_jenis_aset: payloadPK.pk_14_1_jenis_aset || payloadPK.pk_14_1 || null,
+          pk_15_interaksi_harian: payloadPK.pk_15_interaksi_harian || payloadPK.pk_15 || null,
+          pk_15_1_jenis_interaksi: payloadPK.pk_15_1_jenis_interaksi || payloadPK.pk_15_1 || null,
+          pk_16_1_ayah_menemani_anak: payloadPK.pk_16_1_ayah_menemani_anak || payloadPK.pk_16_1 || null,
+          pk_16_2_ayah_komunikasi: payloadPK.pk_16_2_ayah_komunikasi || payloadPK.pk_16_2 || null,
+          pk_16_3_ayah_hak_dasar: payloadPK.pk_16_3_ayah_hak_dasar || payloadPK.pk_16_3 || null,
+          pk_16_4_ayah_pekerjaan_rumah: payloadPK.pk_16_4_ayah_pekerjaan_rumah || payloadPK.pk_16_4 || null,
+          pk_17_1_jenis_atap: payloadPK.pk_17_1_jenis_atap || payloadPK.pk_17_1 || null,
+          pk_17_2_kondisi_atap: payloadPK.pk_17_2_kondisi_atap || payloadPK.pk_17_2 || null,
+          pk_18_1_jenis_dinding: payloadPK.pk_18_1_jenis_dinding || payloadPK.pk_18_1 || null,
+          pk_18_2_kondisi_dinding: payloadPK.pk_18_2_kondisi_dinding || payloadPK.pk_18_2 || null,
+          pk_19_1_jenis_lantai: payloadPK.pk_19_1_jenis_lantai || payloadPK.pk_19_1 || null,
+          pk_19_2_kondisi_lantai: payloadPK.pk_19_2_kondisi_lantai || payloadPK.pk_19_2 || null,
+          pk_20_1_sumber_penerangan: payloadPK.pk_20_1_sumber_penerangan || payloadPK.pk_20_1 || null,
+          pk_20_2_daya_listrik: payloadPK.pk_20_2_daya_listrik || payloadPK.pk_20_2 || null,
+          pk_21_1_sumber_air_minum: payloadPK.pk_21_1_sumber_air_minum || payloadPK.pk_21_1 || null,
+          pk_21_2_jarak_tinja: payloadPK.pk_21_2_jarak_tinja || payloadPK.pk_21_2 || null,
+          pk_22_fasilitas_jamban: payloadPK.pk_22_fasilitas_jamban || payloadPK.pk_22 || null,
+          pk_23_luas_rumah: keFloat(payloadPK.pk_23_luas_rumah || payloadPK.pk_23),
+          pk_24_jumlah_menetap: keInteger(payloadPK.pk_24_jumlah_menetap || payloadPK.pk_24),
+          pk_25_bahan_bakar_masak: payloadPK.pk_25_bahan_bakar_masak || payloadPK.pk_25 || null,
+          pk_26_kepemilikan_rumah: payloadPK.pk_26_kepemilikan_rumah || payloadPK.pk_26 || null,
+          pk_27_pesan_informasi: payloadPK.pk_27_pesan_informasi || payloadPK.pk_27 || null,
+          pk_28_sumber_informasi: payloadPK.pk_28_sumber_informasi || payloadPK.pk_28 || null,
+          pk_29_persetujuan_keluarga: payloadPK.pk_29_persetujuan_keluarga || payloadPK.pk_29 || null,
 
           diperbarui_pada: new Date()
         };
@@ -11333,6 +11381,19 @@
           bekerja_luar_negeri: item.bekerja_luar_negeri,
           mutasi_anggota: item.mutasi_anggota
         }));
+
+        if (navigator.onLine) {
+          const cekNik = await validasiNikIstriSebelumSimpanManual(noKK, payloadAnggota);
+          if (!cekNik.lolos) {
+            Swal.fire({
+              icon: 'error',
+              title: 'NIK Istri Ganda Ditolak!',
+              text: cekNik.alasan,
+              confirmButtonColor: '#e11d48'
+            });
+            return;
+          }
+        }
 
         if (!navigator.onLine) {
           await simpanKeAntreanOffline(payloadKeluarga, payloadAnggota);
@@ -11596,8 +11657,8 @@
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await supabaseClient.from('anggota_keluarga').delete().or(`kode_keluarga.eq."${kodeKeluarga}",nomor_kk.eq."${kodeKeluarga}"`);
-            await supabaseClient.from('keluarga').delete().or(`kode_keluarga.eq."${kodeKeluarga}",nomor_kk.eq."${kodeKeluarga}"`);
+            await supabaseClient.from('anggota_keluarga').delete().or(`kode_keluarga.eq.${kodeKeluarga},nomor_kk.eq.${kodeKeluarga}`);
+            await supabaseClient.from('keluarga').delete().or(`kode_keluarga.eq.${kodeKeluarga},nomor_kk.eq.${kodeKeluarga}`);
             Swal.fire('Terhapus!', 'Data berhasil dihapus.', 'success');
             await muatDataKeluargaKader();
           } catch (err) {
