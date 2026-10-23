@@ -4628,7 +4628,10 @@
     }
 
     async function editFormulirKeluargaLengkap(kodeKelTarget) {
-      if (!kodeKelTarget) return;
+      if (!kodeKelTarget) {
+        console.warn("Kode keluarga / No KK sasaran tidak valid.");
+        return;
+      }
       const targetBersih = String(kodeKelTarget).trim();
       modeEditKeluargaLuar = false;
 
@@ -4640,6 +4643,7 @@
       });
 
       try {
+        // 1. Tarik data keluarga dan seluruh anggotanya dari Supabase (bebas tanda petik ganda)
         const { data: kel, error: errKel } = await supabaseClient
           .from('keluarga')
           .select(`*, anggota_keluarga (*)`)
@@ -4650,6 +4654,7 @@
           throw new Error('Data keluarga tidak ditemukan di dalam database.');
         }
 
+        // 2. Tampilkan layar form sesuai role login
         if (userAktif && userAktif.role === 'USER_DESA') {
           tampilkanLayar('tampilan_formulir');
         } else {
@@ -4659,19 +4664,31 @@
 
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
 
-        const kdProv = String(kel.kode_prov || '52').padStart(2, '0');
-        const kdKab  = String(kel.kode_kab || '01').padStart(2, '0');
-        const kdKec  = String(kel.kode_kec || '').padStart(2, '0');
-        const kdDesa = String(kel.kode_desa || '').padStart(4, '0');
-        const kdDsn  = String(kel.kode_dusun || '').padStart(4, '0');
+        // 3. Normalisasi potongan kode wilayah agar kebal kode panjang (misal 5201082001 -> 2001)
+        const rawProv = String(kel.kode_prov || '52').trim();
+        const rawKab  = String(kel.kode_kab || '01').trim();
+        const rawKec  = String(kel.kode_kec || '').trim();
+        const rawDesa = String(kel.kode_desa || '').trim();
+        const rawDsn  = String(kel.kode_dusun || '').trim();
 
+        const kdProv = rawProv.length > 2 ? rawProv.slice(-2) : rawProv.padStart(2, '0');
+        const kdKab  = rawKab.length > 2 ? rawKab.slice(-2) : rawKab.padStart(2, '0');
+        const kdKec  = rawKec.length > 2 ? rawKec.slice(-2) : rawKec.padStart(2, '0');
+        const kdDesa = rawDesa.length > 4 ? rawDesa.slice(-4) : rawDesa.padStart(4, '0');
+        const kdDsn  = rawDsn.length > 4 ? rawDsn.slice(-4) : rawDsn.padStart(4, '0');
+
+        const intKec = parseInt(kdKec, 10);
+        const intDesa = parseInt(kdDesa, 10);
+        const intDsn = parseInt(kdDsn, 10);
+
+        // Helper menetapkan nilai ke semua elemen ID kembar
         const setValAll = (id, val) => {
           document.querySelectorAll(`[id="${id}"]`).forEach(el => {
             el.value = (val !== null && val !== undefined) ? val : '';
           });
         };
 
-        // Buka seluruh dropdown wilayah dan sembunyikan label statis
+        // Buka kunci semua dropdown wilayah
         document.querySelectorAll('#provinsi, #kabupaten, #kecamatan, #desa, #dusun, #rt').forEach(el => {
           el.classList.remove('hidden', 'bg-slate-100', 'cursor-not-allowed');
           el.disabled = false;
@@ -4680,7 +4697,7 @@
           el.classList.add('hidden');
         });
 
-        // 1. Provinsi
+        // a. Provinsi
         document.querySelectorAll('[id="provinsi"]').forEach(el => {
           el.innerHTML = '<option value="">-- PILIH PROVINSI --</option>';
           Object.keys(dataProvinsi || {}).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(k => {
@@ -4689,7 +4706,7 @@
           el.value = kdProv;
         });
 
-        // 2. Kabupaten
+        // b. Kabupaten
         document.querySelectorAll('[id="kabupaten"]').forEach(el => {
           el.innerHTML = '<option value="">-- PILIH KABUPATEN --</option>';
           const listKab = (dataKabupaten && dataKabupaten[kdProv]) ? dataKabupaten[kdProv] : {};
@@ -4699,7 +4716,7 @@
           el.value = kdKab;
         });
 
-        // 3. Kecamatan
+        // c. Kecamatan
         document.querySelectorAll('[id="kecamatan"]').forEach(el => {
           el.innerHTML = '<option value="">-- PILIH KECAMATAN --</option>';
           const listKec = (dataKecamatan && dataKecamatan[kdKab]) ? dataKecamatan[kdKab] : {};
@@ -4709,7 +4726,7 @@
           el.value = kdKec;
         });
 
-        // 4. Desa
+        // d. Desa
         const desaKey = kdKab + "_" + kdKec;
         document.querySelectorAll('[id="desa"]').forEach(el => {
           el.innerHTML = '<option value="">-- PILIH DESA --</option>';
@@ -4720,12 +4737,12 @@
           el.value = kdDesa;
         });
 
-        // 5. Dusun (Pencocokan numerik agar kebal dari perbedaan panjang 0100 vs 100)
-        const dsnSaring = (rawWilayahList || []).filter(w => 
-          parseInt(w.kode_kab, 10) === parseInt(kdKab, 10) &&
-          parseInt(w.kode_kec, 10) === parseInt(kdKec, 10) &&
-          parseInt(w.kode_desa, 10) === parseInt(kdDesa, 10)
-        );
+        // e. Dusun (Pencocokan fleksibel dengan membandingkan angka numerik)
+        const dsnSaring = (rawWilayahList || []).filter(w => {
+          const wKec = parseInt(w.kode_kec || w.kd_kec, 10);
+          const wDesa = parseInt(w.kode_desa || w.kd_desa, 10);
+          return (!isNaN(intKec) && wKec === intKec) && (!isNaN(intDesa) && wDesa === intDesa);
+        });
 
         document.querySelectorAll('[id="dusun"]').forEach(el => {
           el.innerHTML = '<option value="">-- PILIH RW/DUSUN --</option>';
@@ -4735,13 +4752,21 @@
             opt.setAttribute('data-rt', w.jumlah_rt || 1);
             el.add(opt);
           });
-          el.value = kdDsn;
+
+          // Pilih opsi dusun yang cocok baik berformat 0100 maupun 100
+          const opsiCocok = Array.from(el.options).find(o => parseInt(o.value, 10) === intDsn);
+          if (opsiCocok) {
+            el.value = opsiCocok.value;
+          } else {
+            el.value = kdDsn;
+          }
+
           el.disabled = false;
           el.classList.remove('bg-slate-100', 'cursor-not-allowed');
         });
 
-        // 6. RT
-        const dusunObj = dsnSaring.find(w => parseInt(w.kode_dusun, 10) === parseInt(kdDsn, 10));
+        // f. RT (Hitung opsi RT dusun terpilih & langsung pasang nilainya)
+        const dusunObj = dsnSaring.find(w => parseInt(w.kode_dusun, 10) === intDsn);
         const jmlRtMax = Math.max(dusunObj ? (dusunObj.jumlah_rt || 1) : 10, parseInt(kel.rt || 1, 10));
         const valRtBersih = String(parseInt(kel.rt || 1, 10)).padStart(3, '0');
 
@@ -4760,14 +4785,15 @@
           sinkronkanLabelWilayah();
         }
 
+        // 4. Set nilai input pokok identitas wilayah
         setValAll('kode_prov', kdProv);
         setValAll('kode_kab', kdKab);
         setValAll('kode_kec', kdKec);
         setValAll('kode_desa', kdDesa);
         setValAll('kode_dusun', kdDsn);
         setValAll('nomor_kk', kel.nomor_kk || '');
-        setValAll('kode_rumah', kel.kode_rumah || '001');
-        setValAll('no_urut_keluarga', kel.no_urut_keluarga || '001');
+        setValAll('kode_rumah', String(kel.kode_rumah || '001').padStart(3, '0'));
+        setValAll('no_urut_keluarga', String(kel.no_urut_keluarga || '001').padStart(3, '0'));
         setValAll('no_hp', kel.no_hp || '');
         setValAll('alamat_detail', kel.alamat_detail || '');
 
@@ -4781,7 +4807,15 @@
           evaluasiStatusKeluarga();
         }
 
-        // 7. Muat Anggota Individu Sesuai Jumlah Nyata
+        // Set geolokasi pratinjau jika ada
+        if (kel.latitude && kel.longitude) {
+          const latEl = document.getElementById('review_lat');
+          const lngEl = document.getElementById('review_lng');
+          if (latEl) latEl.innerText = kel.latitude;
+          if (lngEl) lngEl.innerText = kel.longitude;
+        }
+
+        // 5. Muat dan bangun Halaman Anggota Individu sesuai data riil
         const rawAnggota = Array.isArray(kel.anggota_keluarga) ? kel.anggota_keluarga : [];
         rawAnggota.sort((a, b) => (parseInt(a.nomor_anggota_keluarga, 10) || 0) - (parseInt(b.nomor_anggota_keluarga, 10) || 0));
 
@@ -4847,7 +4881,7 @@
           }
         });
 
-        // 8. Muat Blok KB
+        // 6. Muat Data Blok KB
         const toKodeBool = (val) => {
           if (val === true || val === '1' || val === 1) return '1';
           if (val === false || val === '2' || val === 2) return '2';
@@ -4879,7 +4913,7 @@
         dataNilaiKB.kb_09_info_efek_samping = toKodeBool(kel.kb_09_info_efek_samping);
         dataNilaiKB.kb_09_info_tindakan = toKodeBool(kel.kb_09_info_tindakan);
 
-        // 9. Muat Blok PK
+        // 7. Muat Data Blok PK (Mendukung nama kolom panjang dan pendek)
         const parseArrayPK = (val) => {
           if (!val) return [];
           if (Array.isArray(val)) return val;
@@ -4893,51 +4927,105 @@
 
         nilaiJawabanPK = {
           pk_01_ibadah: getValPK('pk_01_ibadah', 'pk_01'),
+          pk_01: getValPK('pk_01_ibadah', 'pk_01'),
           pk_02_toleransi_agama: getValPK('pk_02_toleransi_agama', 'pk_02'),
+          pk_02: getValPK('pk_02_toleransi_agama', 'pk_02'),
           pk_03_1_tanpa_sapa: getValPK('pk_03_1_tanpa_sapa', 'pk_03_1'),
+          pk_03_1: getValPK('pk_03_1_tanpa_sapa', 'pk_03_1'),
           pk_03_2_pisah_ranjang: getValPK('pk_03_2_pisah_ranjang', 'pk_03_2'),
+          pk_03_2: getValPK('pk_03_2_pisah_ranjang', 'pk_03_2'),
           pk_03_3_pergi_rumah: getValPK('pk_03_3_pergi_rumah', 'pk_03_3'),
+          pk_03_3: getValPK('pk_03_3_pergi_rumah', 'pk_03_3'),
           pk_03_4_kdrt: getValPK('pk_03_4_kdrt', 'pk_03_4'),
+          pk_03_4: getValPK('pk_03_4_kdrt', 'pk_03_4'),
           pk_03_5_kekerasan_anak: getValPK('pk_03_5_kekerasan_anak', 'pk_03_5'),
+          pk_03_5: getValPK('pk_03_5_kekerasan_anak', 'pk_03_5'),
           pk_04_anggota_sakit: getValPK('pk_04_anggota_sakit', 'pk_04'),
+          pk_04: getValPK('pk_04_anggota_sakit', 'pk_04'),
           pk_05_rekreasi: getValPK('pk_05_rekreasi', 'pk_05'),
+          pk_05: getValPK('pk_05_rekreasi', 'pk_05'),
           pk_06_kegiatan_sosial: getValPK('pk_06_kegiatan_sosial', 'pk_06'),
+          pk_06: getValPK('pk_06_kegiatan_sosial', 'pk_06'),
           pk_07_bantuan_orang_lain: getValPK('pk_07_bantuan_orang_lain', 'pk_07'),
+          pk_07: getValPK('pk_07_bantuan_orang_lain', 'pk_07'),
           pk_08_akses_sarana_publik: getValPK('pk_08_akses_sarana_publik', 'pk_08'),
+          pk_08: getValPK('pk_08_akses_sarana_publik', 'pk_08'),
           pk_09_aman_nyaman: getValPK('pk_09_aman_nyaman', 'pk_09'),
+          pk_09: getValPK('pk_09_aman_nyaman', 'pk_09'),
+
           pk_10_makan_dua_kali: getValPK('pk_10_makan_dua_kali', 'pk_10'),
+          pk_10: getValPK('pk_10_makan_dua_kali', 'pk_10'),
           pk_10_1_jenis_makanan: parseArrayPK(kel.pk_10_1_jenis_makanan || kel.pk_10_1),
+          pk_10_1: parseArrayPK(kel.pk_10_1_jenis_makanan || kel.pk_10_1),
+
           pk_11_akses_internet: getValPK('pk_11_akses_internet', 'pk_11'),
+          pk_11: getValPK('pk_11_akses_internet', 'pk_11'),
           pk_12_internet_anak: getValPK('pk_12_internet_anak', 'pk_12'),
+          pk_12: getValPK('pk_12_internet_anak', 'pk_12'),
           pk_13_sumber_penghasilan: getValPK('pk_13_sumber_penghasilan', 'pk_13'),
+          pk_13: getValPK('pk_13_sumber_penghasilan', 'pk_13'),
+
           pk_14_memiliki_aset: getValPK('pk_14_memiliki_aset', 'pk_14'),
+          pk_14: getValPK('pk_14_memiliki_aset', 'pk_14'),
           pk_14_1_jenis_aset: parseArrayPK(kel.pk_14_1_jenis_aset || kel.pk_14_1),
+          pk_14_1: parseArrayPK(kel.pk_14_1_jenis_aset || kel.pk_14_1),
+
           pk_15_interaksi_harian: getValPK('pk_15_interaksi_harian', 'pk_15'),
+          pk_15: getValPK('pk_15_interaksi_harian', 'pk_15'),
           pk_15_1_jenis_interaksi: parseArrayPK(kel.pk_15_1_jenis_interaksi || kel.pk_15_1),
+          pk_15_1: parseArrayPK(kel.pk_15_1_jenis_interaksi || kel.pk_15_1),
+
           pk_16_1_ayah_menemani_anak: getValPK('pk_16_1_ayah_menemani_anak', 'pk_16_1'),
+          pk_16_1: getValPK('pk_16_1_ayah_menemani_anak', 'pk_16_1'),
           pk_16_2_ayah_komunikasi: getValPK('pk_16_2_ayah_komunikasi', 'pk_16_2'),
+          pk_16_2: getValPK('pk_16_2_ayah_komunikasi', 'pk_16_2'),
           pk_16_3_ayah_hak_dasar: getValPK('pk_16_3_ayah_hak_dasar', 'pk_16_3'),
+          pk_16_3: getValPK('pk_16_3_ayah_hak_dasar', 'pk_16_3'),
           pk_16_4_ayah_pekerjaan_rumah: getValPK('pk_16_4_ayah_pekerjaan_rumah', 'pk_16_4'),
+          pk_16_4: getValPK('pk_16_4_ayah_pekerjaan_rumah', 'pk_16_4'),
+
           pk_17_1_jenis_atap: getValPK('pk_17_1_jenis_atap', 'pk_17_1'),
+          pk_17_1: getValPK('pk_17_1_jenis_atap', 'pk_17_1'),
           pk_17_2_kondisi_atap: getValPK('pk_17_2_kondisi_atap', 'pk_17_2'),
+          pk_17_2: getValPK('pk_17_2_kondisi_atap', 'pk_17_2'),
           pk_18_1_jenis_dinding: getValPK('pk_18_1_jenis_dinding', 'pk_18_1'),
+          pk_18_1: getValPK('pk_18_1_jenis_dinding', 'pk_18_1'),
           pk_18_2_kondisi_dinding: getValPK('pk_18_2_kondisi_dinding', 'pk_18_2'),
+          pk_18_2: getValPK('pk_18_2_kondisi_dinding', 'pk_18_2'),
           pk_19_1_jenis_lantai: getValPK('pk_19_1_jenis_lantai', 'pk_19_1'),
+          pk_19_1: getValPK('pk_19_1_jenis_lantai', 'pk_19_1'),
           pk_19_2_kondisi_lantai: getValPK('pk_19_2_kondisi_lantai', 'pk_19_2'),
+          pk_19_2: getValPK('pk_19_2_kondisi_lantai', 'pk_19_2'),
+
           pk_20_1_sumber_penerangan: getValPK('pk_20_1_sumber_penerangan', 'pk_20_1'),
+          pk_20_1: getValPK('pk_20_1_sumber_penerangan', 'pk_20_1'),
           pk_20_2_daya_listrik: getValPK('pk_20_2_daya_listrik', 'pk_20_2'),
+          pk_20_2: getValPK('pk_20_2_daya_listrik', 'pk_20_2'),
           pk_21_1_sumber_air_minum: getValPK('pk_21_1_sumber_air_minum', 'pk_21_1'),
+          pk_21_1: getValPK('pk_21_1_sumber_air_minum', 'pk_21_1'),
           pk_21_2_jarak_tinja: getValPK('pk_21_2_jarak_tinja', 'pk_21_2'),
+          pk_21_2: getValPK('pk_21_2_jarak_tinja', 'pk_21_2'),
+
           pk_22_fasilitas_jamban: getValPK('pk_22_fasilitas_jamban', 'pk_22'),
+          pk_22: getValPK('pk_22_fasilitas_jamban', 'pk_22'),
           pk_23_luas_rumah: getValPK('pk_23_luas_rumah', 'pk_23'),
+          pk_23: getValPK('pk_23_luas_rumah', 'pk_23'),
           pk_24_jumlah_menetap: getValPK('pk_24_jumlah_menetap', 'pk_24'),
+          pk_24: getValPK('pk_24_jumlah_menetap', 'pk_24'),
           pk_25_bahan_bakar_masak: getValPK('pk_25_bahan_bakar_masak', 'pk_25'),
+          pk_25: getValPK('pk_25_bahan_bakar_masak', 'pk_25'),
           pk_26_kepemilikan_rumah: getValPK('pk_26_kepemilikan_rumah', 'pk_26'),
+          pk_26: getValPK('pk_26_kepemilikan_rumah', 'pk_26'),
+
           pk_27_pesan_informasi: parseArrayPK(kel.pk_27_pesan_informasi || kel.pk_27),
+          pk_27: parseArrayPK(kel.pk_27_pesan_informasi || kel.pk_27),
           pk_28_sumber_informasi: parseArrayPK(kel.pk_28_sumber_informasi || kel.pk_28),
-          pk_29_persetujuan_keluarga: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29)
+          pk_28: parseArrayPK(kel.pk_28_sumber_informasi || kel.pk_28),
+          pk_29_persetujuan_keluarga: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29),
+          pk_29: parseArrayPK(kel.pk_29_persetujuan_keluarga || kel.pk_29)
         };
 
+        // 8. Mulai wizard langkah KB & PK dari awal
         indexStepKB = 0;
         riwayatStepKB = [];
         indexStepPK = 0;
@@ -4949,8 +5037,13 @@
         Swal.close();
 
       } catch (err) {
-        console.error("Gagal membuka form keluarga:", err);
-        Swal.fire('Error', err.message || 'Gagal membuka formulir data.', 'error');
+        console.error("Gagal membuka form keluarga lengkap:", err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Gagal Membuka Form',
+          text: err.message || 'Terjadi kesalahan saat memuat formulir edit data.',
+          confirmButtonColor: '#e11d48'
+        });
       }
     }
 
