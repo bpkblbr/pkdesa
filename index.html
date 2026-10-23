@@ -3967,34 +3967,62 @@
 
     function renderTabelCariEditKeluarga() {
       const tbody = document.getElementById('tbodyCariEditKeluarga');
+      if (!tbody) return;
+
       const keywordNama = (document.getElementById('cari_edit_cari_nama')?.value || '').toLowerCase().trim();
       const keywordNik = (document.getElementById('cari_edit_cari_nik')?.value || '').trim();
-
-      let data = dataCariEditCache;
-      if (keywordNama) data = data.filter(k => (k.nama_kk || '').toLowerCase().includes(keywordNama));
-      if (keywordNik) data = data.filter(k => (k.nik_kk || '').includes(keywordNik) || (k.nomor_kk || '').includes(keywordNik));
-
+      
+      let data = dataCariEditCache || [];
+      if (keywordNama) {
+        data = data.filter(k => (k.nama_kk || '').toLowerCase().includes(keywordNama));
+      }
+      if (keywordNik) {
+        data = data.filter(k => 
+          (k.nik_kk || '').includes(keywordNik) || 
+          (k.nomor_kk || '').includes(keywordNik)
+        );
+      }
+      
       const cbAll = document.getElementById('cb_pilih_semua_ce');
       if (cbAll) {
         cbAll.checked = false;
         cbAll.indeterminate = false;
         cbAll.classList.remove('accent-slate-400');
       }
-
-      document.getElementById('labelTotalCariEdit').innerText = `Total: ${data.length} Keluarga`;
-
+      
+      const lblTotal = document.getElementById('labelTotalCariEdit');
+      if (lblTotal) {
+        lblTotal.innerText = `Total: ${data.length} Keluarga`;
+      }
+      
       if (data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-semibold uppercase">Tidak ada data keluarga yang sesuai.</td></tr>`;
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="p-6 text-center text-slate-400 font-semibold uppercase">
+              Tidak ada data keluarga yang sesuai dengan kriteria pencarian.
+            </td>
+          </tr>
+        `;
         return;
       }
-
+      
       let html = '';
       data.forEach((k, idx) => {
-        const listAng = k.anggota_keluarga || [];
-        const kepala = listAng.find(a => String(a.hubungan_dengan_kk) === '1') || {};
+        const listAng = Array.isArray(k.anggota_keluarga) ? k.anggota_keluarga : [];
+        
+        const cleanNikKK = String(k.nik_kk || '').trim();
+        const kepala = listAng.find(a => cleanNikKK && String(a.nik || '').trim() === cleanNikKK)
+                    || listAng.find(a => String(a.hubungan_dengan_kk) === '1')
+                    || {};
+        
+        const namaKK = (k.nama_kk || kepala.nama_lengkap || '-').toUpperCase();
+        const nikKK = k.nik_kk || kepala.nik || '-';
+        
         const tglLahir = kepala.tanggal_lahir ? formatTglIndo(kepala.tanggal_lahir) : '-';
         const usia = kepala.tanggal_lahir ? hitungUsiaTahun(kepala.tanggal_lahir) : '-';
+        
         const kodeKeluarga = k.kode_keluarga || `${k.kode_prov || '52'}${k.kode_kab || '01'}${k.kode_kec || '08'}${k.kode_desa || '2001'}${k.kode_dusun || '0100'} ${k.rt || '001'}${k.kode_rumah || '001'}${k.no_urut_keluarga || '001'}`;
+        const targetAksiEscaped = String(k.kode_keluarga || k.nomor_kk || '').replace(/'/g, "\\'");
 
         html += `
           <tr class="hover:bg-slate-50 transition border-b">
@@ -4005,26 +4033,27 @@
             <td class="p-2.5 text-center font-bold text-slate-500">${idx + 1}</td>
             <td class="p-2.5 text-center">
               <div class="flex items-center justify-center gap-1.5">
-                <button type="button" onclick="bukaDetailKeluargaCariEditByIndex(${idx})" 
+                <button type="button" onclick="bukaDetailKeluargaCariEdit('${targetAksiEscaped}')" 
                         title="Buka Rincian Anggota Keluarga"
                         class="px-2 py-1 bg-[#205493] hover:bg-[#163f73] active:scale-95 text-white rounded-lg font-bold text-[10px] shadow-sm transition">
                   👨‍👩‍👧‍👦 Rincian
                 </button>
-                <button type="button" onclick="editFormulirKeluargaLengkapByIndex(${idx})" 
+                <button type="button" onclick="editFormulirKeluargaLengkap('${targetAksiEscaped}')" 
                         title="Edit Formulir Lengkap"
                         class="px-2 py-1 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white rounded-lg font-bold text-[10px] shadow-sm transition">
                   ✏️ Edit
                 </button>
               </div>
             </td>
-            <td class="p-2.5 font-bold text-slate-800 uppercase">${k.nama_kk || '-'}</td>
-            <td class="p-2.5 font-mono text-slate-600 font-semibold">${k.nik_kk || '-'}</td>
+            <td class="p-2.5 font-bold text-slate-800 uppercase">${namaKK}</td>
+            <td class="p-2.5 font-mono text-slate-600 font-semibold">${nikKK}</td>
             <td class="p-2.5 font-mono font-bold text-slate-700 text-[10.5px]">${kodeKeluarga}</td>
             <td class="p-2.5 text-center text-slate-600">${tglLahir}</td>
-            <td class="p-2.5 text-center font-bold text-slate-700">${usia}</td>
+            <td class="p-2.5 text-center font-black text-slate-800">${usia}</td>
           </tr>
         `;
       });
+
       tbody.innerHTML = html;
     }
 
