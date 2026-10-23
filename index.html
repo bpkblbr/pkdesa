@@ -2877,6 +2877,11 @@
 
     function kembaliKeDashboard() {
       if (userAktif && userAktif.role === 'USER_DESA') {
+        const sidebar = document.getElementById('adminty_sidebar');
+        const headerAdmin = document.querySelector('#tampilan_dashboard header');
+        if (sidebar) sidebar.classList.remove('hidden');
+        if (headerAdmin) headerAdmin.classList.remove('hidden');
+
         tampilkanLayar('tampilan_kader_app');
         navigasiKaderTab('data');
       } else {
@@ -4747,10 +4752,29 @@
         }
 
         // PERBAIKAN BLANK: Pastikan tampilan dashboard dan sub-view formulir yang aktif
-        tampilkanLayar('tampilan_dashboard');
-        document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
-        const targetSub = document.getElementById('sub_view_formulir');
-        if (targetSub) targetSub.classList.remove('hidden');
+        if (userAktif && userAktif.role === 'USER_DESA') {          
+          tampilkanLayar('tampilan_dashboard');
+          
+          const sidebar = document.getElementById('adminty_sidebar');
+          const headerAdmin = document.querySelector('#tampilan_dashboard header');
+          if (sidebar) sidebar.classList.add('hidden');
+          if (headerAdmin) headerAdmin.classList.add('hidden');
+
+          document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+          const targetSub = document.getElementById('sub_view_formulir');
+          if (targetSub) targetSub.classList.remove('hidden');
+        } else {          
+          tampilkanLayar('tampilan_dashboard');
+          
+          const sidebar = document.getElementById('adminty_sidebar');
+          const headerAdmin = document.querySelector('#tampilan_dashboard header');
+          if (sidebar) sidebar.classList.remove('hidden');
+          if (headerAdmin) headerAdmin.classList.remove('hidden');
+
+          document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+          const targetSub = document.getElementById('sub_view_formulir');
+          if (targetSub) targetSub.classList.remove('hidden');
+        }
 
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
 
