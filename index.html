@@ -2065,7 +2065,7 @@
           // 1. Kirim tabel keluarga
           const { error: errKel } = await supabaseClient
             .from('keluarga')
-            .upsert([item.keluarga], { onConflict: 'nomor_kk' });
+            .upsert([item.keluarga], { onConflict: 'kode_keluarga' });
           if (errKel) throw errKel;
 
           // 2. Kirim tabel anggota_keluarga
@@ -9043,7 +9043,7 @@
 
           const { error: errUpsert } = await supabaseClient
             .from('keluarga')
-            .upsert([payloadKKNonAktif], { onConflict: 'nomor_kk' });
+            .upsert([payloadKKNonAktif], { onConflict: 'kode_keluarga' });
 
           if (errUpsert) throw errUpsert;
 
@@ -11539,12 +11539,19 @@
 
         const { error: errKel } = await supabaseClient
           .from('keluarga')
-          .upsert([payloadKeluarga], { onConflict: 'nomor_kk' });
+          .upsert([payloadKeluarga], { onConflict: 'kode_keluarga' });
 
-        if (errKel) throw errKel;
+        if (errKel) throw errKel;        
+        
+        await supabaseClient
+          .from('anggota_keluarga')
+          .delete()
+          .eq('kode_keluarga', kodeKeluarga);
 
-        await supabaseClient.from('anggota_keluarga').delete().or(`kode_keluarga.eq."${kodeKeluarga}",nomor_kk.eq."${noKK}"`);
-        const { error: errAng } = await supabaseClient.from('anggota_keluarga').insert(payloadAnggota);
+        const { error: errAng } = await supabaseClient
+          .from('anggota_keluarga')
+          .insert(payloadAnggota);
+
         if (errAng) throw errAng;
 
         Swal.fire('Berhasil Disimpan!', 'Data keluarga dan seluruh anggota berhasil disimpan.', 'success').then(() => {
