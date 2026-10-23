@@ -3817,14 +3817,28 @@
 
       try {
         let query = supabaseClient.from('keluarga').select('*').order('kode_keluarga', { ascending: true }).range(0, 99999);
+        
+        if (kdDesa) {
+          const intDesa = parseInt(kdDesa, 10);
+          query = query.or(`kode_desa.eq.${kdDesa},kode_desa.eq.${intDesa},kode_desa.ilike.%${intDesa}%`);
+        } else if (kdKec) {
+          const intKec = parseInt(kdKec, 10);
+          query = query.or(`kode_kec.eq.${kdKec},kode_kec.eq.${intKec},kode_kec.ilike.%${intKec}%`);
+        } else if (kdKab) {
+          const intKab = parseInt(kdKab, 10);
+          query = query.or(`kode_kab.eq.${kdKab},kode_kab.eq.${intKab}`);
+        }
 
-        // Filter multi-format (mengakomodasi padding angka nol dan tanpa nol)
-        if (kdDesa) query = query.or(`kode_desa.eq.${kdDesa},kode_desa.eq.${parseInt(kdDesa, 10)}`);
-        else if (kdKec) query = query.or(`kode_kec.eq.${kdKec},kode_kec.eq.${parseInt(kdKec, 10)}`);
-        else if (kdKab) query = query.or(`kode_kab.eq.${kdKab},kode_kab.eq.${parseInt(kdKab, 10)}`);
+        if (kdDusun) {
+          const intDusun = parseInt(kdDusun, 10);
+          // Mencocokkan "0100", "100", atau string dusun yang mengandung angka tersebut
+          query = query.or(`kode_dusun.eq.${kdDusun},kode_dusun.eq.${intDusun},kode_dusun.ilike.%${intDusun}%`);
+        }
 
-        if (kdDusun) query = query.or(`kode_dusun.eq.${kdDusun},kode_dusun.eq.${parseInt(kdDusun, 10)}`);
-        if (noRt) query = query.or(`rt.eq.${noRt},rt.eq.${parseInt(noRt, 10)}`);
+        if (noRt) {
+          const intRt = parseInt(noRt, 10);
+          query = query.or(`rt.eq.${noRt},rt.eq.${intRt},rt.ilike.%${intRt}%`);
+        }
 
         if (inputNik) {
           query = query.or(`nik_kk.ilike.%${inputNik}%,nomor_kk.ilike.%${inputNik}%`);
