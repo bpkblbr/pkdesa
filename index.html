@@ -1489,11 +1489,8 @@
   <!-- ========================================================
        MODUL KHUSUS KADER PENDATA (MOBILE-FIRST UI)
        ======================================================== -->
-      <div id="tampilan_kader_app" class="halaman-tampilan min-h-screen bg-slate-200 sm:py-6">
-      <div class="max-w-md mx-auto min-h-screen sm:min-h-[844px] bg-[#f8fafc] shadow-2xl relative flex flex-col justify-between overflow-hidden sm:rounded-[2.5rem]">        
-        
-        <div class="flex-1 overflow-y-auto pb-20">          
-        </div>
+  <div id="tampilan_kader_app" class="halaman-tampilan min-h-screen bg-[#f8fafc] pb-28">
+    <div class="max-w-md mx-auto min-h-screen bg-[#f8fafc] shadow-2xl relative flex flex-col justify-between">
       
       <!-- ==================== SUB-HALAMAN 1: HOME ==================== -->
       <div id="kader_tab_home" class="kader-sub-halaman space-y-4">
@@ -1783,28 +1780,23 @@
         </div>
       </div>
 
-      <!-- ==================== BOTTOM NAVIGATION DENGAN LEKUKAN ==================== -->
-      <nav class="absolute bottom-0 left-0 right-0 z-40 bg-transparent select-none">
-        <div class="w-full relative">          
+      <!-- ==================== BOTTOM NAVIGATION (TERPADU & RAPI) ==================== -->
+      <nav class="fixed bottom-0 left-0 right-0 z-40 select-none">
+        <div class="max-w-md mx-auto relative">
           
-          <svg viewBox="0 0 400 68" class="w-full h-[68px] drop-shadow-[0_-4px_12px_rgba(0,0,0,0.06)] fill-white pointer-events-none">
+          <!-- Background SVG Melengkung Putih Bersih -->
+          <svg viewBox="0 0 400 68" class="w-full h-[68px] drop-shadow-[0_-4px_12px_rgba(0,0,0,0.08)] fill-white pointer-events-none">
             <path d="M 0,16 
-                    L 155,16 
-                    C 168,16 174,48 200,48 
-                    C 226,48 232,16 245,16 
-                    L 400,16 
-                    L 400,68 
-                    L 0,68 Z"></path>
+                     L 155,16 
+                     C 168,16 174,48 200,48 
+                     C 226,48 232,16 245,16 
+                     L 400,16 
+                     L 400,68 
+                     L 0,68 Z"></path>
           </svg>
-          
-          <div class="absolute inset-0 pt-4 flex items-center justify-between px-6">            
-          </div>
-          
-          <div class="absolute left-1/2 -top-5 -translate-x-1/2">            
-          </div>
 
-        </div>
-      </nav>
+          <!-- Baris 4 Tombol Menu -->
+          <div class="absolute inset-0 pt-4 flex items-center justify-between px-6">
             
             <!-- 1. HOME -->
             <button type="button" onclick="navigasiKaderTab('home')" id="kaderNavBtn_home" 
@@ -1844,11 +1836,10 @@
 
           </div>
 
-          <!-- TOMBOL APUNG TENGAH (FAB): DINAikkan (-top-5) DENGAN JARAK RENGGANG DARI LEKUKAN DASAR -->
+          <!-- TOMBOL APUNG TENGAH (FAB) -->
           <div class="absolute left-1/2 -top-5 -translate-x-1/2">
             <button type="button" id="kaderFabTambah" onclick="bukaFormulirKeluargaDariKader()" title="Tambah Data Baru"
                     class="w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-xl transition-all duration-200 active:scale-95">
-              <!-- Ikon Tambah (+) Warna Putih Bersih -->
               <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24">
                 <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
