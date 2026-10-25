@@ -1489,8 +1489,11 @@
   <!-- ========================================================
        MODUL KHUSUS KADER PENDATA (MOBILE-FIRST UI)
        ======================================================== -->
-  <div id="tampilan_kader_app" class="halaman-tampilan min-h-screen bg-slate-100 pb-28">
-    <div class="max-w-md mx-auto min-h-screen bg-[#f8fafc] shadow-2xl relative flex flex-col justify-between">
+      <div id="tampilan_kader_app" class="halaman-tampilan min-h-screen bg-slate-200 sm:py-6">
+      <div class="max-w-md mx-auto min-h-screen sm:min-h-[844px] bg-[#f8fafc] shadow-2xl relative flex flex-col justify-between overflow-hidden sm:rounded-[2.5rem]">        
+        
+        <div class="flex-1 overflow-y-auto pb-20">          
+        </div>
       
       <!-- ==================== SUB-HALAMAN 1: HOME ==================== -->
       <div id="kader_tab_home" class="kader-sub-halaman space-y-4">
@@ -1781,22 +1784,27 @@
       </div>
 
       <!-- ==================== BOTTOM NAVIGATION DENGAN LEKUKAN ==================== -->
-      <nav class="fixed bottom-0 left-0 right-0 z-40">
-        <div class="max-w-md mx-auto relative select-none">
+      <nav class="absolute bottom-0 left-0 right-0 z-40 bg-transparent select-none">
+        <div class="w-full relative">          
           
-          <!-- Background SVG Melengkung -->
-          <svg viewBox="0 0 400 68" class="w-full h-[68px] drop-shadow-[0_-4px_12px_rgba(0,0,0,0.08)] fill-white pointer-events-none">
+          <svg viewBox="0 0 400 68" class="w-full h-[68px] drop-shadow-[0_-4px_12px_rgba(0,0,0,0.06)] fill-white pointer-events-none">
             <path d="M 0,16 
-                     L 155,16 
-                     C 168,16 174,48 200,48 
-                     C 226,48 232,16 245,16 
-                     L 400,16 
-                     L 400,68 
-                     L 0,68 Z"></path>
+                    L 155,16 
+                    C 168,16 174,48 200,48 
+                    C 226,48 232,16 245,16 
+                    L 400,16 
+                    L 400,68 
+                    L 0,68 Z"></path>
           </svg>
+          
+          <div class="absolute inset-0 pt-4 flex items-center justify-between px-6">            
+          </div>
+          
+          <div class="absolute left-1/2 -top-5 -translate-x-1/2">            
+          </div>
 
-          <!-- Baris 4 Tombol Menu -->
-          <div class="absolute inset-0 pt-4 flex items-center justify-between px-6">
+        </div>
+      </nav>
             
             <!-- 1. HOME -->
             <button type="button" onclick="navigasiKaderTab('home')" id="kaderNavBtn_home" 
