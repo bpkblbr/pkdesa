@@ -1489,11 +1489,13 @@
   <!-- ========================================================
        MODUL KHUSUS KADER PENDATA (MOBILE-FIRST UI)
        ======================================================== -->
-  <div id="tampilan_kader_app" class="halaman-tampilan min-h-screen bg-[#f8fafc] pb-28">
-    <div class="max-w-md mx-auto min-h-screen bg-[#f8fafc] shadow-2xl relative flex flex-col justify-between">
+  <div id="tampilan_kader_app" class="halaman-tampilan min-h-screen bg-slate-100 sm:py-6 flex justify-center items-start">
+    
+    <!-- FRAME APLIKASI PONSEL TERPADU -->
+    <div class="w-full max-w-md bg-[#f8fafc] shadow-2xl relative flex flex-col sm:rounded-[2.5rem] overflow-hidden border border-slate-200/60">
       
       <!-- ==================== SUB-HALAMAN 1: HOME ==================== -->
-      <div id="kader_tab_home" class="kader-sub-halaman space-y-4">
+      <div id="kader_tab_home" class="kader-sub-halaman space-y-4 pb-6">
         <!-- Header Konsisten: Gradasi Hijau Tua ke Hijau Muda -->
         <div class="bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-600 p-5 pb-8 rounded-b-[2.5rem] shadow-md relative text-white min-h-[160px] flex flex-col justify-between">
           <div class="flex justify-between items-center">
@@ -1622,8 +1624,7 @@
       </div>
 
       <!-- ==================== SUB-HALAMAN 2: DATA ==================== -->
-      <div id="kader_tab_data" class="kader-sub-halaman hidden space-y-4">
-        <!-- Header Ukuran Sama Persis -->
+      <div id="kader_tab_data" class="kader-sub-halaman hidden space-y-4 pb-6">
         <div class="bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-600 p-5 pb-8 rounded-b-[2.5rem] shadow-md text-center text-white min-h-[160px] flex flex-col justify-center items-center">
           <h2 class="text-lg font-black tracking-wide uppercase drop-shadow-sm">Daftar Keluarga</h2>
           <p class="text-xs text-emerald-100 mt-1">Data sasaran keluarga pada RT penugasan aktif</p>
@@ -1643,16 +1644,13 @@
             </div>
           </div>
 
-          <!-- List Akordion Baris Keluarga -->
           <div id="kaderDaftarKkContainer" class="space-y-2 pt-1 pb-4">
-            <!-- Dirender dinamis oleh renderDaftarKeluargaKader() -->
           </div>
         </div>
       </div>
 
       <!-- ==================== SUB-HALAMAN 3: REKAP ==================== -->
-      <div id="kader_tab_rekap" class="kader-sub-halaman hidden space-y-4">
-        <!-- Header Ukuran Sama Persis -->
+      <div id="kader_tab_rekap" class="kader-sub-halaman hidden space-y-4 pb-6">
         <div class="bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-600 p-5 pb-8 rounded-b-[2.5rem] shadow-md text-center text-white min-h-[160px] flex flex-col justify-center items-center">
           <h2 class="text-lg font-black tracking-wide uppercase drop-shadow-sm">Rekap RT</h2>
           <p id="kaderRekapSubHeader" class="text-xs font-bold text-emerald-100 mt-1 uppercase">-</p>
@@ -1686,7 +1684,6 @@
             </div>
           </div>
 
-          <!-- Pilihan RW/Dusun & RT untuk Rekap Real-time -->
           <div class="grid grid-cols-2 gap-3 pt-1">
             <div>
               <label class="block font-bold text-slate-700 text-[11px] mb-1">RW / Dusun</label>
@@ -1702,7 +1699,6 @@
             </div>
           </div>
 
-          <!-- 7 Poin Agregat Real-Time -->
           <div class="border-t pt-3 space-y-2.5 font-semibold text-slate-800 text-xs">
             <div class="flex justify-between items-center">
               <span>1. Jumlah keluarga yang ada</span>
@@ -1737,8 +1733,7 @@
       </div>
 
       <!-- ==================== SUB-HALAMAN 4: PROFILE ==================== -->
-      <div id="kader_tab_profile" class="kader-sub-halaman hidden space-y-4">
-        <!-- Header Ukuran Sama Persis -->
+      <div id="kader_tab_profile" class="kader-sub-halaman hidden space-y-4 pb-6">
         <div class="bg-gradient-to-b from-emerald-900 via-emerald-800 to-teal-600 p-5 pb-8 rounded-b-[2.5rem] shadow-md text-center text-white min-h-[160px] flex flex-col justify-center items-center">
           <h2 class="text-lg font-black tracking-wide uppercase drop-shadow-sm">Profile</h2>
           <p id="kaderProfileSubHeader" class="text-xs font-bold text-emerald-100 mt-1 uppercase">-</p>
@@ -1780,12 +1775,12 @@
         </div>
       </div>
 
-      <!-- ==================== BOTTOM NAVIGATION (TERPADU & RAPI) ==================== -->
-      <nav class="fixed bottom-0 left-0 right-0 z-40 select-none">
-        <div class="max-w-md mx-auto relative">
+      <!-- ==================== BOTTOM NAVIGATION (MENEMPEL RAPAT DI DASAR KARTU) ==================== -->
+      <nav class="sticky bottom-0 z-40 select-none bg-[#f8fafc] w-full">
+        <div class="w-full relative h-[68px]">
           
-          <!-- Background SVG Melengkung Putih Bersih -->
-          <svg viewBox="0 0 400 68" class="w-full h-[68px] drop-shadow-[0_-4px_12px_rgba(0,0,0,0.08)] fill-white pointer-events-none">
+          <!-- Background SVG Melengkung Putih Bersih Menutup Rapat -->
+          <svg viewBox="0 0 400 68" class="w-full h-[68px] drop-shadow-[0_-4px_12px_rgba(0,0,0,0.06)] fill-white pointer-events-none">
             <path d="M 0,16 
                      L 155,16 
                      C 168,16 174,48 200,48 
@@ -1795,7 +1790,7 @@
                      L 0,68 Z"></path>
           </svg>
 
-          <!-- Baris 4 Tombol Menu -->
+          <!-- 4 Tombol Menu Utama -->
           <div class="absolute inset-0 pt-4 flex items-center justify-between px-6">
             
             <!-- 1. HOME -->
@@ -1836,7 +1831,7 @@
 
           </div>
 
-          <!-- TOMBOL APUNG TENGAH (FAB) -->
+          <!-- TOMBOL FAB (+) TENGAH -->
           <div class="absolute left-1/2 -top-5 -translate-x-1/2">
             <button type="button" id="kaderFabTambah" onclick="bukaFormulirKeluargaDariKader()" title="Tambah Data Baru"
                     class="w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-xl transition-all duration-200 active:scale-95">
