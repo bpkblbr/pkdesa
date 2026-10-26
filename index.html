@@ -2174,44 +2174,40 @@
     function bukaFormulirPendataan() {
       modeEditKeluargaLuar = false;      
 
-      // 1. CARI DAN PAKSA HILANGKAN SEMUA ELEMEN YANG MENEMPEL DI BAWAH LAYAR
-      document.querySelectorAll('*').forEach(el => {
-        const style = window.getComputedStyle(el);
-        // Jika elemen menempel di dasar layar (fixed/absolute di bottom) dan bukan bagian dari formulir
-        if ((style.position === 'fixed' || style.position === 'absolute') && 
-            style.bottom === '0px' && 
-            !el.closest('#sub_view_formulir')) {
-          console.log('Elemen pemotong ditemukan:', el);
-          el.style.setProperty('display', 'none', 'important');
-        }
-      });
+      // 1. PINDAHKAN LAYAR KE DASHBOARD FORMULIR TERLEBIH DAHULU
+      tampilkanLayar('tampilan_dashboard');
 
-      // 2. PASTIKAN SEMUA KONTAINER INDUK TIDAK MEMBATASI TINGGI
+      // 2. PAKSA SEMBUNYIKAN TAMPILAN APLIKASI KADER TOTAL
       const elTampilanKader = document.getElementById('tampilan_kader_app');
       if (elTampilanKader) {
-        elTampilanKader.style.display = 'none';
+        elTampilanKader.classList.add('hidden');
+        elTampilanKader.classList.remove('aktif');
+        elTampilanKader.style.setProperty('display', 'none', 'important');
       }
 
+      // 3. PASTIKAN DASHBOARD BERSIH (PUTIH) DAN BISA DIGULIR
       const elDashboard = document.getElementById('tampilan_dashboard');
       if (elDashboard) {
         elDashboard.style.backgroundColor = '#ffffff';
-        elDashboard.style.minHeight = '100dvh';
-        elDashboard.style.height = 'auto';
-        elDashboard.style.overflow = 'visible';
+        elDashboard.style.overflowY = 'auto'; // Pastikan scroll tetap aktif
       }
 
+      // 4. ATUR AREA KERJA UTAMA FORMULIR
       const mainArea = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
       if (mainArea) {
-        mainArea.style.paddingBottom = '80px'; // Ruang gulir aman di dasar HP
-        mainArea.style.overflow = 'visible';
+        mainArea.style.overflowY = 'auto'; // Tetap bisa digulir
+        mainArea.style.padding = '0px';    // Buang padding luar yang menyisakan celah
       }
 
-      // Lanjutkan alur tampilan form
-      tampilkanLayar('tampilan_dashboard');
+      // 5. TAMPILKAN SUB-VIEW FORMULIR
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
       const targetSub = document.getElementById('sub_view_formulir');
-      if (targetSub) targetSub.classList.remove('hidden');
+      if (targetSub) {
+        targetSub.classList.remove('hidden');
+        targetSub.style.paddingBottom = '40px'; // Ruang napas aman di dasar formulir
+      }
 
+      // 6. SEMBUNYIKAN KOMPONEN ADMIN
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
@@ -2921,8 +2917,11 @@
       if (breadcrumb) breadcrumb.classList.remove('hidden');
 
       if (userAktif && userAktif.role === 'USER_DESA') {
+        // Munculkan kembali tampilan kader saat keluar form
         const kaderApp = document.getElementById('tampilan_kader_app');
-        if (kaderApp) kaderApp.classList.remove('hidden');
+        if (kaderApp) {
+          kaderApp.classList.remove('hidden');
+        }
 
         tampilkanLayar('tampilan_kader_app');
         navigasiKaderTab('data');
@@ -4765,11 +4764,20 @@
       if (!kodeKelTarget) return;
       const targetBersih = String(kodeKelTarget).trim();
 
-      // Atur mode edit alur
       if (userAktif && userAktif.role === 'USER_DESA') {
-        modeEditKeluargaLuar = false; // Kader: melewati rincian anggota
-      } else {
-        modeEditKeluargaLuar = true;  // Admin: langsung melompat ke Blok KB
+        // 1. SEMBUNYIKAN TOTAL TAMPILAN KADER APP
+        const kaderApp = document.getElementById('tampilan_kader_app');
+        if (kaderApp) {
+          kaderApp.classList.add('hidden');
+          kaderApp.classList.remove('aktif');
+        }
+
+        // 2. MUNCULKAN TAMPILAN DASHBOARD FORMULIR
+        tampilkanLayar('tampilan_dashboard');
+
+        if (sidebar) sidebar.classList.add('hidden');
+        if (headerAdmin) headerAdmin.classList.add('hidden');
+        if (breadcrumb) breadcrumb.classList.add('hidden');
       }
 
       Swal.fire({
