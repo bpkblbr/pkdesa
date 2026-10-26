@@ -318,7 +318,7 @@
       </aside>
 
       <!-- 3. KONTEN AREA KERJA DINAMIS (ADMIN SUB-VIEWS) -->
-      <main class="flex-1 p-4 sm:p-6 lg:p-8 space-y-5 overflow-y-auto min-w-0">        
+      <main class="flex-1 p-0 sm:p-6 lg:p-8 space-y-0 sm:space-y-5 overflow-y-auto min-w-0">
 
         <!-- ========================================================
              SUB-VIEW 1: BERANDA RINGKASAN EKSEKUTIF
@@ -1018,24 +1018,25 @@
         <!-- ========================================================
              SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
-        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-5">
-          <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-slate-200 form-uppercase">
-            <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-t-2xl shadow-sm">              
+        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
+          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-hidden border-0 sm:border border-slate-200 form-uppercase">            
+            
+            <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-sm">              
+              
               <div class="flex items-center justify-between pb-2 border-b border-white/10">
                 <button type="button" onclick="kembaliKeDashboard()" 
                         class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
                   <span>←</span>
                   <span>Kembali ke Beranda</span>
                 </button>
-              </div>              
+              </div>
               
               <div class="py-2.5 text-center">
                 <h3 class="text-base sm:text-lg font-black uppercase tracking-wide drop-shadow-sm">
                   FORM PENDATAAN KELUARGA
                 </h3>
               </div>
-
-              <!-- Baris 3: Label Indikator Tahapan di Kiri Bawah -->
+              
               <div class="flex items-center gap-1.5 pt-1 border-t border-white/10">
                 <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
                 <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
