@@ -1496,7 +1496,7 @@
   <!-- ========================================================
        MODUL KHUSUS KADER PENDATA (MOBILE-FIRST UI)
        ======================================================== -->
-  <div id="tampilan_kader_app" class="halaman-tampilan h-[100dvh] w-full bg-slate-100 flex justify-center items-end sm:items-center overflow-hidden">
+  <div id="tampilan_kader_app" class="halaman-tampilan min-h-[100dvh] w-full bg-slate-100 flex justify-center items-start sm:items-center overflow-y-auto">
     
     <!-- FRAME UTAMA: FULLSCREEN DI HP (EDGE-TO-EDGE), KARTU ELEGAN DI DESKTOP -->
     <div class="w-full max-w-md h-[100dvh] sm:h-[90vh] sm:max-h-[860px] bg-[#f8fafc] sm:shadow-2xl relative flex flex-col sm:rounded-[2.5rem] overflow-hidden sm:border sm:border-slate-200/60">
@@ -2179,13 +2179,16 @@
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
       const mainKonten = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
 
-      if (userAktif && userAktif.role === 'USER_DESA') {
+      if (userAktif && userAktif.role === 'USER_DESA') {        
+        const kaderApp = document.getElementById('tampilan_kader_app');
+        if (kaderApp) kaderApp.classList.add('hidden');
+
         tampilkanLayar('tampilan_dashboard');
-        
-        // Hapus ruang sela navigasi bawah di layar ponsel saat berada di form
-        if (mainKonten) {
-          mainKonten.classList.remove('pb-16', 'pb-20', 'pb-24');
-          mainKonten.classList.add('pb-0');
+
+        const dash = document.getElementById('tampilan_dashboard');
+        if (dash) {
+          dash.classList.remove('bg-[#F6F7FB]', 'bg-slate-100');
+          dash.classList.add('bg-white');
         }
 
         if (sidebar) sidebar.classList.add('hidden');
@@ -2914,8 +2917,7 @@
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
       const mainKonten = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
-
-      // Pasang kembali padding bawah cadangan untuk halaman dengan navigation bar
+      
       if (mainKonten) {
         mainKonten.classList.remove('pb-0');
         mainKonten.classList.add('pb-20'); // Sesuaikan ukuran kelas asli di file Anda (misal pb-16 atau pb-20)
@@ -2926,11 +2928,11 @@
       if (breadcrumb) breadcrumb.classList.remove('hidden');
 
       if (userAktif && userAktif.role === 'USER_DESA') {
+        const kaderApp = document.getElementById('tampilan_kader_app');
+        if (kaderApp) kaderApp.classList.remove('hidden');
+
         tampilkanLayar('tampilan_kader_app');
         navigasiKaderTab('data');
-      } else {
-        terapkanDataSesiUser();
-        tampilkanLayar('tampilan_dashboard');
       }
     }
 
