@@ -18,7 +18,34 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>  
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-  <style>
+  <style>    
+    @media (max-width: 640px) {      
+      #tampilan_dashboard,
+      #tampilan_dashboard.halaman-tampilan {
+        background-color: #ffffff !important;
+        min-height: 100% !important;
+        height: auto !important;
+        overflow-y: visible !important;
+      }
+      
+      #tampilan_dashboard main {
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
+        /* Ruang napas aman di paling dasar layar agar konten terakhir tidak terpotong */
+        padding-bottom: 80px !important;
+      }
+      
+      #sub_view_formulir > div {
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        min-height: 100% !important;
+      }
+    }
+    
     .form-uppercase input[type="text"], 
     .form-uppercase textarea, 
     .form-uppercase select {
