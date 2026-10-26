@@ -4764,21 +4764,40 @@
       if (!kodeKelTarget) return;
       const targetBersih = String(kodeKelTarget).trim();
 
+      modeEditKeluargaLuar = true;
+
+      // Deklarasikan variabel elemen agar tidak ReferenceError
+      const sidebar = document.getElementById('adminty_sidebar');
+      const headerAdmin = document.querySelector('#tampilan_dashboard header');
+      const breadcrumb = document.getElementById('barBreadcrumbAdmin');
+      const dash = document.getElementById('tampilan_dashboard');
+      
+      tampilkanLayar('tampilan_dashboard');
+
       if (userAktif && userAktif.role === 'USER_DESA') {
-        // 1. SEMBUNYIKAN TOTAL TAMPILAN KADER APP
         const kaderApp = document.getElementById('tampilan_kader_app');
         if (kaderApp) {
           kaderApp.classList.add('hidden');
           kaderApp.classList.remove('aktif');
+          kaderApp.style.setProperty('display', 'none', 'important');
         }
 
-        // 2. MUNCULKAN TAMPILAN DASHBOARD FORMULIR
-        tampilkanLayar('tampilan_dashboard');
+        if (dash) {
+          dash.classList.replace('bg-slate-100', 'bg-white');
+        }
 
         if (sidebar) sidebar.classList.add('hidden');
         if (headerAdmin) headerAdmin.classList.add('hidden');
         if (breadcrumb) breadcrumb.classList.add('hidden');
+      } else {
+        if (sidebar) sidebar.classList.remove('hidden');
+        if (headerAdmin) headerAdmin.classList.remove('hidden');
+        if (breadcrumb) breadcrumb.classList.remove('hidden');
       }
+      
+      document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
+      const targetSub = document.getElementById('sub_view_formulir');
+      if (targetSub) targetSub.classList.remove('hidden');
 
       Swal.fire({
         title: 'Memuat Data Keluarga...',
@@ -4798,39 +4817,8 @@
           throw new Error('Data keluarga tidak ditemukan di dalam database.');
         }
 
-        // PERBAIKAN BLANK: Pastikan tampilan dashboard dan sub-view formulir yang aktif
-        if (userAktif && userAktif.role === 'USER_DESA') {          
-          tampilkanLayar('tampilan_dashboard');
-
-          const dash = document.getElementById('tampilan_dashboard');
-          if (dash) {
-            dash.classList.replace('bg-slate-100', 'bg-white');
-          }
-          
-          const sidebar = document.getElementById('adminty_sidebar');
-          const headerAdmin = document.querySelector('#tampilan_dashboard header');
-          if (sidebar) sidebar.classList.add('hidden');
-          if (headerAdmin) headerAdmin.classList.add('hidden');
-
-          document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
-          const targetSub = document.getElementById('sub_view_formulir');
-          if (targetSub) targetSub.classList.remove('hidden');
-        } else {          
-          tampilkanLayar('tampilan_dashboard');
-          
-          const sidebar = document.getElementById('adminty_sidebar');
-          const headerAdmin = document.querySelector('#tampilan_dashboard header');
-          if (sidebar) sidebar.classList.remove('hidden');
-          if (headerAdmin) headerAdmin.classList.remove('hidden');
-
-          document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
-          const targetSub = document.getElementById('sub_view_formulir');
-          if (targetSub) targetSub.classList.remove('hidden');
-        }
-
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
-
-        // Normalisasi kode wilayah
+        
         const rawProv = String(kel.kode_prov || '52').trim();
         const rawKab  = String(kel.kode_kab || '01').trim();
         const rawKec  = String(kel.kode_kec || '').trim();
@@ -4852,8 +4840,7 @@
             el.value = (val !== null && val !== undefined) ? val : '';
           });
         };
-
-        // Buka kunci seluruh menu wilayah
+        
         document.querySelectorAll('#provinsi, #kabupaten, #kecamatan, #desa, #dusun, #rt').forEach(el => {
           el.classList.remove('hidden', 'bg-slate-100', 'cursor-not-allowed');
           el.disabled = false;
@@ -4861,8 +4848,7 @@
         document.querySelectorAll('#label_provinsi, #label_kabupaten, #label_kecamatan, #label_desa').forEach(el => {
           el.classList.add('hidden');
         });
-
-        // 1. Dropdown Provinsi, Kab, Kec, Desa
+        
         document.querySelectorAll('[id="provinsi"]').forEach(el => {
           el.innerHTML = '<option value="">-- PILIH PROVINSI --</option>';
           Object.keys(dataProvinsi || {}).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach(k => {
@@ -4898,8 +4884,7 @@
           });
           el.value = kdDesa;
         });
-
-        // 2. Dropdown Dusun & RT
+        
         const dsnSaring = (rawWilayahList || []).filter(w => {
           const wKec = parseInt(w.kode_kec || w.kd_kec, 10);
           const wDesa = parseInt(w.kode_desa || w.kd_desa, 10);
@@ -4956,8 +4941,7 @@
         });
 
         if (typeof evaluasiStatusKeluarga === 'function') evaluasiStatusKeluarga();
-
-        // 3. Muat Data Anggota Keluarga
+        
         const rawAnggota = Array.isArray(kel.anggota_keluarga) ? kel.anggota_keluarga : [];
         rawAnggota.sort((a, b) => (parseInt(a.nomor_anggota_keluarga, 10) || 0) - (parseInt(b.nomor_anggota_keluarga, 10) || 0));
 
@@ -5018,8 +5002,7 @@
             });
           }
         });
-
-        // 4. PEMETAAN BLOK KB (FLEKSIBEL TIPE DATA)
+        
         const toStrKode = (val) => {
           if (val === true || val === 1 || val === '1') return '1';
           if (val === false || val === 2 || val === '2') return '2';
@@ -5050,8 +5033,7 @@
         dataNilaiKB.kb_09_info_jenis = toStrKode(kel.kb_09_info_jenis);
         dataNilaiKB.kb_09_info_efek_samping = toStrKode(kel.kb_09_info_efek_samping);
         dataNilaiKB.kb_09_info_tindakan = toStrKode(kel.kb_09_info_tindakan);
-
-        // 5. PEMETAAN BLOK PK (MENDUKUNG KUNCI PANJANG MAUPUN PENDEK)
+        
         const parseArrayPK = (val) => {
           if (!val) return [];
           if (Array.isArray(val)) return val.map(String);
@@ -5064,8 +5046,7 @@
         };
 
         nilaiJawabanPK = {};
-
-        // Petakan pasangan kunci secara otomatis ke nilaiJawabanPK
+        
         const mappingPK = [
           ['pk_01_ibadah', 'pk_01'], ['pk_02_toleransi_agama', 'pk_02'],
           ['pk_03_1_tanpa_sapa', 'pk_03_1'], ['pk_03_2_pisah_ranjang', 'pk_03_2'],
@@ -5109,8 +5090,7 @@
           nilaiJawabanPK[kPjg] = arr;
           nilaiJawabanPK[kPdk] = arr;
         });
-
-        // 6. Mulai wizard langkah KB & PK dari awal
+        
         indexStepKB = 0;
         riwayatStepKB = [];
         indexStepPK = 0;
@@ -5131,8 +5111,7 @@
         });
       }
     }
-
-    // Penerjemah Wilayah yang Kebal Format Padding 0 (Menghindari Nama Dusun Berupa Kode)
+    
     function terjemahkanWilayahKeNama(k) {
       const listWil = window.rawWilayahList || rawWilayahList || [];
 
