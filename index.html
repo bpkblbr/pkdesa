@@ -2177,22 +2177,20 @@
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
-      const dash = document.getElementById('tampilan_dashboard');
+      const mainKonten = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
 
       if (userAktif && userAktif.role === 'USER_DESA') {
-        tampilkanLayar('tampilan_dashboard');        
+        tampilkanLayar('tampilan_dashboard');
         
-        if (dash) dash.classList.replace('bg-slate-100', 'bg-white');
+        // Hapus ruang sela navigasi bawah di layar ponsel saat berada di form
+        if (mainKonten) {
+          mainKonten.classList.remove('pb-16', 'pb-20', 'pb-24');
+          mainKonten.classList.add('pb-0');
+        }
 
         if (sidebar) sidebar.classList.add('hidden');
         if (headerAdmin) headerAdmin.classList.add('hidden');
         if (breadcrumb) breadcrumb.classList.add('hidden');
-      } else {        
-        if (dash) dash.classList.replace('bg-white', 'bg-slate-100');
-
-        if (sidebar) sidebar.classList.remove('hidden');
-        if (headerAdmin) headerAdmin.classList.remove('hidden');
-        if (breadcrumb) breadcrumb.classList.remove('hidden');
       }
 
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
@@ -2915,9 +2913,13 @@
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
-      const dash = document.getElementById('tampilan_dashboard');
-      
-      if (dash) dash.classList.replace('bg-white', 'bg-slate-100');
+      const mainKonten = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
+
+      // Pasang kembali padding bawah cadangan untuk halaman dengan navigation bar
+      if (mainKonten) {
+        mainKonten.classList.remove('pb-0');
+        mainKonten.classList.add('pb-20'); // Sesuaikan ukuran kelas asli di file Anda (misal pb-16 atau pb-20)
+      }
 
       if (sidebar) sidebar.classList.remove('hidden');
       if (headerAdmin) headerAdmin.classList.remove('hidden');
