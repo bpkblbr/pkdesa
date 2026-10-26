@@ -1045,7 +1045,7 @@
               </div>
             </header>
 
-            <form id="pendataanForm" novalidate class="p-4 sm:p-7 space-y-6">
+            <form id="pendataanForm" class="p-4 sm:p-6 pb-24 sm:pb-6">
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
               <div id="hal_wilayah" class="halaman-form aktif space-y-5">
                 <div class="border-b pb-2">
@@ -1154,9 +1154,14 @@
                   </div>
                 </div>
 
-                <div class="flex justify-end pt-5">
-                  <button type="button" id="btnAksiWilayah" onclick="prosesAksiWilayah()" class="px-6 py-2.5 bg-[#0284c7] hover:bg-[#0369a1] text-white font-semibold rounded-lg shadow-sm transition text-xs sm:text-sm">
-                    Selanjutnya &rarr;
+                <div class="fixed sm:static bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-t border-slate-200/80 px-4 py-3 flex justify-between items-center sm:border-0 sm:p-0 sm:pt-5 sm:bg-transparent shadow-[0_-4px_12px_rgba(0,0,0,0.05)] sm:shadow-none">                
+                  <div>                  
+                  </div>
+                  
+                  <button type="button" id="btnAksiWilayah" onclick="prosesAksiWilayah()" 
+                          class="px-6 py-2.5 bg-[#0284c7] hover:bg-[#0369a1] active:scale-95 text-white font-bold rounded-xl shadow-md transition text-xs sm:text-sm flex items-center gap-1.5 ml-auto">
+                    <span>Selanjutnya</span>
+                    <span>&rarr;</span>
                   </button>
                 </div>
               </div>
