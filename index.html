@@ -1019,7 +1019,7 @@
              SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
         <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
-          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-hidden border-0 sm:border border-slate-200 form-uppercase">            
+          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-hidden border-0 sm:border border-slate-200 form-uppercase min-h-[100dvh] sm:min-h-0 flex flex-col justify-between">            
             
             <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-sm">              
               
@@ -2176,16 +2176,22 @@
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
+      const dash = document.getElementById('tampilan_dashboard');
 
       if (userAktif && userAktif.role === 'USER_DESA') {
-        tampilkanLayar('tampilan_dashboard');
+        tampilkanLayar('tampilan_dashboard');        
+        
+        if (dash) dash.classList.replace('bg-slate-100', 'bg-white');
+
         if (sidebar) sidebar.classList.add('hidden');
         if (headerAdmin) headerAdmin.classList.add('hidden');
-        if (breadcrumb) breadcrumb.classList.add('hidden'); // Sembunyikan untuk Pendata
-      } else {
+        if (breadcrumb) breadcrumb.classList.add('hidden');
+      } else {        
+        if (dash) dash.classList.replace('bg-white', 'bg-slate-100');
+
         if (sidebar) sidebar.classList.remove('hidden');
         if (headerAdmin) headerAdmin.classList.remove('hidden');
-        if (breadcrumb) breadcrumb.classList.remove('hidden'); // Tampilkan untuk Admin
+        if (breadcrumb) breadcrumb.classList.remove('hidden');
       }
 
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
@@ -2908,6 +2914,9 @@
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
+      const dash = document.getElementById('tampilan_dashboard');
+      
+      if (dash) dash.classList.replace('bg-white', 'bg-slate-100');
 
       if (sidebar) sidebar.classList.remove('hidden');
       if (headerAdmin) headerAdmin.classList.remove('hidden');
@@ -4786,6 +4795,11 @@
         // PERBAIKAN BLANK: Pastikan tampilan dashboard dan sub-view formulir yang aktif
         if (userAktif && userAktif.role === 'USER_DESA') {          
           tampilkanLayar('tampilan_dashboard');
+
+          const dash = document.getElementById('tampilan_dashboard');
+          if (dash) {
+            dash.classList.replace('bg-slate-100', 'bg-white');
+          }
           
           const sidebar = document.getElementById('adminty_sidebar');
           const headerAdmin = document.querySelector('#tampilan_dashboard header');
