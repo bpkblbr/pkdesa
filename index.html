@@ -2909,7 +2909,7 @@
       
       if (mainKonten) {
         mainKonten.classList.remove('pb-0');
-        mainKonten.classList.add('pb-20'); // Sesuaikan ukuran kelas asli di file Anda (misal pb-16 atau pb-20)
+        mainKonten.classList.add('pb-20');
       }
 
       if (sidebar) sidebar.classList.remove('hidden');
@@ -2917,14 +2917,19 @@
       if (breadcrumb) breadcrumb.classList.remove('hidden');
 
       if (userAktif && userAktif.role === 'USER_DESA') {
-        // Munculkan kembali tampilan kader saat keluar form
         const kaderApp = document.getElementById('tampilan_kader_app');
         if (kaderApp) {
+          // 1. Bersihkan inline style display: none !important
+          kaderApp.style.removeProperty('display');
           kaderApp.classList.remove('hidden');
         }
 
+        // 2. Tampilkan kembali layar aplikasi kader
         tampilkanLayar('tampilan_kader_app');
         navigasiKaderTab('data');
+      } else {
+        terapkanDataSesiUser();
+        tampilkanLayar('tampilan_dashboard');
       }
     }
 
