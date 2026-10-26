@@ -1489,13 +1489,13 @@
   <!-- ========================================================
        MODUL KHUSUS KADER PENDATA (MOBILE-FIRST UI)
        ======================================================== -->
-  <div id="tampilan_kader_app" class="halaman-tampilan h-screen w-full bg-slate-100 flex justify-center items-center overflow-hidden">
+  <div id="tampilan_kader_app" class="halaman-tampilan h-[100dvh] w-full bg-slate-100 flex justify-center items-end sm:items-center overflow-hidden">
     
-    <!-- FRAME APLIKASI PONSEL TERPADU (VIEWPORT HP) -->
-    <div class="w-full max-w-md h-full sm:h-[92vh] sm:max-h-[880px] bg-[#f8fafc] shadow-2xl relative flex flex-col sm:rounded-[2.5rem] overflow-hidden border border-slate-200/60">
+    <!-- FRAME UTAMA: FULLSCREEN DI HP (EDGE-TO-EDGE), KARTU ELEGAN DI DESKTOP -->
+    <div class="w-full max-w-md h-[100dvh] sm:h-[90vh] sm:max-h-[860px] bg-[#f8fafc] sm:shadow-2xl relative flex flex-col sm:rounded-[2.5rem] overflow-hidden sm:border sm:border-slate-200/60">
       
-      <!-- AREA KONTEN YANG DAPAT DIGULIR (SCROLLABLE AREA) -->
-      <div class="flex-1 overflow-y-auto pb-6 scroll-smooth">
+      <!-- AREA KONTEN SCROLLABLE (DIBERI PADDING BAWAH CUKUP SUPAYA TIDAK KETUTUP NAV) -->
+      <div class="flex-1 overflow-y-auto pb-24 scroll-smooth">
 
         <!-- ==================== SUB-HALAMAN 1: HOME ==================== -->
         <div id="kader_tab_home" class="kader-sub-halaman space-y-4">
@@ -1780,8 +1780,8 @@
       </div>
       <!-- AKHIR DARI AREA KONTEN SCROLLABLE -->
 
-      <!-- ==================== BOTTOM NAVIGATION (DIKUNCI STATIS DI DASAR FRAME) ==================== -->
-      <nav class="shrink-0 w-full select-none bg-[#f8fafc] z-40 relative">
+      <!-- ==================== BOTTOM NAVIGATION (TERKUNCI RAPAT DI UJUNG BAWAH) ==================== -->
+      <nav class="fixed sm:absolute bottom-0 left-0 right-0 sm:left-auto sm:right-auto sm:w-full z-40 select-none bg-white">
         <div class="w-full relative h-[68px]">
           
           <!-- Background SVG Melengkung Putih Bersih Menutup Rapat -->
