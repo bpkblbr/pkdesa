@@ -2173,58 +2173,51 @@
 
     function bukaFormulirPendataan() {
       modeEditKeluargaLuar = false;      
-      
-      const breadcrumb = document.getElementById('barBreadcrumbAdmin');
-      const sidebar = document.getElementById('adminty_sidebar');
-      const headerAdmin = document.querySelector('#tampilan_dashboard header');
-      const mainKonten = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
 
-      if (userAktif && userAktif.role === 'USER_DESA') {        
-        const kaderApp = document.getElementById('tampilan_kader_app');
-        if (kaderApp) kaderApp.classList.add('hidden');
-
-        tampilkanLayar('tampilan_dashboard');
-
-        const dash = document.getElementById('tampilan_dashboard');
-        if (dash) {
-          dash.classList.remove('bg-[#F6F7FB]', 'bg-slate-100');
-          dash.classList.add('bg-white');
+      // 1. CARI DAN PAKSA HILANGKAN SEMUA ELEMEN YANG MENEMPEL DI BAWAH LAYAR
+      document.querySelectorAll('*').forEach(el => {
+        const style = window.getComputedStyle(el);
+        // Jika elemen menempel di dasar layar (fixed/absolute di bottom) dan bukan bagian dari formulir
+        if ((style.position === 'fixed' || style.position === 'absolute') && 
+            style.bottom === '0px' && 
+            !el.closest('#sub_view_formulir')) {
+          console.log('Elemen pemotong ditemukan:', el);
+          el.style.setProperty('display', 'none', 'important');
         }
+      });
 
-        if (sidebar) sidebar.classList.add('hidden');
-        if (headerAdmin) headerAdmin.classList.add('hidden');
-        if (breadcrumb) breadcrumb.classList.add('hidden');
+      // 2. PASTIKAN SEMUA KONTAINER INDUK TIDAK MEMBATASI TINGGI
+      const elTampilanKader = document.getElementById('tampilan_kader_app');
+      if (elTampilanKader) {
+        elTampilanKader.style.display = 'none';
       }
 
+      const elDashboard = document.getElementById('tampilan_dashboard');
+      if (elDashboard) {
+        elDashboard.style.backgroundColor = '#ffffff';
+        elDashboard.style.minHeight = '100dvh';
+        elDashboard.style.height = 'auto';
+        elDashboard.style.overflow = 'visible';
+      }
+
+      const mainArea = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
+      if (mainArea) {
+        mainArea.style.paddingBottom = '80px'; // Ruang gulir aman di dasar HP
+        mainArea.style.overflow = 'visible';
+      }
+
+      // Lanjutkan alur tampilan form
+      tampilkanLayar('tampilan_dashboard');
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
       const targetSub = document.getElementById('sub_view_formulir');
       if (targetSub) targetSub.classList.remove('hidden');
 
-      const form = document.getElementById('pendataanForm');
-      if (form) form.reset();
-
-      const kontainerAnggota = document.getElementById('area_anggota_keluarga');
-      if (kontainerAnggota) kontainerAnggota.innerHTML = '';
-      totalHalamanAnggota = 0;
-
-      pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
-      inisialisasiWilayahSesuaiRole();
-      
-      const selStatus = document.getElementById('status_keluarga');
-      if (selStatus) {
-        selStatus.value = '6';
-        selStatus.disabled = true;
-        selStatus.classList.add('bg-slate-100', 'cursor-not-allowed');
-      }
-
-      for (let k in dataNilaiKB) dataNilaiKB[k] = '';
-      nilaiJawabanPK = {};
-      indexStepKB = 0;
-      riwayatStepKB = [];
-      indexStepPK = 0;
-      riwayatStepPK = [];
-
-      evaluasiStatusKeluarga();
+      const sidebar = document.getElementById('adminty_sidebar');
+      const headerAdmin = document.querySelector('#tampilan_dashboard header');
+      const breadcrumb = document.getElementById('barBreadcrumbAdmin');
+      if (sidebar) sidebar.classList.add('hidden');
+      if (headerAdmin) headerAdmin.classList.add('hidden');
+      if (breadcrumb) breadcrumb.classList.add('hidden');
     }
 
     function resetHalamanCariEdit() {
