@@ -9168,10 +9168,18 @@
       hal.setAttribute('data-urutan', no);
 
       hal.innerHTML = `
-
-        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 pt-1">
+        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 pt-1 border-b pb-2">
           <div>No Anggota: <span class="font-bold text-slate-900">${no}</span></div>
           <div>Jumlah Keluarga: <span class="font-bold text-slate-900 total-anggota-display">${totalHalamanAnggota}</span></div>
+        </div>
+
+        <!-- TOMBOL HAPUS MANDIRI SETIAP INDIVIDU (DI BAWAH JUDUL FORM) -->
+        <div class="flex justify-end pt-1">
+          <button type="button" onclick="hapusHalamanAnggota(${no})"
+                  class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
+            <span>Hapus Individu</span>
+            <span>🗑️</span>
+          </button>
         </div>
 
         <input type="hidden" name="nomor_anggota_keluarga" value="${no}" />
@@ -9617,10 +9625,7 @@
 
     function bukaHalamanAnggota(noUrut) {
       pindahHalamanForm(`hal_anggota_${noUrut}`, 'II. DATA INDIVIDU ANGGOTA KELUARGA');
-
-      const tombolHapus = `<button type="button" onclick="hapusHalamanAnggota(${noUrut})" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition"><span>Hapus Individu</span> 🗑️</button>`;
-
-      perbaruiBarJudulTetap('Form Keluarga', '', tombolHapus);
+      perbaruiBarJudulTetap('Form Keluarga', '');
     }
 
     function mundurDariAnggota(noUrut) {
