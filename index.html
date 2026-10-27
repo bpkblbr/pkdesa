@@ -1022,37 +1022,45 @@
           <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
             <!-- HEADER HIJAU FORMULIR (DITUTUP SECARA TUNTAS DENGAN </header>) -->
-            <header class="sticky top-0 z-40 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md">              
-              <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
-                <button type="button" onclick="kembaliKeDashboard()" 
-                        class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
-                  <span>←</span>
-                  <span>Kembali ke Beranda</span>
-                </button>
+            <header class="sticky top-0 z-40 shadow-sm select-none">              
+              <!-- Lapisan Atas: Gradasi Hijau -->
+              <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-5 rounded-none sm:rounded-t-2xl space-y-1.5">
+                <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
+                  <button type="button" onclick="kembaliKeDashboard()" 
+                          class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
+                    <span>←</span>
+                    <span>Kembali ke Beranda</span>
+                  </button>
+                </div>
+                
+                <div class="py-0.5 text-center">
+                  <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
+                    FORM PENDATAAN KELUARGA
+                  </h3>
+                </div>              
+                
+                <div class="flex items-center gap-1.5 pt-1 border-t border-white/10 text-xs">
+                  <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                  <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
+                    I. IDENTITAS WILAYAH
+                  </span>
+                </div>
               </div>
-              
-              <div class="py-1 text-center">
-                <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
-                  FORM PENDATAAN KELUARGA
-                </h3>
-              </div>              
-              
-              <div class="flex items-center gap-1.5 pt-1 border-t border-white/10 text-xs">
-                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
-                  I. IDENTITAS WILAYAH
-                </span>
+
+              <!-- Lapisan Bawah: Judul Form Putih (Terkunci Diam Tidak Bisa Bergeser) -->
+              <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-xs">
+                <div>
+                  <h4 id="teksJudulFormTetap" class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
+                  <p id="subTeksJudulFormTetap" class="text-[10px] sm:text-[11px] text-slate-500 hidden"></p>
+                </div>
+                <div id="wadahAksiKananFormTetap"></div>
               </div>
             </header>
-            <!-- TAG PENUTUP HEADER DI ATAS MEMASTIKAN LATAR HIJAU BERHENTI DI SINI -->
 
             <form id="pendataanForm" class="p-4 sm:p-6 pb-4 sm:pb-6 bg-white text-slate-800 flex-1">
               
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
-              <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white">
-                <div class="sticky top-[108px] z-30 bg-white border-b py-2 px-1 flex items-center justify-between shadow-xs">
-                  <h4 class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
-                </div>
+              <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white">                
                 
                 <div class="grid grid-cols-2 gap-x-4 gap-y-3.5 text-xs sm:text-sm">
                   <div>
@@ -2470,17 +2478,33 @@
       document.querySelectorAll('.halaman-form').forEach(el => el.classList.remove('aktif'));
     }
 
+    function perbaruiBarJudulTetap(judul, subJudul = '', elemenKananHtml = '') {
+      const elJudul = document.getElementById('teksJudulFormTetap');
+      const elSub = document.getElementById('subTeksJudulFormTetap');
+      const elKanan = document.getElementById('wadahAksiKananFormTetap');
+
+      if (elJudul) elJudul.innerText = judul;
+      if (elSub) {
+        if (subJudul) {
+          elSub.innerText = subJudul;
+          elSub.classList.remove('hidden');
+        } else {
+          elSub.classList.add('hidden');
+        }
+      }
+      if (elKanan) elKanan.innerHTML = elemenKananHtml;
+    }
+
     function pindahHalamanForm(idTarget, labelJudul) {
       sembunyikanSemuaHalamanForm();      
       document.querySelectorAll(`[id="${idTarget}"]`).forEach(el => el.classList.add('aktif'));
       document.querySelectorAll('#labelTotalTahap').forEach(lbl => lbl.innerText = labelJudul.toUpperCase());
-      
-      // Sembunyikan badge langkah jika sedang di Form Wilayah, Anggota, atau Review
-      const badgeHeader = document.getElementById('badgeHeaderLangkah');
-      if (badgeHeader && !['hal_kb', 'hal_pembangunan'].includes(idTarget)) {
-        badgeHeader.classList.add('hidden');
-      }
 
+      if (idTarget === 'hal_wilayah') {
+        perbaruiBarJudulTetap('Form Wilayah');
+      } else if (idTarget === 'hal_review') {
+        perbaruiBarJudulTetap('Form Pratinjau');
+      }
       window.scrollTo(0, 0);
     }
 
@@ -9623,8 +9647,10 @@
 
     function bukaHalamanAnggota(noUrut) {
       pindahHalamanForm(`hal_anggota_${noUrut}`, 'II. DATA INDIVIDU ANGGOTA KELUARGA');
-      const badge = document.getElementById('badgeLangkah');
-      if (badge) badge.innerText = '';
+
+      const tombolHapus = `<button type="button" onclick="hapusHalamanAnggota(${noUrut})" class="px-3 py-1 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition"><span>Hapus Individu</span> 🗑️</button>`;
+
+      perbaruiBarJudulTetap('Form Keluarga', '', tombolHapus);
     }
 
     function mundurDariAnggota(noUrut) {
@@ -9859,18 +9885,11 @@
       return { adaSuamiIstri, adaAnak0_17, adaAyah };
     }
     
-    function tampilkanStepPK() {
-      const kontainer = document.getElementById('kontainer_step_pk');
-      const labelLangkah = document.getElementById('label_langkah_pk');
-      const badgeHeader = document.getElementById('badgeHeaderLangkah');
-      if (!kontainer) return;
-
+    function tampilkanStepPK() {      
       const teksLangkah = `Langkah ${indexStepPK + 1} / ${daftarPertanyaanPK.length}`;
-      if (labelLangkah) labelLangkah.innerText = teksLangkah;
-      if (badgeHeader) {
-        badgeHeader.classList.remove('hidden');
-        badgeHeader.innerText = teksLangkah;
-      }
+      const badgeHtml = `<span class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">${teksLangkah}</span>`;
+
+      perbaruiBarJudulTetap('Pembangunan Keluarga', 'Kondisi ketahanan keluarga, perumahan, sanitasi, dan lingkungan', badgeHtml);
       const q = daftarPertanyaanPK[indexStepPK];
       const demo = getStatusDemografiKeluarga();
       let html = '';
@@ -10532,16 +10551,13 @@
 
     function tampilkanStepKB() {
       const kontainer = document.getElementById('kontainer_step_kb');
-      const labelLangkah = document.getElementById('label_langkah_kb');
-      const badgeHeader = document.getElementById('badgeHeaderLangkah');
       if (!kontainer) return;
-
+      
       const teksLangkah = `Langkah ${indexStepKB + 1} / ${daftarPertanyaanKB.length}`;
-      if (labelLangkah) labelLangkah.innerText = teksLangkah;
-      if (badgeHeader) {
-        badgeHeader.classList.remove('hidden');
-        badgeHeader.innerText = teksLangkah;
-      }
+      const badgeHtml = `<span class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">${teksLangkah}</span>`;
+
+      perbaruiBarJudulTetap('Form KB', 'Ditanyakan kepada wanita PUS usia 10–49 tahun', badgeHtml);
+      
       const q = daftarPertanyaanKB[indexStepKB];
       let html = '';
 
