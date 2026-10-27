@@ -1023,36 +1023,34 @@
             
             <header class="sticky top-0 z-30 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md space-y-2">              
   
-              <div class="flex items-center justify-between pb-2 border-b border-white/10">
-                <button type="button" onclick="kembaliKeDashboard()" 
-                        class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
-                  <span>←</span>
-                  <span>Kembali ke Beranda</span>
-                </button>
-              </div>
-              
-              <div class="py-1 text-center">
-                <h3 class="text-base sm:text-lg font-black uppercase tracking-wide drop-shadow-sm">
-                  FORM PENDATAAN KELUARGA
-                </h3>
-              </div>              
-              
-              <div class="flex items-center justify-between pt-1 border-t border-white/10 text-xs">
-                <div class="flex items-center gap-1.5">
+              <header class="sticky top-0 z-40 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md">              
+                <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
+                  <button type="button" onclick="kembaliKeDashboard()" 
+                          class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
+                    <span>←</span>
+                    <span>Kembali ke Beranda</span>
+                  </button>
+                </div>
+                
+                <div class="py-1 text-center">
+                  <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
+                    FORM PENDATAAN KELUARGA
+                  </h3>
+                </div>              
+                
+                <div class="flex items-center gap-1.5 pt-1 border-t border-white/10 text-xs">
                   <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
                   <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
                     I. IDENTITAS WILAYAH
                   </span>
-                </div>                
-                <span id="badgeHeaderLangkah" class="hidden text-[10px] sm:text-xs font-bold text-emerald-950 bg-emerald-100 px-2.5 py-0.5 rounded-full shadow-sm"></span>
-              </div>
-            </header>
+                </div>
+              </header>
 
             <form id="pendataanForm" class="p-4 sm:p-6 pb-4 sm:pb-6">
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
               <div id="hal_wilayah" class="halaman-form aktif space-y-5">
-                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm border-b pb-2 pt-1">
-                  <h4 class="text-base font-bold text-slate-800">Form Wilayah</h4>
+                <div class="sticky top-[98px] z-30 bg-white border-b py-2 px-1 flex items-center justify-between shadow-xs">
+                  <h4 class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
                 </div>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-3.5 text-xs sm:text-sm">
                   <div>
@@ -1170,7 +1168,7 @@
 
               <!-- STEP 3: BLOK KB -->
               <div id="hal_kb" class="halaman-form space-y-5">
-                <div class="flex justify-between items-center border-b pb-2 pt-1">
+                <div class="sticky top-[98px] z-30 bg-white border-b py-2 px-1 flex justify-between items-center shadow-xs">
                   <div class="pr-2">
                     <h4 class="text-sm sm:text-base font-bold text-slate-800">Form KB</h4>
                     <p class="text-[11px] text-slate-500">Ditanyakan kepada wanita PUS usia 10–49 tahun</p>
@@ -1191,7 +1189,7 @@
 
               <!-- STEP 4: BLOK PEMBANGUNAN KELUARGA -->
               <div id="hal_pembangunan" class="halaman-form space-y-5">
-                <div class="flex justify-between items-center border-b pb-2 pt-1">
+                <div class="sticky top-[98px] z-30 bg-white border-b py-2 px-1 flex justify-between items-center shadow-xs">
                   <div class="pr-2">
                     <h4 class="text-sm sm:text-base font-bold text-slate-800">Pembangunan Keluarga</h4>
                     <p class="text-[11px] text-slate-500">Kondisi ketahanan keluarga, perumahan, sanitasi, dan lingkungan</p>
@@ -1212,8 +1210,8 @@
 
               <!-- STEP 5: REVIEW RINGKASAN DATA KELUARGA -->
               <div id="hal_review" class="halaman-form space-y-4 text-xs sm:text-sm">
-                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm border-b pb-2 pt-1">
-                  <h4 class="text-base font-bold text-slate-800">Form Pratinjau</h4>
+                <div class="sticky top-[98px] z-30 bg-white border-b py-2 px-1 flex items-center justify-between shadow-xs">
+                  <h4 class="text-sm sm:text-base font-bold text-slate-800">Form Pratinjau</h4>
                 </div>
                 <div class="space-y-1 pt-1">
                   <div class="flex items-center justify-between">
@@ -9021,7 +9019,8 @@
           return;
         }
 
-        if (typeof modeEditKeluargaLuar !== 'undefined' && modeEditKeluargaLuar) {
+        const isAdmin = userAktif && userAktif.role !== 'USER_DESA';
+        if (modeEditKeluargaLuar && isAdmin) {
           pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
           indexStepKB = 0;
           riwayatStepKB = [];
@@ -9166,10 +9165,10 @@
       hal.setAttribute('data-urutan', no);
 
       hal.innerHTML = `
-        <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm border-b pb-2 pt-1 flex justify-between items-center">
-          <h2 class="text-base font-bold text-slate-800">Form Keluarga</h2>          
+        <div class="sticky top-[98px] z-30 bg-white border-b py-2 px-1 flex justify-between items-center shadow-xs">
+          <h2 class="text-sm sm:text-base font-bold text-slate-800">Form Keluarga</h2>          
           <button type="button" onclick="hapusHalamanAnggota(${no})"
-                  class="shrink-0 whitespace-nowrap px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
+                  class="shrink-0 whitespace-nowrap px-3 py-1 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
             <span>Hapus Individu</span> 🗑️
           </button>
         </div>
