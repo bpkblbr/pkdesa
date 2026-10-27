@@ -1019,9 +1019,9 @@
              SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
         <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
-          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-hidden border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-between">            
+          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-hidden border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
-            <header class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-sm">              
+            <header class="sticky top-0 z-30 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md">              
               
               <div class="flex items-center justify-between pb-2 border-b border-white/10">
                 <button type="button" onclick="kembaliKeDashboard()" 
@@ -1048,7 +1048,7 @@
             <form id="pendataanForm" class="p-4 sm:p-6 pb-4 sm:pb-6">
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
               <div id="hal_wilayah" class="halaman-form aktif space-y-5">
-                <div class="border-b pb-2">
+                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm border-b pb-2 pt-1">
                   <h4 class="text-base font-bold text-slate-800">Form Wilayah</h4>
                 </div>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-3.5 text-xs sm:text-sm">
@@ -1167,12 +1167,12 @@
 
               <!-- STEP 3: BLOK KB -->
               <div id="hal_kb" class="halaman-form space-y-5">
-                <div class="flex justify-between items-center border-b pb-2">
-                  <div>
+                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm flex justify-between items-center border-b pb-2 pt-1">
+                  <div class="pr-2">
                     <h4 class="text-sm sm:text-base font-bold text-slate-800">Form KB</h4>
                     <p class="text-[11px] text-slate-500">Ditanyakan kepada wanita PUS usia 10–49 tahun</p>
                   </div>
-                  <span id="label_langkah_kb" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <span id="label_langkah_kb" class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                     Langkah 1/9
                   </span>
                 </div>
@@ -1187,12 +1187,12 @@
 
               <!-- STEP 4: BLOK PEMBANGUNAN KELUARGA -->
               <div id="hal_pembangunan" class="halaman-form space-y-5">
-                <div class="flex justify-between items-center border-b pb-2">
-                  <div>
+                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm flex justify-between items-center border-b pb-2 pt-1">
+                  <div class="pr-2">
                     <h4 class="text-sm sm:text-base font-bold text-slate-800">Pembangunan Keluarga</h4>
                     <p class="text-[11px] text-slate-500">Kondisi ketahanan keluarga, perumahan, sanitasi, dan lingkungan</p>
                   </div>
-                  <span id="label_langkah_pk" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <span id="label_langkah_pk" class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                     Langkah 1/26
                   </span>
                 </div>
@@ -1207,7 +1207,7 @@
 
               <!-- STEP 5: REVIEW RINGKASAN DATA KELUARGA -->
               <div id="hal_review" class="halaman-form space-y-4 text-xs sm:text-sm">
-                <div class="border-b pb-2">
+                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm border-b pb-2 pt-1">
                   <h4 class="text-base font-bold text-slate-800">Form Pratinjau</h4>
                 </div>
                 <div class="space-y-1 pt-1">
@@ -9154,10 +9154,10 @@
       hal.setAttribute('data-urutan', no);
 
       hal.innerHTML = `
-        <div class="border-b pb-2 flex justify-between items-center">
+        <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm border-b pb-2 pt-1 flex justify-between items-center">
           <h2 class="text-base font-bold text-slate-800">Form Keluarga</h2>          
           <button type="button" onclick="hapusHalamanAnggota(${no})"
-                  class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
+                  class="shrink-0 whitespace-nowrap px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm transition">
             <span>Hapus Individu</span> 🗑️
           </button>
         </div>
