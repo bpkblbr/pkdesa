@@ -1021,8 +1021,8 @@
         <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
           <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-visible border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
-            <header class="sticky top-0 z-30 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md">              
-              
+            <header class="sticky top-0 z-30 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md space-y-2">              
+  
               <div class="flex items-center justify-between pb-2 border-b border-white/10">
                 <button type="button" onclick="kembaliKeDashboard()" 
                         class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
@@ -1031,17 +1031,20 @@
                 </button>
               </div>
               
-              <div class="py-2.5 text-center">
+              <div class="py-1 text-center">
                 <h3 class="text-base sm:text-lg font-black uppercase tracking-wide drop-shadow-sm">
                   FORM PENDATAAN KELUARGA
                 </h3>
-              </div>
+              </div>              
               
-              <div class="flex items-center gap-1.5 pt-1 border-t border-white/10">
-                <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
-                  I. IDENTITAS WILAYAH
-                </span>
+              <div class="flex items-center justify-between pt-1 border-t border-white/10 text-xs">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                  <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
+                    I. IDENTITAS WILAYAH
+                  </span>
+                </div>                
+                <span id="badgeHeaderLangkah" class="hidden text-[10px] sm:text-xs font-bold text-emerald-950 bg-emerald-100 px-2.5 py-0.5 rounded-full shadow-sm"></span>
               </div>
             </header>
 
@@ -1167,11 +1170,12 @@
 
               <!-- STEP 3: BLOK KB -->
               <div id="hal_kb" class="halaman-form space-y-5">
-                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm flex justify-between items-center border-b pb-2 pt-1">
+                <div class="flex justify-between items-center border-b pb-2 pt-1">
                   <div class="pr-2">
                     <h4 class="text-sm sm:text-base font-bold text-slate-800">Form KB</h4>
                     <p class="text-[11px] text-slate-500">Ditanyakan kepada wanita PUS usia 10–49 tahun</p>
                   </div>
+                </div>
                   <span id="label_langkah_kb" class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                     Langkah 1/9
                   </span>
@@ -1187,11 +1191,12 @@
 
               <!-- STEP 4: BLOK PEMBANGUNAN KELUARGA -->
               <div id="hal_pembangunan" class="halaman-form space-y-5">
-                <div class="sticky top-[110px] z-20 bg-white/95 backdrop-blur-sm flex justify-between items-center border-b pb-2 pt-1">
+                <div class="flex justify-between items-center border-b pb-2 pt-1">
                   <div class="pr-2">
                     <h4 class="text-sm sm:text-base font-bold text-slate-800">Pembangunan Keluarga</h4>
                     <p class="text-[11px] text-slate-500">Kondisi ketahanan keluarga, perumahan, sanitasi, dan lingkungan</p>
                   </div>
+                </div>
                   <span id="label_langkah_pk" class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
                     Langkah 1/26
                   </span>
@@ -2469,6 +2474,13 @@
       sembunyikanSemuaHalamanForm();      
       document.querySelectorAll(`[id="${idTarget}"]`).forEach(el => el.classList.add('aktif'));
       document.querySelectorAll('#labelTotalTahap').forEach(lbl => lbl.innerText = labelJudul.toUpperCase());
+      
+      // Sembunyikan badge langkah jika sedang di Form Wilayah, Anggota, atau Review
+      const badgeHeader = document.getElementById('badgeHeaderLangkah');
+      if (badgeHeader && !['hal_kb', 'hal_pembangunan'].includes(idTarget)) {
+        badgeHeader.classList.add('hidden');
+      }
+
       window.scrollTo(0, 0);
     }
 
@@ -9849,9 +9861,15 @@
     function tampilkanStepPK() {
       const kontainer = document.getElementById('kontainer_step_pk');
       const labelLangkah = document.getElementById('label_langkah_pk');
+      const badgeHeader = document.getElementById('badgeHeaderLangkah');
       if (!kontainer) return;
 
-      if (labelLangkah) labelLangkah.innerText = `Langkah ${indexStepPK + 1} / ${daftarPertanyaanPK.length}`;
+      const teksLangkah = `Langkah ${indexStepPK + 1} / ${daftarPertanyaanPK.length}`;
+      if (labelLangkah) labelLangkah.innerText = teksLangkah;
+      if (badgeHeader) {
+        badgeHeader.classList.remove('hidden');
+        badgeHeader.innerText = teksLangkah;
+      }
       const q = daftarPertanyaanPK[indexStepPK];
       const demo = getStatusDemografiKeluarga();
       let html = '';
@@ -10514,9 +10532,15 @@
     function tampilkanStepKB() {
       const kontainer = document.getElementById('kontainer_step_kb');
       const labelLangkah = document.getElementById('label_langkah_kb');
+      const badgeHeader = document.getElementById('badgeHeaderLangkah');
       if (!kontainer) return;
 
-      if (labelLangkah) labelLangkah.innerText = `Langkah ${indexStepKB + 1} / ${daftarPertanyaanKB.length}`;
+      const teksLangkah = `Langkah ${indexStepKB + 1} / ${daftarPertanyaanKB.length}`;
+      if (labelLangkah) labelLangkah.innerText = teksLangkah;
+      if (badgeHeader) {
+        badgeHeader.classList.remove('hidden');
+        badgeHeader.innerText = teksLangkah;
+      }
       const q = daftarPertanyaanKB[indexStepKB];
       let html = '';
 
