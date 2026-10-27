@@ -11816,9 +11816,15 @@
       dataList.forEach((k, idx) => {
         const kodeKel = k.kode_keluarga || k.nomor_kk;
         const namaKK = (k.nama_kk || 'TANPA NAMA').toUpperCase();
+        
+        const sudahUpdate = k.diperbarui_pada !== null && k.diperbarui_pada !== undefined && k.diperbarui_pada !== '';
+        
+        const temaWarnaKartu = sudahUpdate
+          ? 'bg-slate-50/80 border-slate-300 hover:bg-slate-100'
+          : 'bg-[#ecfdf5] border-emerald-300 hover:bg-emerald-100/70';
 
         html += `
-          <div class="bg-slate-50/80 border border-slate-300 rounded-2xl p-3 flex items-center justify-between shadow-sm hover:bg-slate-100 transition">
+          <div class="${temaWarnaKartu} border rounded-2xl p-3 flex items-center justify-between shadow-sm transition">
             <div class="flex items-center gap-2.5 overflow-hidden pr-2">
               <span class="text-slate-400 font-bold text-xs shrink-0">&gt;</span>
               <span class="font-black text-slate-500 text-xs shrink-0">${idx + 1}</span>
