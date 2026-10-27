@@ -318,7 +318,7 @@
       </aside>
 
       <!-- 3. KONTEN AREA KERJA DINAMIS (ADMIN SUB-VIEWS) -->
-      <main class="flex-1 overflow-y-auto p-0 sm:p-6 min-w-0">
+      <main class="flex-1 overflow-y-visible sm:overflow-y-auto p-0 sm:p-6 min-w-0">
 
         <!-- ========================================================
              SUB-VIEW 1: BERANDA RINGKASAN EKSEKUTIF
@@ -1019,7 +1019,7 @@
              SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
         <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
-          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-hidden border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
+          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl overflow-visible border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
             <header class="sticky top-0 z-30 bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-4 sm:p-5 rounded-none sm:rounded-t-2xl shadow-md">              
               
@@ -2185,18 +2185,18 @@
         elTampilanKader.style.setProperty('display', 'none', 'important');
       }
 
-      // 3. PASTIKAN DASHBOARD BERSIH (PUTIH) DAN BISA DIGULIR
+      // 3. PASTIKAN DASHBOARD BERSIH (PUTIH) DAN BEBAS GULIR
       const elDashboard = document.getElementById('tampilan_dashboard');
       if (elDashboard) {
         elDashboard.style.backgroundColor = '#ffffff';
-        elDashboard.style.overflowY = 'auto'; // Pastikan scroll tetap aktif
+        elDashboard.style.overflow = 'visible'; // Gunakan visible agar sticky berfungsi
       }
 
       // 4. ATUR AREA KERJA UTAMA FORMULIR
       const mainArea = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
       if (mainArea) {
-        mainArea.style.overflowY = 'auto'; // Tetap bisa digulir
-        mainArea.style.padding = '0px';    // Buang padding luar yang menyisakan celah
+        mainArea.style.overflow = 'visible'; // Gunakan visible agar sticky berfungsi
+        mainArea.style.padding = '0px';
       }
 
       // 5. TAMPILKAN SUB-VIEW FORMULIR
