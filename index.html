@@ -8796,13 +8796,11 @@
 
     // Perbaikan Dropdown Dusun: Melepas status disabled secara responsif
     function updateFormDusun() {
-      const kontainer = (userAktif && userAktif.role === 'USER_DESA') 
-        ? (document.querySelector('#tampilan_formulir') || document)
-        : (document.querySelector('#sub_view_formulir') || document);
+      const targetWrap = document.getElementById('sub_view_formulir') || document;
 
-      const rawKab = kontainer.querySelector('[id="kabupaten"]')?.value || kontainer.querySelector('[id="kode_kab"]')?.value || '';
-      const rawKec = kontainer.querySelector('[id="kecamatan"]')?.value || kontainer.querySelector('[id="kode_kec"]')?.value || '';
-      const rawDesa = kontainer.querySelector('[id="desa"]')?.value || kontainer.querySelector('[id="kode_desa"]')?.value || '';
+      const rawKab = targetWrap.querySelector('#kabupaten')?.value || document.getElementById('kode_kab')?.value || '';
+      const rawKec = targetWrap.querySelector('#kecamatan')?.value || document.getElementById('kode_kec')?.value || '';
+      const rawDesa = targetWrap.querySelector('#desa')?.value || document.getElementById('kode_desa')?.value || '';
 
       const intKab = parseInt(rawKab, 10);
       const intKec = parseInt(rawKec, 10);
@@ -8851,14 +8849,12 @@
 
     // Perbaikan Dropdown RT: Menghitung jumlah RT dan melepas status disabled
     function updateFormRT() {
-      const kontainer = (userAktif && userAktif.role === 'USER_DESA') 
-        ? (document.querySelector('#tampilan_formulir') || document)
-        : (document.querySelector('#sub_view_formulir') || document);
+      const targetWrap = document.getElementById('sub_view_formulir') || document;
 
       let kdDusun = '';
       let jmlRtMax = 1;
 
-      const selDusun = kontainer.querySelector('[id="dusun"]');
+      const selDusun = targetWrap.querySelector('#dusun') || document.getElementById('dusun');
       if (selDusun && selDusun.value) {
         kdDusun = selDusun.value;
         const opt = selDusun.selectedOptions[0];
