@@ -2164,12 +2164,13 @@
     }
 
     function bukaFormulirPendataan() {
+      // 1. PASTIKAN MODE EDIT DIMATIKAN TOTAL (DISET FALSE)
       modeEditKeluargaLuar = false;      
 
-      // 1. PINDAHKAN LAYAR KE DASHBOARD FORMULIR TERLEBIH DAHULU
+      // 2. Pindahkan layar ke dashboard formulir
       tampilkanLayar('tampilan_dashboard');
 
-      // 2. PAKSA SEMBUNYIKAN TAMPILAN APLIKASI KADER TOTAL
+      // 3. Sembunyikan tampilan aplikasi kader jika dari mode kader
       const elTampilanKader = document.getElementById('tampilan_kader_app');
       if (elTampilanKader) {
         elTampilanKader.classList.add('hidden');
@@ -2177,35 +2178,31 @@
         elTampilanKader.style.setProperty('display', 'none', 'important');
       }
 
-      // 3. PASTIKAN DASHBOARD BERSIH (PUTIH) DAN BEBAS GULIR
-      const elDashboard = document.getElementById('tampilan_dashboard');
-      if (elDashboard) {
-        elDashboard.style.backgroundColor = '#ffffff';
-        elDashboard.style.overflow = 'visible'; // Gunakan visible agar sticky berfungsi
-      }
+      // 4. Reset form isian agar bersih untuk data baru
+      const formPen = document.getElementById('pendataanForm');
+      if (formPen) formPen.reset();
+      
+      const containerAnggota = document.getElementById('area_anggota_keluarga');
+      if (containerAnggota) containerAnggota.innerHTML = '';
+      totalHalamanAnggota = 0;
 
-      // 4. ATUR AREA KERJA UTAMA FORMULIR
-      const mainArea = document.querySelector('#tampilan_dashboard main') || document.querySelector('main');
-      if (mainArea) {
-        mainArea.style.overflow = 'visible'; // Gunakan visible agar sticky berfungsi
-        mainArea.style.padding = '0px';
-      }
-
-      // 5. TAMPILKAN SUB-VIEW FORMULIR
+      // 5. Tampilkan sub-view formulir dan sembunyikan menu admin
       document.querySelectorAll('.sub-view-admin').forEach(el => el.classList.add('hidden'));
       const targetSub = document.getElementById('sub_view_formulir');
       if (targetSub) {
         targetSub.classList.remove('hidden');
-        targetSub.style.paddingBottom = '40px'; // Ruang napas aman di dasar formulir
+        targetSub.style.paddingBottom = '40px';
       }
 
-      // 6. SEMBUNYIKAN KOMPONEN ADMIN
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
       if (sidebar) sidebar.classList.add('hidden');
       if (headerAdmin) headerAdmin.classList.add('hidden');
       if (breadcrumb) breadcrumb.classList.add('hidden');
+
+      // 6. Selalu arahkan ke halaman awal (Form Wilayah)
+      pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
     }
 
     function resetHalamanCariEdit() {
