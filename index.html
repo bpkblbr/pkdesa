@@ -9882,10 +9882,14 @@
     }
     
     function tampilkanStepPK() {      
+      const kontainer = document.getElementById('kontainer_step_pk');
+      if (!kontainer) return;
+
       const teksLangkah = `Langkah ${indexStepPK + 1} / ${daftarPertanyaanPK.length}`;
       const badgeHtml = `<span class="shrink-0 whitespace-nowrap text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">${teksLangkah}</span>`;
 
       perbaruiBarJudulTetap('Pembangunan Keluarga', 'Kondisi ketahanan keluarga, perumahan, sanitasi, dan lingkungan', badgeHtml);
+      
       const q = daftarPertanyaanPK[indexStepPK];
       const demo = getStatusDemografiKeluarga();
       let html = '';
