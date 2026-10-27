@@ -9870,21 +9870,33 @@
       const demo = getStatusDemografiKeluarga();
       let html = '';
       
-      if (q.opsi && !q.tipe) {
+      if (q.opsi && !q.tipe) {        
+        const butuhKunciTidakBerlaku = q.opsi.some(op => op.autoDisable === 'no_anak_0_17') && !demo.adaAnak0_17;
+
+        if (butuhKunciTidakBerlaku) {          
+          nilaiJawabanPK[q.id] = '4';
+        }
+
         html = `
           <div class="judul-tanya-krs">${q.nomor}. ${q.teks}</div>
           <div class="flex flex-wrap gap-2.5 pt-2">
             ${q.opsi.map(op => {
-              let disable = false;
-              if (op.autoDisable === 'no_anak_0_17' && !demo.adaAnak0_17) disable = true;
-              if (disable && !nilaiJawabanPK[q.id]) nilaiJawabanPK[q.id] = op.val;
+              let tombolTerkunci = false;
+
+              if (butuhKunciTidakBerlaku) {
+                // Kunci (disable) semua opsi KECUALI opsi "4" (Tidak berlaku)
+                if (op.val !== '4') {
+                  tombolTerkunci = true;
+                }
+              }
 
               const isAktif = String(nilaiJawabanPK[q.id]) === String(op.val);
+
               return `
                 <button type="button" 
                         onclick="setOpsiPK('${q.id}', '${op.val}')"
-                        ${disable ? 'disabled' : ''}
-                        class="opsi-pil ${isAktif ? 'aktif' : ''} ${disable ? 'opacity-50 cursor-not-allowed' : ''}">
+                        ${tombolTerkunci ? 'disabled' : ''}
+                        class="opsi-pil ${isAktif ? 'aktif' : ''} ${tombolTerkunci ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}">
                   ${op.label}
                 </button>
               `;
@@ -10338,13 +10350,56 @@
         }
       }
       else if (q.tipe === 'konflik_keluarga_baru') {
-        const subList = ['pk_03_1', 'pk_03_2', 'pk_03_3', 'pk_03_4', 'pk_03_5'];
-        for (let k of subList) {
-          if (!nilaiJawabanPK[k]) {
-            Swal.fire('Perhatian', 'Poin konflik keluarga belum dilengkapi seluruhnya!', 'warning');
-            return;
-          }
-        }
+        const subItems = [
+          { id: 'pk_03_1', teks: '1. Tanpa tegur sapa (selama 3 hari berturut-turut)', opsi: [{ val: '1', label: 'Ya' }, { val: '2', label: 'Tidak' }] },
+          { id: 'pk_03_2', teks: '2. Pisah ranjang antara suami dan istri (selama 7 hari berturut-turut)', opsi: [{ val: '1', label: 'Ya' }, { val: '2', label: 'Tidak' }, { val: '3', label: 'Tidak Berlaku', autoDisable: 'non_pus' }] },
+          { id: 'pk_03_3', teks: '3. Pergi dari rumah/minggat (selama 2 hari berturut-turut)', opsi: [{ val: '1', label: 'Ya' }, { val: '2', label: 'Tidak' }] },
+          { id: 'pk_03_4', teks: '4. Kekerasan dalam rumah tangga (fisik, seksual, psikologis)', opsi: [{ val: '1', label: 'Ya' }, { val: '2', label: 'Tidak' }] },
+          { id: 'pk_03_5', teks: '5. Kekerasan kepada anak berusia 0 - 17 tahun (fisik, seksual, psikologis)', opsi: [{ val: '1', label: 'Ya' }, { val: '2', label: 'Tidak' }, { val: '3', label: 'Tidak Berlaku', autoDisable: 'no_anak_0_17' }] }
+        ];
+
+        html = `
+          <div class="judul-tanya-krs">${q.nomor}. ${q.teks}</div>
+          <div class="space-y-3.5 pt-2 text-xs sm:text-sm">
+            ${subItems.map(sub => {
+              // Cek apakah item ini harus dikunci ke opsi '3' (Tidak Berlaku)
+              let butuhKunciTidakBerlaku = false;
+              if (sub.id === 'pk_03_2' && !demo.adaSuamiIstri) {
+                butuhKunciTidakBerlaku = true;
+              } else if (sub.id === 'pk_03_5' && !demo.adaAnak0_17) {
+                butuhKunciTidakBerlaku = true;
+              }
+
+              if (butuhKunciTidakBerlaku) {
+                nilaiJawabanPK[sub.id] = '3'; // Otomatis pilih opsi '3'
+              }
+
+              return `
+                <div class="border-b pb-2.5">
+                  <p class="font-semibold text-slate-700 mb-1.5">${sub.teks}</p>
+                  <div class="flex flex-wrap gap-2">
+                    ${sub.opsi.map(op => {
+                      let tombolTerkunci = false;
+                      if (butuhKunciTidakBerlaku && op.val !== '3') {
+                        tombolTerkunci = true; // Kunci pilihan selain Tidak Berlaku
+                      }
+
+                      const isAktif = String(nilaiJawabanPK[sub.id]) === String(op.val);
+                      return `
+                        <button type="button" 
+                                onclick="setOpsiPK('${sub.id}', '${op.val}')"
+                                ${tombolTerkunci ? 'disabled' : ''}
+                                class="opsi-pil ${isAktif ? 'aktif' : ''} ${tombolTerkunci ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}">
+                          ${op.label}
+                        </button>
+                      `;
+                    }).join('')}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
       }
       else if (q.tipe === 'makanan_beragam') {
         const val10 = nilaiJawabanPK['pk_10'];
@@ -10380,13 +10435,49 @@
         }
       }
       else if (q.tipe === 'pengasuhan_ayah') {
-        const subAyah = ['pk_16_1', 'pk_16_2', 'pk_16_3', 'pk_16_4'];
-        for (let k of subAyah) {
-          if (!nilaiJawabanPK[k]) {
-            Swal.fire('Perhatian', 'Poin pengasuhan ayah belum dilengkapi seluruhnya!', 'warning');
-            return;
-          }
-        }
+        const subAyah = [
+          { id: 'pk_16_1', teks: '1. Menemani anak bermain/belajar/bercerita' },
+          { id: 'pk_16_2', teks: '2. Menyediakan waktu berkomunikasi dengan anak' },
+          { id: 'pk_16_3', teks: '3. Memenuhi hak dasar anak & terlibat pengambilan keputusan' },
+          { id: 'pk_16_4', teks: '4. Terlibat dalam pekerjaan rumah tangga' }
+        ];
+
+        // Jika tidak ada Ayah atau tidak ada Anak 0-17 tahun, otomatis TIDAK BERLAKU
+        const disAyah = (!demo.adaAyah || !demo.adaAnak0_17);
+
+        html = `
+          <div class="judul-tanya-krs">${q.nomor}. ${q.teks}</div>
+          <div class="space-y-3.5 pt-2 text-xs sm:text-sm">
+            ${subAyah.map(sub => {
+              if (disAyah) {
+                nilaiJawabanPK[sub.id] = '3'; // Otomatis pilih opsi '3' (Tidak Berlaku)
+              }
+              const valSub = nilaiJawabanPK[sub.id] || '';
+
+              return `
+                <div class="border-b pb-2.5">
+                  <p class="font-semibold text-slate-700 mb-1.5">${sub.teks}</p>
+                  <div class="flex flex-wrap gap-2">
+                    <button type="button" onclick="setOpsiPK('${sub.id}', '1')" 
+                            ${disAyah ? 'disabled' : ''} 
+                            class="opsi-pil ${valSub === '1' ? 'aktif' : ''} ${disAyah ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}">
+                      1. Ya
+                    </button>
+                    <button type="button" onclick="setOpsiPK('${sub.id}', '2')" 
+                            ${disAyah ? 'disabled' : ''} 
+                            class="opsi-pil ${valSub === '2' ? 'aktif' : ''} ${disAyah ? 'opacity-40 cursor-not-allowed pointer-events-none' : ''}">
+                      2. Tidak
+                    </button>
+                    <button type="button" onclick="setOpsiPK('${sub.id}', '3')" 
+                            class="opsi-pil ${valSub === '3' ? 'aktif' : ''}">
+                      3. Tidak Berlaku
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
       }
       else if (q.tipe === 'atap_rumah') {
         if (!nilaiJawabanPK['pk_17_1'] || !nilaiJawabanPK['pk_17_2']) {
