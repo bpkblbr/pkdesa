@@ -3706,8 +3706,6 @@
     // ========================================================
     // MODUL CARI & EDIT DATA (SEBELUMNYA BNBA)
     // ========================================================
-    let dataCariEditCache = [];
-
     function bukaHalamanCariEdit() {
       tampilkanLayar('tampilan_cari_edit');
       initFilterWilayahCariEdit();
@@ -4117,7 +4115,7 @@
       tbody.innerHTML = html;
     }
 	
-	function bukaDetailKeluargaCariEditByIndex(idx) {
+	  function bukaDetailKeluargaCariEditByIndex(idx) {
       const kel = dataCariEditCache[idx];
       if (kel) {
         bukaDetailKeluargaCariEdit(kel.kode_keluarga || kel.nomor_kk);
@@ -5894,9 +5892,6 @@
     // ========================================================
     // LOGIKA MODUL LAPORAN BNBA DINAMIS & EKSPOR
     // ========================================================
-    let dataHasilBnbaLap = [];
-    let konfigurasiKolomAktif = [];
-
     const masterPilihanBnba = {
       janda: [
         { val: '4', label: 'Cerai Hidup Tercatat' },
