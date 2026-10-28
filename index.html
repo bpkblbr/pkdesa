@@ -3974,29 +3974,21 @@
           renderTabelCariEditKeluarga();
           return;
         }
-
-        // Ambil rincian anggota keluarga dengan normalisasi kode keluarga dan nomor KK
+        
         const listKode = dataKeluarga.map(k => k.kode_keluarga).filter(Boolean);
-        const listNoKK = dataKeluarga.map(k => k.nomor_kk).filter(Boolean);
 
         let listAnggota = [];
-        if (listKode.length > 0 || listNoKK.length > 0) {
-          const filterKueri = [];
-          if (listKode.length > 0) {
-            filterKueri.push(`kode_keluarga.in.(${listKode.map(k => `"${k}"`).join(',')})`);
-          }
-          if (listNoKK.length > 0) {
-            filterKueri.push(`nomor_kk.in.(${listNoKK.map(n => `"${n}"`).join(',')})`);
-          }
-
-          const { data: dataAng } = await supabaseClient
+        if (listKode.length > 0) {          
+          const { data: dataAng, error: errAng } = await supabaseClient
             .from('anggota_keluarga')
             .select('*')
-            .or(filterKueri.join(','));
-          listAnggota = dataAng || [];
-        }
+            .in('kode_keluarga', listKode);
 
-        // Petakan anggota ke keluarga masing-masing dengan normalisasi spasi
+          if (!errAng && dataAng) {
+            listAnggota = dataAng;
+          }
+        }
+        
         const normalisasi = (str) => String(str || '').replace(/\s+/g, ' ').trim();
 
         dataCariEditCache = dataKeluarga.map(k => {
@@ -4006,7 +3998,12 @@
           const anggota = listAnggota.filter(a => {
             const aKode = normalisasi(a.kode_keluarga);
             const aKK = String(a.nomor_kk || '').trim();
-            return (aKode && aKode === kodeKelClean) || (aKK && aKK === noKKClean);
+            
+            // Kunci utama: kode_keluarga harus cocok
+            if (aKode && kodeKelClean && aKode === kodeKelClean) return true;
+            // Fallback: nomor_kk hanya jika valid (bukan dummy/kosong)
+            if (aKK && noKKClean && noKKClean !== '9999999999999999' && noKKClean !== '-' && aKK === noKKClean) return true;
+            return false;
           });
 
           return {
@@ -5842,6 +5839,10 @@
             if (updateErr) throw updateErr;
 
             if (result.value.hubungan_dengan_kk === '1') {
+              const filterKunci = targetKK.kode_keluarga 
+                ? { kolom: 'kode_keluarga', nilai: targetKK.kode_keluarga }
+                : { kolom: 'nomor_kk', nilai: targetKK.nomor_kk };
+
               await supabaseClient
                 .from('keluarga')
                 .update({
@@ -5849,7 +5850,7 @@
                   nik_kk: result.value.nik,
                   diperbarui_pada: new Date()
                 })
-                .eq('nomor_kk', targetKK.nomor_kk);
+                .eq(filterKunci.kolom, filterKunci.nilai);
             }
 
             Swal.fire('Berhasil!', 'Data anggota keluarga berhasil diperbarui.', 'success');
