@@ -2232,225 +2232,7 @@
       }
       
       initFilterWilayahCariEdit();
-    }
-	
-	  function isiDataUjiCobaOtomatis() {
-      const unik = Math.floor(1000 + Math.random() * 9000);
-      const noKKTest = `520108${Date.now().toString().slice(-6)}${unik.toString().slice(-4)}`;
-
-      const elProv = document.getElementById('provinsi');
-      if (elProv && elProv.options.length > 1 && !elProv.value) {
-        elProv.selectedIndex = 1;
-        updateFormKabupaten();
-      }
-
-      const elKab = document.getElementById('kabupaten');
-      if (elKab && elKab.options.length > 1 && !elKab.value) {
-        elKab.selectedIndex = 1;
-        updateFormKecamatan();
-      }
-
-      const elKec = document.getElementById('kecamatan');
-      if (elKec && elKec.options.length > 1) {
-        if (!elKec.value) elKec.selectedIndex = 1;
-        updateFormDesa();
-      }
-
-      const elDesa = document.getElementById('desa');
-      if (elDesa && elDesa.options.length > 1) {
-        if (!elDesa.value) elDesa.selectedIndex = 1;
-        updateFormDusun();
-      }
-
-      const elDusun = document.getElementById('dusun');
-      if (elDusun && elDusun.options.length > 1) {
-        if (!elDusun.value) elDusun.selectedIndex = 1;
-        updateFormRT();
-      }
-
-      const elRt = document.getElementById('rt');
-      if (elRt && elRt.options.length > 1) {
-        elRt.selectedIndex = 1;
-      }
-
-      sinkronkanLabelWilayah();
-
-      const setVal = (id, val) => {
-        document.querySelectorAll(`[id="${id}"]`).forEach(el => el.value = val);
-      };
-
-      setVal('kode_prov', document.getElementById('provinsi')?.value || '52');
-      setVal('kode_kab', document.getElementById('kabupaten')?.value || '01');
-      setVal('kode_kec', document.getElementById('kecamatan')?.value || '08');
-      setVal('kode_desa', document.getElementById('desa')?.value || '2001');
-      setVal('kode_dusun', document.getElementById('dusun')?.value || '0100');
-
-      setVal('nomor_kk', noKKTest);
-      setVal('status_keluarga', '1');
-      setVal('kode_rumah', '001');
-      setVal('no_urut_keluarga', '001');
-      setVal('no_hp', '081234567890');
-      setVal('jumlah_anggota_input', '3');
-      setVal('alamat_detail', 'JL. UJI COBA SISTEM NO. ' + unik);
-
-      const containerAnggota = document.getElementById('area_anggota_keluarga');
-      if (containerAnggota) containerAnggota.innerHTML = '';
-      totalHalamanAnggota = 0;
-
-      for (let i = 1; i <= 3; i++) {
-        tambahHalamanAnggotaBaru();
-      }
-
-      // Isi Data KK
-      const hal1 = document.getElementById('hal_anggota_1');
-      if (hal1) {
-        hal1.querySelector('[name="nama_lengkap"]').value = 'AHMAD TESTING';
-        hal1.querySelector('[name="nik"]').value = `520108010185${unik}`;
-        hal1.querySelector('[name="jenis_kelamin"]').value = '1';
-        hal1.querySelector('[name="tanggal_lahir"]').value = '1985-01-01';
-        hal1.querySelector('[name="display_usia"]').value = '41';
-        hal1.querySelector('[name="status_perkawinan"]').value = '2';
-        hal1.querySelector('[name="usia_kawin_pertama"]').value = '24';
-        hal1.querySelector('[name="memiliki_akta_lahir"]').value = '1';
-        hal1.querySelector('[name="hubungan_dengan_kk"]').value = '1';
-        hal1.querySelector('[name="agama"]').value = '1';
-        hal1.querySelector('[name="jenis_pekerjaan"]').value = '8';
-        hal1.querySelector('[name="pendidikan"]').value = '8';
-        hal1.querySelector('[name="kepesertaan_jkn"]').value = '1';
-        hal1.querySelector('[name="gangguan_fungsional"]').value = '5';
-        hal1.querySelector('[name="kemampuan_mengurus_diri"]').value = '4';
-        hal1.querySelector('[name="bekerja_luar_negeri"]').value = '4';
-        hal1.querySelector('[name="mutasi_anggota"]').value = '0';
-      }
-
-      // Isi Data Istri
-      const hal2 = document.getElementById('hal_anggota_2');
-      if (hal2) {
-        hal2.querySelector('[name="nama_lengkap"]').value = 'SITI TESTING';
-        hal2.querySelector('[name="nik"]').value = `520108410190${unik}`;
-        hal2.querySelector('[name="jenis_kelamin"]').value = '2';
-        hal2.querySelector('[name="tanggal_lahir"]').value = '1990-01-01';
-        hal2.querySelector('[name="display_usia"]').value = '36';
-        hal2.querySelector('[name="status_perkawinan"]').value = '2';
-        hal2.querySelector('[name="usia_kawin_pertama"]').value = '19';
-        hal2.querySelector('[name="memiliki_akta_lahir"]').value = '1';
-        hal2.querySelector('[name="hubungan_dengan_kk"]').value = '2';
-        hal2.querySelector('[name="agama"]').value = '1';
-        hal2.querySelector('[name="jenis_pekerjaan"]').value = '1';
-        hal2.querySelector('[name="pendidikan"]').value = '8';
-        hal2.querySelector('[name="kepesertaan_jkn"]').value = '1';
-        hal2.querySelector('[name="gangguan_fungsional"]').value = '5';
-        hal2.querySelector('[name="kemampuan_mengurus_diri"]').value = '4';
-        hal2.querySelector('[name="bekerja_luar_negeri"]').value = '4';
-        hal2.querySelector('[name="mutasi_anggota"]').value = '0';
-      }
-
-      // Isi Data Anak
-      const hal3 = document.getElementById('hal_anggota_3');
-      if (hal3) {
-        hal3.querySelector('[name="nama_lengkap"]').value = 'BUDI TESTING';
-        hal3.querySelector('[name="nik"]').value = `520108101015${unik}`;
-        hal3.querySelector('[name="jenis_kelamin"]').value = '1';
-        hal3.querySelector('[name="tanggal_lahir"]').value = '2015-10-10';
-        hal3.querySelector('[name="display_usia"]').value = '11';
-        hal3.querySelector('[name="status_perkawinan"]').value = '1';
-        hal3.querySelector('[name="memiliki_akta_lahir"]').value = '1';
-        hal3.querySelector('[name="hubungan_dengan_kk"]').value = '3';
-        hal3.querySelector('[name="kode_ibu_kandung"]').value = '02';
-        hal3.querySelector('[name="agama"]').value = '1';
-        hal3.querySelector('[name="jenis_pekerjaan"]').value = '1';
-        hal3.querySelector('[name="pendidikan"]').value = '3';
-        hal3.querySelector('[name="kepesertaan_jkn"]').value = '1';
-        hal3.querySelector('[name="gangguan_fungsional"]').value = '5';
-        hal3.querySelector('[name="kemampuan_mengurus_diri"]').value = '4';
-        hal3.querySelector('[name="bekerja_luar_negeri"]').value = '4';
-        hal3.querySelector('[name="mutasi_anggota"]').value = '0';
-      }
-
-      perbaruiSemuaOpsiIbuKandung();
-
-      // Isi Data KB
-      dataNilaiKB.kb_01_melahirkan = 2;
-      dataNilaiKB.kb_01_hidup_laki = 1;
-      dataNilaiKB.kb_01_hidup_perempuan = 1;
-      dataNilaiKB.kb_01_masih_laki = 1;
-      dataNilaiKB.kb_01_masih_perempuan = 1;
-      dataNilaiKB.kb_02_anak_ideal = 2;
-      dataNilaiKB.kb_03_sedang_hamil = '2';
-      dataNilaiKB.kb_03_keinginan_anak_lagi = '3';
-      dataNilaiKB.kb_04_sedang_kb = '1';
-      dataNilaiKB.kb_04_mulai_bulan = '01';
-      dataNilaiKB.kb_04_mulai_tahun = 2024;
-      dataNilaiKB.kb_05_pernah_kb = '1';
-      dataNilaiKB.kb_05_mulai_bulan = '01';
-      dataNilaiKB.kb_05_mulai_tahun = 2022;
-      dataNilaiKB.kb_05_berhenti_bulan = '12';
-      dataNilaiKB.kb_05_berhenti_tahun = 2023;
-      dataNilaiKB.kb_06_alasan_tidak_kb = '1';
-      dataNilaiKB.kb_07_jenis_kb = '4';
-      dataNilaiKB.kb_08_sumber_pelayanan = '6';
-      dataNilaiKB.kb_09_info_jenis = '1';
-      dataNilaiKB.kb_09_info_efek_samping = '1';
-      dataNilaiKB.kb_09_info_tindakan = '1';
-
-      // Isi Data PK
-      nilaiJawabanPK = {
-        pk_01_ibadah: '1',
-        pk_02_toleransi_agama: '1',
-        pk_03_1_tanpa_sapa: '2',
-        pk_03_2_pisah_ranjang: '2',
-        pk_03_3_pergi_rumah: '2',
-        pk_03_4_kdrt: '2',
-        pk_03_5_kekerasan_anak: '2',
-        pk_04_anggota_sakit: '2',
-        pk_05_rekreasi: '1',
-        pk_06_kegiatan_sosial: '1',
-        pk_07_bantuan_orang_lain: '1',
-        pk_08_akses_sarana_publik: '1',
-        pk_09_aman_nyaman: '1',
-        pk_10_makan_dua_kali: '1',
-        pk_10_1_jenis_makanan: ['1', '2', '3', '4'],
-        pk_11_akses_internet: '1',
-        pk_12_internet_anak: '1',
-        pk_13_sumber_penghasilan: '1',
-        pk_14_memiliki_aset: '1',
-        pk_14_1_jenis_aset: ['1', '3', '6'],
-        pk_15_interaksi_harian: '1',
-        pk_15_1_jenis_interaksi: ['1', '2', '3'],
-        pk_16_1_ayah_menemani_anak: '1',
-        pk_16_2_ayah_komunikasi: '1',
-        pk_16_3_ayah_hak_dasar: '1',
-        pk_16_4_ayah_pekerjaan_rumah: '1',
-        pk_17_1_jenis_atap: '2',
-        pk_17_2_kondisi_atap: '1',
-        pk_18_1_jenis_dinding: '1',
-        pk_18_2_kondisi_dinding: '1',
-        pk_19_1_jenis_lantai: '2',
-        pk_19_2_kondisi_lantai: '1',
-        pk_20_1_sumber_penerangan: '1',
-        pk_20_2_daya_listrik: '2',
-        pk_21_1_sumber_air_minum: '3',
-        pk_21_2_jarak_tinja: '2',
-        pk_22_fasilitas_jamban: '1',
-        pk_23_luas_rumah: '60',
-        pk_24_jumlah_menetap: '3',
-        pk_25_bahan_bakar_masak: '4',
-        pk_26_kepemilikan_rumah: '1',
-        pk_27_pesan_informasi: ['1', '2', '3', '4'],
-        pk_28_sumber_informasi: ['1', '8', '9'],
-        pk_29_persetujuan_keluarga: ['1', '2', '6', '7', '8']
-      };
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Data Uji Coba Terisi!',
-        text: 'Seluruh form telah terisi otomatis.',
-        timer: 1500,
-        showConfirmButton: false
-      }).then(() => {
-        bukaHalamanReview();
-      });
-    }
+    }	  
 
     function sembunyikanSemuaHalamanForm() {
       document.querySelectorAll('.halaman-form').forEach(el => el.classList.remove('aktif'));
@@ -5034,7 +4816,9 @@
         dataNilaiKB.kb_01_masih_laki = kel.kb_01_masih_laki ?? '';
         dataNilaiKB.kb_01_masih_perempuan = kel.kb_01_masih_perempuan ?? '';
         dataNilaiKB.kb_02_anak_ideal = kel.kb_02_anak_ideal ?? '';
-        dataNilaiKB.kb_03_sedang_hamil = toStrKode(kel.kb_03_sedang_hamil);
+        dataNilaiKB.kb_03_sedang_hamil = (kel.kb_03_sedang_hamil === true || String(kel.kb_03_sedang_hamil) === '1')
+          ? '1'
+          : (kel.kb_03_sedang_hamil === false || String(kel.kb_03_sedang_hamil) === '2') ? '2' : '';
         dataNilaiKB.kb_03_usia_kehamilan = kel.kb_03_usia_kehamilan ?? '';
         dataNilaiKB.kb_03_status_ingin_hamil = toStrKode(kel.kb_03_status_ingin_hamil);
         dataNilaiKB.kb_03_keinginan_anak_lagi = toStrKode(kel.kb_03_keinginan_anak_lagi);
@@ -11629,7 +11413,11 @@
           kb_01_masih_laki: keInteger(dataNilaiKB.kb_01_masih_laki) ?? 0,
           kb_01_masih_perempuan: keInteger(dataNilaiKB.kb_01_masih_perempuan) ?? 0,
           kb_02_anak_ideal: keInteger(dataNilaiKB.kb_02_anak_ideal),
-          kb_03_sedang_hamil: dataNilaiKB.kb_03_sedang_hamil === '1',
+          kb_03_sedang_hamil: (
+            dataNilaiKB.kb_03_sedang_hamil === '1' ||
+            dataNilaiKB.kb_03_sedang_hamil === 1 ||
+            dataNilaiKB.kb_03_sedang_hamil === true
+          ),
           kb_03_usia_kehamilan: keInteger(dataNilaiKB.kb_03_usia_kehamilan),
           kb_03_status_ingin_hamil: dataNilaiKB.kb_03_status_ingin_hamil || null,
           kb_03_keinginan_anak_lagi: dataNilaiKB.kb_03_keinginan_anak_lagi || null,
