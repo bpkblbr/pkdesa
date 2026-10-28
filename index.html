@@ -5020,10 +5020,10 @@
         
         const toStrKode = (val) => {
           if (val === null || val === undefined || val === '') return '';
-          const str = String(val).trim().toLowerCase();          
-          if (str === 'true' || str === 't' || str === '1') return '1';          
-          if (str === 'false' || str === 'f' || str === '2') return '2';
-          return String(val);
+          const s = String(val).trim().toLowerCase();          
+          if (s === 'true' || s === 't') return '1';
+          if (s === 'false' || s === 'f') return '2';
+          return String(val).trim();
         };
 
         dataNilaiKB.kb_01_melahirkan = kel.kb_01_melahirkan ?? '';
@@ -8431,14 +8431,29 @@
               kb_01_masih_laki: parseInt(k.KB_01_MASIH_LAKI || 0, 10),
               kb_01_masih_perempuan: parseInt(k.KB_01_MASIH_PEREMPUAN || 0, 10),
               kb_02_anak_ideal: parseInt(k.KB_02_ANAK_IDEAL || 0, 10),
-              kb_03_sedang_hamil: String(k.KB_03_SEDANG_HAMIL) === '1',
+              kb_03_sedang_hamil: (() => {
+                const v = String(k.KB_03_SEDANG_HAMIL || '').trim().toLowerCase();
+                if (v === 'true' || v === 't' || v === '1') return '1';
+                if (v === 'false' || v === 'f' || v === '2') return '2';
+                return v || null;
+              })(),
               kb_03_usia_kehamilan: parseInt(k.KB_03_USIA_KEHAMILAN, 10) || null,
               kb_03_status_ingin_hamil: String(k.KB_03_STATUS_INGIN_HAMIL || '') || null,
               kb_03_keinginan_anak_lagi: String(k.KB_03_KEINGINAN_ANAK_LAGI || '') || null,
-              kb_04_sedang_kb: String(k.KB_04_SEDANG_KB) === '1',
+              kb_04_sedang_kb: (() => {
+                const v = String(k.KB_04_SEDANG_KB || '').trim().toLowerCase();
+                if (v === 'true' || v === 't' || v === '1') return '1';
+                if (v === 'false' || v === 'f' || v === '2') return '2';
+                return v || null;
+              })(),
               kb_04_mulai_bulan: String(k.KB_04_MULAI_BULAN || '') || null,
               kb_04_mulai_tahun: parseInt(k.KB_04_MULAI_TAHUN, 10) || null,
-              kb_05_pernah_kb: String(k.KB_05_PERNAH_KB || '') || null,
+              kb_05_pernah_kb: (() => {
+                const v = String(k.KB_05_PERNAH_KB || '').trim().toLowerCase();
+                if (v === 'true' || v === 't' || v === '1') return '1';
+                if (v === 'false' || v === 'f' || v === '2') return '2';
+                return v || null;
+              })(),
               kb_05_mulai_bulan: String(k.KB_05_MULAI_BULAN || '') || null,
               kb_05_mulai_tahun: parseInt(k.KB_05_MULAI_TAHUN, 10) || null,
               kb_05_berhenti_bulan: String(k.KB_05_BERHENTI_BULAN || '') || null,
@@ -8446,9 +8461,24 @@
               kb_06_alasan_tidak_kb: String(k.KB_06_ALASAN_TIDAK_KB || '') || null,
               kb_07_jenis_kb: String(k.KB_07_JENIS_KB || '') || null,
               kb_08_sumber_pelayanan: String(k.KB_08_SUMBER_PELAYANAN || '') || null,
-              kb_09_info_jenis: String(k.KB_09_INFO_JENIS) === '1',
-              kb_09_info_efek_samping: String(k.KB_09_INFO_EFEK_SAMPING) === '1',
-              kb_09_info_tindakan: String(k.KB_09_INFO_TINDAKAN) === '1',
+              kb_09_info_jenis: (() => {
+                const v = String(k.KB_09_INFO_JENIS || '').trim().toLowerCase();
+                if (v === 'true' || v === 't' || v === '1') return '1';
+                if (v === 'false' || v === 'f' || v === '2') return '2';
+                return v || null;
+              })(),
+              kb_09_info_efek_samping: (() => {
+                const v = String(k.KB_09_INFO_EFEK_SAMPING || '').trim().toLowerCase();
+                if (v === 'true' || v === 't' || v === '1') return '1';
+                if (v === 'false' || v === 'f' || v === '2') return '2';
+                return v || null;
+              })(),
+              kb_09_info_tindakan: (() => {
+                const v = String(k.KB_09_INFO_TINDAKAN || '').trim().toLowerCase();
+                if (v === 'true' || v === 't' || v === '1') return '1';
+                if (v === 'false' || v === 'f' || v === '2') return '2';
+                return v || null;
+              })(),
               diperbarui_pada: null
             });
 
@@ -11620,11 +11650,11 @@
           kb_01_masih_laki: keInteger(dataNilaiKB.kb_01_masih_laki) ?? 0,
           kb_01_masih_perempuan: keInteger(dataNilaiKB.kb_01_masih_perempuan) ?? 0,
           kb_02_anak_ideal: keInteger(dataNilaiKB.kb_02_anak_ideal),
-          kb_03_sedang_hamil: dataNilaiKB.kb_03_sedang_hamil === '1' ? 'true' : (dataNilaiKB.kb_03_sedang_hamil === '2' ? 'false' : null),
+          kb_03_sedang_hamil: dataNilaiKB.kb_03_sedang_hamil || null,
           kb_03_usia_kehamilan: keInteger(dataNilaiKB.kb_03_usia_kehamilan),
           kb_03_status_ingin_hamil: dataNilaiKB.kb_03_status_ingin_hamil || null,
           kb_03_keinginan_anak_lagi: dataNilaiKB.kb_03_keinginan_anak_lagi || null,
-          kb_04_sedang_kb: dataNilaiKB.kb_04_sedang_kb === '1' ? 'true' : (dataNilaiKB.kb_04_sedang_kb === '2' ? 'false' : null),
+          kb_04_sedang_kb: dataNilaiKB.kb_04_sedang_kb || null,
           kb_04_mulai_bulan: dataNilaiKB.kb_04_mulai_bulan || null,
           kb_04_mulai_tahun: keInteger(dataNilaiKB.kb_04_mulai_tahun),
           kb_05_pernah_kb: dataNilaiKB.kb_05_pernah_kb || null,
@@ -11635,9 +11665,9 @@
           kb_06_alasan_tidak_kb: dataNilaiKB.kb_06_alasan_tidak_kb || null,
           kb_07_jenis_kb: dataNilaiKB.kb_07_jenis_kb || null,
           kb_08_sumber_pelayanan: dataNilaiKB.kb_08_sumber_pelayanan || null,
-          kb_09_info_jenis: dataNilaiKB.kb_09_info_jenis === '1' ? 'true' : (dataNilaiKB.kb_09_info_jenis === '2' ? 'false' : null),
-          kb_09_info_efek_samping: dataNilaiKB.kb_09_info_efek_samping === '1' ? 'true' : (dataNilaiKB.kb_09_info_efek_samping === '2' ? 'false' : null),
-          kb_09_info_tindakan: dataNilaiKB.kb_09_info_tindakan === '1' ? 'true' : (dataNilaiKB.kb_09_info_tindakan === '2' ? 'false' : null),
+          kb_09_info_jenis: dataNilaiKB.kb_09_info_jenis || null,
+          kb_09_info_efek_samping: dataNilaiKB.kb_09_info_efek_samping || null,
+          kb_09_info_tindakan: dataNilaiKB.kb_09_info_tindakan || null,
 
           pk_01_ibadah: payloadPK.pk_01_ibadah || payloadPK.pk_01 || null,
           pk_02_toleransi_agama: payloadPK.pk_02_toleransi_agama || payloadPK.pk_02 || null,
