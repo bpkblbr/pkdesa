@@ -1024,38 +1024,41 @@
           </div>
         </div>
 
-        SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
+        <!-- ========================================================
+             SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
-        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-4">
+        <div id="sub_view_formulir" class="sub-view-admin hidden">
           
-          <!-- HEADER FORM TERPADU (STICKY DI BAWAH NAVBAR UTAMA) -->
-          <div class="sticky top-16 z-30 shadow-md rounded-2xl overflow-hidden bg-white border border-slate-200">
-            <!-- Baris Hijau: Judul Utama Modul -->
-            <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-4 py-3 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
-                <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider">
-                  I. IDENTITAS WILAYAH
+          <!-- KARTU FORMULIR UTAMA -->
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            
+            <!-- HEADER FORM TERINTEGRASI -->
+            <div class="sticky top-16 z-30 bg-white border-b border-slate-200">
+              <!-- Baris Hijau Penuh -->
+              <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-5 py-3.5 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                  <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider">
+                    I. IDENTITAS WILAYAH
+                  </span>
+                </div>
+                <span class="text-[11px] font-bold text-emerald-100 uppercase tracking-widest hidden sm:inline">
+                  Aplikasi Pendataan Keluarga
                 </span>
               </div>
-              <span class="text-[11px] font-bold text-emerald-100 uppercase tracking-widest hidden sm:inline">
-                Aplikasi Pendataan Keluarga
-              </span>
-            </div>
 
-            <!-- Baris Putih: Sub-Header Dinamis -->
-            <div id="barJudulFormTetap" class="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-              <div>
-                <h4 id="teksJudulFormTetap" class="text-xs sm:text-sm font-bold text-slate-800">Form Wilayah</h4>
-                <p id="subTeksJudulFormTetap" class="text-[10px] text-slate-500 hidden"></p>
+              <!-- Baris Sub-Judul Putih -->
+              <div id="barJudulFormTetap" class="px-5 py-2.5 bg-slate-50 flex items-center justify-between">
+                <div>
+                  <h4 id="teksJudulFormTetap" class="text-xs sm:text-sm font-bold text-slate-800">Form Wilayah</h4>
+                  <p id="subTeksJudulFormTetap" class="text-[10px] text-slate-500 hidden"></p>
+                </div>
+                <div id="wadahAksiKananFormTetap"></div>
               </div>
-              <div id="wadahAksiKananFormTetap"></div>
             </div>
-          </div>
 
-          <!-- KARTU BADAN FORMULIR (OVERFLOW BERSIH) -->
-          <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-            <form id="pendataanForm" class="p-4 sm:p-7 bg-white text-slate-800">
+            <!-- ISI FORMULIR -->
+            <form id="pendataanForm" class="p-5 sm:p-8 bg-white text-slate-800">
               
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
               <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white pt-2">                
