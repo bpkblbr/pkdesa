@@ -1027,38 +1027,46 @@
         <!-- ========================================================
              SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
-        <div id="sub_view_formulir" class="sub-view-admin hidden">
-          
-          <!-- KARTU FORMULIR UTAMA -->
-          <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
+          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
-            <!-- HEADER FORM TERINTEGRASI -->
-            <div class="sticky top-16 z-30 bg-white border-b border-slate-200">
-              <!-- Baris Hijau Penuh -->
-              <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-5 py-3.5 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
-                  <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider">
+            <!-- HEADER HIJAU FORMULIR (DITUTUP SECARA TUNTAS DENGAN </header>) -->
+            <header class="sticky top-0 z-40 shadow-sm select-none">              
+              <!-- Lapisan Atas: Gradasi Hijau -->
+              <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-5 rounded-none sm:rounded-t-2xl space-y-1.5">
+                <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
+                  <button type="button" onclick="kembaliKeDashboard()" 
+                          class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
+                    <span>←</span>
+                    <span>Kembali ke Beranda</span>
+                  </button>
+                </div>
+                
+                <div class="py-0.5 text-center">
+                  <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
+                    FORM PENDATAAN KELUARGA
+                  </h3>
+                </div>              
+                
+                <div class="flex items-center gap-1.5 pt-1 border-t border-white/10 text-xs">
+                  <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+                  <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
                     I. IDENTITAS WILAYAH
                   </span>
                 </div>
-                <span class="text-[11px] font-bold text-emerald-100 uppercase tracking-widest hidden sm:inline">
-                  Aplikasi Pendataan Keluarga
-                </span>
               </div>
 
-              <!-- Baris Sub-Judul Putih -->
-              <div id="barJudulFormTetap" class="px-5 py-2.5 bg-slate-50 flex items-center justify-between">
+              <!-- Lapisan Bawah: Judul Form Putih (Terkunci Diam Tidak Bisa Bergeser) -->
+              <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-xs">
                 <div>
-                  <h4 id="teksJudulFormTetap" class="text-xs sm:text-sm font-bold text-slate-800">Form Wilayah</h4>
-                  <p id="subTeksJudulFormTetap" class="text-[10px] text-slate-500 hidden"></p>
+                  <h4 id="teksJudulFormTetap" class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
+                  <p id="subTeksJudulFormTetap" class="text-[10px] sm:text-[11px] text-slate-500 hidden"></p>
                 </div>
                 <div id="wadahAksiKananFormTetap"></div>
               </div>
-            </div>
+            </header>
 
-            <!-- ISI FORMULIR -->
-            <form id="pendataanForm" class="p-5 sm:p-8 bg-white text-slate-800">
+            <form id="pendataanForm" class="p-4 sm:p-6 pb-4 sm:pb-6 bg-white text-slate-800 flex-1">
               
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
               <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white pt-2">                
