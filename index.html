@@ -86,6 +86,15 @@
       font-size: 0.92rem;
       line-height: 1.35;
     }
+    /* Header Utama Navbar */
+    #tampilan_dashboard > header {
+      z-index: 50 !important;
+    }
+
+    /* Header Form Sticky */
+    #sub_view_formulir .sticky {
+      z-index: 40 !important;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen antialiased">
@@ -1015,65 +1024,62 @@
           </div>
         </div>
 
-        <!-- ========================================================
-             SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
+        SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
-        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
-          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
-            
-            <!-- HEADER HIJAU FORMULIR (DITUTUP SECARA TUNTAS DENGAN </header>) -->
-            <header class="sticky top-16 z-30 shadow-sm select-none">              
-              <!-- Lapisan Atas: Gradasi Hijau -->
-              <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-4 rounded-none sm:rounded-t-2xl space-y-1">
-                <div class="py-0.5 text-center">
-                  <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
-                    FORM PENDATAAN KELUARGA
-                  </h3>
-                </div>              
-                
-                <div class="flex items-center gap-1.5 pt-1 border-t border-white/10 text-xs">
-                  <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                  <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
-                    I. IDENTITAS WILAYAH
-                  </span>
-                </div>
+        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-4">
+          
+          <!-- HEADER FORM TERPADU (STICKY DI BAWAH NAVBAR UTAMA) -->
+          <div class="sticky top-16 z-30 shadow-md rounded-2xl overflow-hidden bg-white border border-slate-200">
+            <!-- Baris Hijau: Judul Utama Modul -->
+            <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-4 py-3 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider">
+                  I. IDENTITAS WILAYAH
+                </span>
               </div>
+              <span class="text-[11px] font-bold text-emerald-100 uppercase tracking-widest hidden sm:inline">
+                Aplikasi Pendataan Keluarga
+              </span>
+            </div>
 
-              <!-- Lapisan Bawah: Judul Form Putih -->
-              <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-xs">
-                <div>
-                  <h4 id="teksJudulFormTetap" class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
-                  <p id="subTeksJudulFormTetap" class="text-[10px] sm:text-[11px] text-slate-500 hidden"></p>
-                </div>
-                <div id="wadahAksiKananFormTetap"></div>
+            <!-- Baris Putih: Sub-Header Dinamis -->
+            <div id="barJudulFormTetap" class="px-4 py-2 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <div>
+                <h4 id="teksJudulFormTetap" class="text-xs sm:text-sm font-bold text-slate-800">Form Wilayah</h4>
+                <p id="subTeksJudulFormTetap" class="text-[10px] text-slate-500 hidden"></p>
               </div>
-            </header>
+              <div id="wadahAksiKananFormTetap"></div>
+            </div>
+          </div>
 
-            <form id="pendataanForm" class="p-4 sm:p-6 pb-4 sm:pb-6 bg-white text-slate-800 flex-1">
+          <!-- KARTU BADAN FORMULIR (OVERFLOW BERSIH) -->
+          <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <form id="pendataanForm" class="p-4 sm:p-7 bg-white text-slate-800">
               
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
-              <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white">                
+              <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white pt-2">                
                 
-                <div class="grid grid-cols-2 gap-x-4 gap-y-3.5 text-xs sm:text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4 text-xs sm:text-sm">
                   <div>
-                    <p class="text-slate-500 font-medium mb-0.5">Provinsi</p>
+                    <label class="block text-slate-600 font-semibold mb-1">Provinsi *</label>
                     <p id="label_provinsi" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="provinsi" required onchange="updateFormKabupaten(); sinkronkanLabelWilayah();" 
-                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-lg p-2 outline-none text-xs sm:text-sm">
+                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm shadow-xs">
                       <option value="">-- PILIH PROVINSI --</option>
                     </select>
                     <input type="hidden" id="kode_prov" />
                   </div>
                   <div>
-                    <p class="text-slate-500 font-medium mb-0.5">Kabupaten</p>
+                    <label class="block text-slate-600 font-semibold mb-1">Kabupaten *</label>
                     <p id="label_kabupaten" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="kabupaten" required onchange="updateFormKecamatan(); sinkronkanLabelWilayah();" 
-                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-lg p-2 outline-none text-xs sm:text-sm">
+                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm shadow-xs">
                       <option value="">-- PILIH KABUPATEN --</option>
                     </select>
                     <input type="hidden" id="kode_kab" />
                   </div>
-                  <div>
+                </div>
                     <p class="text-slate-500 font-medium mb-0.5">Kecamatan</p>
                     <p id="label_kecamatan" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="kecamatan" required onchange="updateFormDesa(); sinkronkanLabelWilayah();" 
@@ -9212,26 +9218,28 @@
       hal.setAttribute('data-urutan', no);
 
       hal.innerHTML = `
-        <div class="flex justify-between items-center text-xs font-semibold text-slate-700 pt-1 border-b pb-2">
-          <div>No Anggota: <span class="font-bold text-slate-900">${no}</span></div>
-          <div>Jumlah Keluarga: <span class="font-bold text-slate-900 total-anggota-display">${totalHalamanAnggota}</span></div>
-        </div>
-
-        <!-- TOMBOL HAPUS MANDIRI SETIAP INDIVIDU (DI BAWAH JUDUL FORM) -->
-        <div class="flex justify-end pt-1">
-          <button type="button" onclick="hapusHalamanAnggota(${no})"
-                  class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition">
-            <span>Hapus Individu</span>
-            <span>🗑️</span>
-          </button>
+        <!-- BAR INFO ANGGOTA & TOMBOL HAPUS (RAPI DI DALAM FORM) -->
+        <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-2xl mb-4">
+          <div class="flex items-center gap-2 text-xs font-semibold text-slate-700">
+            <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold">Anggota #${no}</span>
+            <span class="text-slate-400">|</span>
+            <span>Total Keluarga: <b class="text-slate-900 total-anggota-display">${totalHalamanAnggota}</b> Jiwa</span>
+          </div>
+          <div>
+            <button type="button" onclick="hapusHalamanAnggota(${no})"
+                    class="px-2.5 py-1 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs transition active:scale-95">
+              <span>Hapus</span>
+              <span>🗑️</span>
+            </button>
+          </div>
         </div>
 
         <input type="hidden" name="nomor_anggota_keluarga" value="${no}" />
 
         <div>
-          <label class="block text-slate-700 font-medium mb-1">Nama Anggota Keluarga *</label>
+          <label class="block text-slate-700 font-semibold mb-1">Nama Anggota Keluarga *</label>
           <input type="text" name="nama_lengkap" required oninput="perbaruiSemuaOpsiIbuKandung()" placeholder="Masukkan Nama Lengkap"
-                 class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg outline-none uppercase font-semibold text-slate-800 focus:border-blue-500" />
+                 class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none uppercase font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500" />
         </div>
 
         <div>
