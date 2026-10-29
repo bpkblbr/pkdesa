@@ -86,14 +86,28 @@
       font-size: 0.92rem;
       line-height: 1.35;
     }
-    /* Header Utama Navbar */
+    /* Pastikan tinggi layar terkunci di viewport browser */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Header Navbar Utama */
     #tampilan_dashboard > header {
       z-index: 50 !important;
     }
 
-    /* Header Form Sticky */
+    /* Sidebar Terkunci Penuh */
+    #adminty_sidebar {
+      position: sticky;
+      top: 4rem;
+      height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+
+    /* Header Form Sticky di bawah Navbar */
     #sub_view_formulir .sticky {
-      z-index: 40 !important;
+      z-index: 30 !important;
     }
   </style>
 </head>
@@ -219,10 +233,10 @@
       </div>
     </header>
 
-    <div class="flex min-h-screen sm:h-[calc(100vh-4rem)] overflow-visible sm:overflow-hidden">
+    <div class="flex h-[calc(100vh-4rem)] overflow-hidden">
       
       <!-- 2. SIDEBAR KIRI TETAP (ADMINTY PERSISTENT SIDEBAR) -->
-      <aside id="adminty_sidebar" class="w-64 h-full bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 shadow-sm overflow-y-auto">
+      <aside id="adminty_sidebar" class="w-64 h-[calc(100vh-4rem)] sticky top-16 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 shadow-sm overflow-y-auto z-30">
         <div class="py-3">
           
           <div class="px-5 py-2">
@@ -327,7 +341,7 @@
       </aside>
 
       <!-- 3. KONTEN AREA KERJA DINAMIS (ADMIN SUB-VIEWS) -->
-      <main class="flex-1 overflow-y-visible sm:overflow-y-auto p-0 sm:p-6 min-w-0">
+      <main class="flex-1 h-[calc(100vh-4rem)] overflow-y-auto p-3 sm:p-6 min-w-0 bg-[#F6F7FB]">
 
         <!-- ========================================================
              SUB-VIEW 1: BERANDA RINGKASAN EKSEKUTIF
@@ -1030,53 +1044,42 @@
         <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
           <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
-            <!-- HEADER HIJAU FORMULIR (DITUTUP SECARA TUNTAS DENGAN </header>) -->
-            <header class="sticky top-0 z-40 shadow-sm select-none">              
-              <!-- Lapisan Atas: Gradasi Hijau -->
-              <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-5 rounded-none sm:rounded-t-2xl space-y-1.5">
-                <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
-                  <button type="button" onclick="kembaliKeDashboard()" 
-                          class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
-                    <span>←</span>
-                    <span>Kembali ke Beranda</span>
-                  </button>
-                </div>
-                
-                <div class="py-0.5 text-center">
-                  <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
-                    FORM PENDATAAN KELUARGA
-                  </h3>
-                </div>              
-                
-                <div class="flex items-center gap-1.5 pt-1 border-t border-white/10 text-xs">
-                  <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
-                  <span id="labelTotalTahap" class="text-[11px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider block text-left">
+            <!-- HEADER FORMULIR RAPI (TANPA TOMBOL KEMBALI) -->
+            <div class="sticky top-0 z-30 shadow-sm select-none">              
+              <!-- Lapisan Atas: Gradasi Hijau Penuh -->
+              <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-5 py-3.5 rounded-none sm:rounded-t-3xl flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                  <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-100">
                     I. IDENTITAS WILAYAH
                   </span>
                 </div>
+                <span class="text-xs font-black uppercase tracking-widest text-white/90">
+                  FORM PENDATAAN KELUARGA
+                </span>
               </div>
 
-              <!-- Lapisan Bawah: Judul Form Putih (Terkunci Diam Tidak Bisa Bergeser) -->
-              <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-xs">
+              <!-- Lapisan Bawah: Bar Judul Sub-Form Putih -->
+              <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-5 py-2.5 flex items-center justify-between shadow-xs">
                 <div>
-                  <h4 id="teksJudulFormTetap" class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
-                  <p id="subTeksJudulFormTetap" class="text-[10px] sm:text-[11px] text-slate-500 hidden"></p>
+                  <h4 id="teksJudulFormTetap" class="text-xs sm:text-sm font-bold text-slate-800">Form Wilayah</h4>
+                  <p id="subTeksJudulFormTetap" class="text-[10px] text-slate-500 hidden"></p>
                 </div>
                 <div id="wadahAksiKananFormTetap"></div>
               </div>
-            </header>
+            </div>
 
             <form id="pendataanForm" class="p-4 sm:p-6 pb-4 sm:pb-6 bg-white text-slate-800 flex-1">
               
               <!-- STEP 1: I. IDENTITAS WILAYAH -->
-              <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white pt-2">                
+              <div id="hal_wilayah" class="halaman-form aktif space-y-5 bg-white pt-3">                
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4 text-xs sm:text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs sm:text-sm">
                   <div>
                     <label class="block text-slate-600 font-semibold mb-1">Provinsi *</label>
                     <p id="label_provinsi" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="provinsi" required onchange="updateFormKabupaten(); sinkronkanLabelWilayah();" 
-                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm shadow-xs">
+                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm">
                       <option value="">-- PILIH PROVINSI --</option>
                     </select>
                     <input type="hidden" id="kode_prov" />
@@ -1085,25 +1088,25 @@
                     <label class="block text-slate-600 font-semibold mb-1">Kabupaten *</label>
                     <p id="label_kabupaten" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="kabupaten" required onchange="updateFormKecamatan(); sinkronkanLabelWilayah();" 
-                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm shadow-xs">
+                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm">
                       <option value="">-- PILIH KABUPATEN --</option>
                     </select>
                     <input type="hidden" id="kode_kab" />
                   </div>
-                </div>
-                    <p class="text-slate-500 font-medium mb-0.5">Kecamatan</p>
+                  <div>
+                    <label class="block text-slate-600 font-semibold mb-1">Kecamatan *</label>
                     <p id="label_kecamatan" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="kecamatan" required onchange="updateFormDesa(); sinkronkanLabelWilayah();" 
-                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-lg p-2 outline-none text-xs sm:text-sm">
+                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm">
                       <option value="">-- PILIH KECAMATAN --</option>
                     </select>
                     <input type="hidden" id="kode_kec" />
                   </div>
                   <div>
-                    <p class="text-slate-500 font-medium mb-0.5">Kelurahan / Desa</p>
+                    <label class="block text-slate-600 font-semibold mb-1">Kelurahan / Desa *</label>
                     <p id="label_desa" class="font-bold text-slate-900 leading-snug hidden"></p>
                     <select id="desa" required onchange="updateFormDusun(); sinkronkanLabelWilayah();" 
-                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-lg p-2 outline-none text-xs sm:text-sm">
+                            class="w-full bg-white font-bold text-slate-900 border border-slate-300 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-xs sm:text-sm">
                       <option value="">-- PILIH DESA --</option>
                     </select>
                     <input type="hidden" id="kode_desa" />
