@@ -9073,6 +9073,7 @@
         const kartuSaatIni = containerAnggota ? containerAnggota.querySelectorAll('.item-anggota-page') : [];
         const jumlahSaatIni = kartuSaatIni.length;
 
+        // Pastikan jumlah form individu persis sejumlah input di Form Wilayah
         if (jumlahSaatIni === 0) {
           document.querySelectorAll('[id="area_anggota_keluarga"]').forEach(c => c.innerHTML = '');
           totalHalamanAnggota = 0;
@@ -9734,30 +9735,65 @@
       perbaruiSemuaOpsiIbuKandung();
 
       const totalHalamanSaatIni = document.querySelectorAll('.item-anggota-page').length;
-
+      
       if (noUrut < totalHalamanSaatIni) {
         bukaHalamanAnggota(noUrut + 1);
         evaluasiAturanOtomatisAnggota(noUrut + 1);
         return;
       }
-
+      
       Swal.fire({
         title: '<div class="text-base sm:text-lg font-black text-slate-800 uppercase">Tambah Data Individu?</div>',
         html: '<p class="text-xs sm:text-sm text-slate-600 font-medium">Apakah Anda ingin menambah anggota keluarga lagi?</p>',
         showCancelButton: true,
-        confirmButtonText: '👤+ Ya, Tambah Anggota',
-        cancelButtonText: 'Tidak, Lanjut ke Blok KB →',
+        confirmButtonText: 'Ya',
+        cancelButtonText: 'Tidak',
         confirmButtonColor: '#10b981',
-        cancelButtonColor: '#0284c7'
+        cancelButtonColor: '#0284c7',
+        reverseButtons: false
       }).then((res) => {
-        if (res.isConfirmed) {
+        if (res.isConfirmed) {          
           tambahHalamanAnggotaBaru();
-          bukaHalamanAnggota(document.querySelectorAll('.item-anggota-page').length);
-        } else {
-          pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
-          indexStepKB = 0;
-          riwayatStepKB = [];
-          tampilkanStepKB();
+          const totalBaru = document.querySelectorAll('.item-anggota-page').length;
+          const inputJml = document.getElementById('jumlah_anggota_input');
+          if (inputJml) inputJml.value = totalBaru;
+          
+          bukaHalamanAnggota(totalBaru);
+        } else {          
+          const totalAnggotaFinal = document.querySelectorAll('.item-anggota-page').length;
+
+          if (totalAnggotaFinal === 1) {            
+            dataNilaiKB.kb_01_melahirkan = 0;
+            dataNilaiKB.kb_01_hidup_laki = 0;
+            dataNilaiKB.kb_01_hidup_perempuan = 0;
+            dataNilaiKB.kb_01_masih_laki = 0;
+            dataNilaiKB.kb_01_masih_perempuan = 0;
+            dataNilaiKB.kb_02_anak_ideal = 0;
+            dataNilaiKB.kb_03_sedang_hamil = '2';
+            dataNilaiKB.kb_04_sedang_kb = '2';
+            dataNilaiKB.kb_05_pernah_kb = '2';
+
+            nilaiJawabanPK['pk_03_2'] = '3';
+            nilaiJawabanPK['pk_03_5'] = '3';
+            nilaiJawabanPK['pk_12_internet_anak'] = '4';
+            nilaiJawabanPK['pk_15'] = '2';
+            nilaiJawabanPK['pk_15_1'] = [];              
+            nilaiJawabanPK['pk_16_1'] = '3';
+            nilaiJawabanPK['pk_16_2'] = '3';
+            nilaiJawabanPK['pk_16_3'] = '3';
+            nilaiJawabanPK['pk_16_4'] = '3';
+            nilaiJawabanPK['pk_24'] = '1';
+
+            indexStepPK = 0;
+            riwayatStepPK = [];
+            pindahHalamanForm('hal_pembangunan', 'IV. BLOK PEMBANGUNAN KELUARGA');
+            tampilkanStepPK();
+          } else {            
+            pindahHalamanForm('hal_kb', 'III. BLOK KELUARGA BERENCANA');
+            indexStepKB = 0;
+            riwayatStepKB = [];
+            tampilkanStepKB();
+          }
         }
       });
     }
