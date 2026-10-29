@@ -165,24 +165,24 @@
   <div id="tampilan_dashboard" class="halaman-tampilan min-h-screen bg-white sm:bg-[#F6F7FB] text-slate-700">
     
     <!-- 1. HEADER UTAMA TETAP (STICKY TOP NAVBAR) -->
-    <header class="bg-gradient-to-r from-[#404E67] via-[#455A64] to-[#2C3E50] text-white shadow-md sticky top-0 z-40">
-      <div class="flex items-center justify-between px-4 sm:px-6 h-16">
+    <header class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white shadow-md sticky top-0 z-50 w-full">
+      <div class="flex items-center justify-between px-3 sm:px-6 h-16 w-full">
         
         <!-- Brand Logo & Toggle Sidebar -->
-        <div class="flex items-center gap-4">
-          <a href="javascript:void(0)" onclick="bukaHalamanAdmin('beranda')" class="flex items-center gap-2.5 hover:opacity-90 transition">
-            <img src="https://raw.githubusercontent.com/bpkblbr/pdptpk/refs/heads/main/Logo3.png" alt="Logo" class="h-9 w-auto object-contain drop-shadow" />
-            <span class="font-black text-sm tracking-widest uppercase text-white truncate">DATA KELUARGA DESA</span>
-          </a>
-          <button type="button" onclick="toggleSidebarAdminty()" class="p-1.5 hover:bg-white/10 rounded-lg transition text-slate-200" title="Toggle Menu">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-3 sm:gap-4">
+          <button type="button" onclick="toggleSidebarAdminty()" class="p-1.5 hover:bg-white/10 rounded-lg transition text-white" title="Toggle Menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
+          <a href="javascript:void(0)" onclick="bukaHalamanAdmin('beranda')" class="flex items-center gap-2 hover:opacity-90 transition">
+            <img src="https://raw.githubusercontent.com/bpkblbr/pdptpk/refs/heads/main/Logo3.png" alt="Logo" class="h-8 sm:h-9 w-auto object-contain drop-shadow" />
+            <span class="font-black text-xs sm:text-sm tracking-wider uppercase text-white truncate">DATA KELUARGA DESA</span>
+          </a>
         </div>
 
         <!-- Profil & Aksi Sesi Kanan -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
           <span id="badgeStatusKoneksi" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500 text-white shadow-sm">
             🟢 Online
           </span>
@@ -190,18 +190,18 @@
             🔄 Sinkronkan
           </button>
           
-          <div class="h-6 w-px bg-white/20 mx-1"></div>
+          <div class="h-6 w-px bg-white/20 mx-0.5 sm:mx-1"></div>
 
           <!-- User Info Mini -->
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-full bg-emerald-400 text-slate-900 font-black text-xs flex items-center justify-center shadow">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-emerald-300 text-emerald-950 font-black text-xs flex items-center justify-center shadow">
               AD
             </div>
             <div class="hidden sm:block text-left leading-tight">
               <span id="userNameDisplay" class="text-xs font-black uppercase text-white block">SUPER ADMINISTRATOR</span>
-              <span id="roleBadge" class="text-[9.5px] font-semibold text-slate-300 uppercase">SUPER ADMIN</span>
+              <span id="roleBadge" class="text-[9.5px] font-semibold text-emerald-100 uppercase">SUPER ADMIN</span>
             </div>
-            <button type="button" onclick="prosesLogout()" title="Keluar Sesi" class="ml-1 p-1.5 bg-rose-500/80 hover:bg-rose-600 active:scale-95 text-white rounded-lg transition text-xs font-bold shadow-sm">
+            <button type="button" onclick="prosesLogout()" title="Keluar Sesi" class="ml-1 p-1.5 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white rounded-lg transition text-xs font-bold shadow-sm">
               🚪
             </button>
           </div>
@@ -1022,17 +1022,9 @@
           <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
             
             <!-- HEADER HIJAU FORMULIR (DITUTUP SECARA TUNTAS DENGAN </header>) -->
-            <header class="sticky top-0 z-40 shadow-sm select-none">              
+            <header class="sticky top-16 z-30 shadow-sm select-none">              
               <!-- Lapisan Atas: Gradasi Hijau -->
-              <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-5 rounded-none sm:rounded-t-2xl space-y-1.5">
-                <div class="flex items-center justify-between pb-1.5 border-b border-white/10">
-                  <button type="button" onclick="kembaliKeDashboard()" 
-                          class="px-3 py-1.5 bg-white/15 hover:bg-white/25 active:scale-95 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm backdrop-blur-sm border border-white/20">
-                    <span>←</span>
-                    <span>Kembali ke Beranda</span>
-                  </button>
-                </div>
-                
+              <div class="bg-gradient-to-r from-emerald-800 to-teal-700 text-white p-3.5 sm:p-4 rounded-none sm:rounded-t-2xl space-y-1">
                 <div class="py-0.5 text-center">
                   <h3 class="text-sm sm:text-base font-black uppercase tracking-wide drop-shadow-sm">
                     FORM PENDATAAN KELUARGA
@@ -1047,7 +1039,7 @@
                 </div>
               </div>
 
-              <!-- Lapisan Bawah: Judul Form Putih (Terkunci Diam Tidak Bisa Bergeser) -->
+              <!-- Lapisan Bawah: Judul Form Putih -->
               <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-4 py-2.5 flex items-center justify-between shadow-xs">
                 <div>
                   <h4 id="teksJudulFormTetap" class="text-sm sm:text-base font-bold text-slate-800">Form Wilayah</h4>
@@ -2198,9 +2190,10 @@
       const sidebar = document.getElementById('adminty_sidebar');
       const headerAdmin = document.querySelector('#tampilan_dashboard header');
       const breadcrumb = document.getElementById('barBreadcrumbAdmin');
-      if (sidebar) sidebar.classList.add('hidden');
-      if (headerAdmin) headerAdmin.classList.add('hidden');
-      if (breadcrumb) breadcrumb.classList.add('hidden');
+      
+      if (sidebar) sidebar.classList.remove('hidden');
+      if (headerAdmin) headerAdmin.classList.remove('hidden');
+      if (breadcrumb) breadcrumb.classList.remove('hidden');
       
       pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
     }
@@ -2497,7 +2490,19 @@
 
     function toggleSidebarAdminty() {
       const sidebar = document.getElementById('adminty_sidebar');
-      if (sidebar) sidebar.classList.toggle('-ml-64');
+      if (!sidebar) return;
+      
+      // Toggle class untuk layar kecil dan besar
+      if (window.innerWidth < 640) {
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('fixed');
+        sidebar.classList.toggle('z-50');
+        sidebar.classList.toggle('top-16');
+        sidebar.classList.toggle('bottom-0');
+        sidebar.classList.toggle('left-0');
+      } else {
+        sidebar.classList.toggle('-ml-64');
+      }
     }
 
     function bukaHalamanAdmin(namaModul) {      
