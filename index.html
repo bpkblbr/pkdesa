@@ -1041,26 +1041,33 @@
         <!-- ========================================================
              SUB-VIEW 6: WIZARD FORMULIR PENDATAAN KELUARGA
              ======================================================== -->
-        <div id="sub_view_formulir" class="sub-view-admin hidden space-y-0 sm:space-y-5">
-          <div class="bg-white shadow-none sm:shadow-xl rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 form-uppercase min-h-screen sm:min-h-0 flex flex-col justify-start">            
-            
-            <!-- HEADER FORMULIR RAPI (TANPA TOMBOL KEMBALI) -->
             <div class="sticky top-0 z-30 shadow-sm select-none">              
               <!-- Lapisan Atas: Gradasi Hijau Penuh -->
-              <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-5 py-3.5 rounded-none sm:rounded-t-3xl flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
-                  <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-100">
-                    I. IDENTITAS WILAYAH
-                  </span>
+              <div class="bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800 text-white px-4 sm:px-5 py-3 rounded-none sm:rounded-t-3xl flex items-center justify-between">
+                
+                <div class="flex items-center gap-3">
+                  <!-- Tombol Kembali: Khusus untuk Akun Pendata / Kader -->
+                  <button type="button" id="btnKembaliFormulir" onclick="kembaliKeDashboard()" 
+                          class="hidden px-3 py-1.5 bg-white/20 hover:bg-white/30 active:scale-95 text-white rounded-xl text-xs font-bold transition items-center gap-1.5 shadow-sm border border-white/20">
+                    <span>←</span>
+                    <span>Kembali</span>
+                  </button>
+
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-pulse"></span>
+                    <span id="labelTotalTahap" class="text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-100">
+                      I. IDENTITAS WILAYAH
+                    </span>
+                  </div>
                 </div>
-                <span class="text-xs font-black uppercase tracking-widest text-white/90">
+
+                <span class="text-xs font-black uppercase tracking-widest text-white/90 hidden sm:inline">
                   FORM PENDATAAN KELUARGA
                 </span>
               </div>
 
               <!-- Lapisan Bawah: Bar Judul Sub-Form Putih -->
-              <div id="barJudulFormTetap" class="bg-white border-b border-slate-200 px-5 py-2.5 flex items-center justify-between shadow-xs">
+              <div id="barJudulFormTetap" class="px-5 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shadow-xs">
                 <div>
                   <h4 id="teksJudulFormTetap" class="text-xs sm:text-sm font-bold text-slate-800">Form Wilayah</h4>
                   <p id="subTeksJudulFormTetap" class="text-[10px] text-slate-500 hidden"></p>
@@ -2214,6 +2221,19 @@
       if (sidebar) sidebar.classList.remove('hidden');
       if (headerAdmin) headerAdmin.classList.remove('hidden');
       if (breadcrumb) breadcrumb.classList.remove('hidden');
+
+      const btnKembali = document.getElementById('btnKembaliFormulir');
+      if (btnKembali) {
+        if (userAktif && userAktif.role === 'USER_DESA') {
+          // Kader / Pendata: TAMPILKAN tombol kembali
+          btnKembali.classList.remove('hidden');
+          btnKembali.classList.add('inline-flex');
+        } else {
+          // Admin: SEMBUNYIKAN tombol kembali (navigasi via sidebar)
+          btnKembali.classList.add('hidden');
+          btnKembali.classList.remove('inline-flex');
+        }
+      }
       
       pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
     }
@@ -5150,6 +5170,17 @@
         
         if (typeof tampilkanStepKB === 'function') tampilkanStepKB();
         if (typeof tampilkanStepPK === 'function') tampilkanStepPK();
+
+        const btnKembali = document.getElementById('btnKembaliFormulir');
+        if (btnKembali) {
+          if (userAktif && userAktif.role === 'USER_DESA') {
+            btnKembali.classList.remove('hidden');
+            btnKembali.classList.add('inline-flex');
+          } else {
+            btnKembali.classList.add('hidden');
+            btnKembali.classList.remove('inline-flex');
+          }
+        }
         
         pindahHalamanForm('hal_wilayah', 'I. IDENTITAS WILAYAH');
 
